@@ -1,0 +1,7 @@
+copied,data,C:\ProgramData\MySQL\MySQL Server 8.0\Data\historical\clean,create temporary version of raw data to modify
+fix paths
+fix pre-headers
+fix headers
+fix columns
+load database
+deleted,C:\ProgramData\MySQL\MySQL Server 8.0\Data\historical\clean,clean up temp folder

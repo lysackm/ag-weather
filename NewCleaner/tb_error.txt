@@ -1,0 +1,22 @@
+Traceback (most recent call last):
+  File "C:\Users\Administrator\Documents\NewCleaner\run.py", line 31, in <module>
+    load_database.run(temp_folder)
+  File "C:\Users\Administrator\Documents\NewCleaner\load_database.py", line 25, in run
+    conn = mysql.connector.connect(
+  File "C:\Users\Administrator\Documents\NewCleaner\venv\lib\site-packages\mysql\connector\__init__.py", line 179, in connect
+    return MySQLConnection(*args, **kwargs)
+  File "C:\Users\Administrator\Documents\NewCleaner\venv\lib\site-packages\mysql\connector\connection.py", line 95, in __init__
+    self.connect(**kwargs)
+  File "C:\Users\Administrator\Documents\NewCleaner\venv\lib\site-packages\mysql\connector\abstracts.py", line 716, in connect
+    self._open_connection()
+  File "C:\Users\Administrator\Documents\NewCleaner\venv\lib\site-packages\mysql\connector\connection.py", line 208, in _open_connection
+    self._do_auth(self._user, self._password,
+  File "C:\Users\Administrator\Documents\NewCleaner\venv\lib\site-packages\mysql\connector\connection.py", line 137, in _do_auth
+    packet = self._protocol.make_auth(
+  File "C:\Users\Administrator\Documents\NewCleaner\venv\lib\site-packages\mysql\connector\protocol.py", line 99, in make_auth
+    packet += self._auth_response(client_flags, username, password,
+  File "C:\Users\Administrator\Documents\NewCleaner\venv\lib\site-packages\mysql\connector\protocol.py", line 58, in _auth_response
+    auth = get_auth_plugin(auth_plugin)(
+  File "C:\Users\Administrator\Documents\NewCleaner\venv\lib\site-packages\mysql\connector\authentication.py", line 190, in get_auth_plugin
+    raise errors.NotSupportedError(
+mysql.connector.errors.NotSupportedError: Authentication plugin 'caching_sha2_password' is not supported

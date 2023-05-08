@@ -1,0 +1,2287 @@
+Station: alexander rate: 15
+Station: alexander rate: 24
+Station: alexander rate: 60
+Station: alonsa rate: 15
+Column: AvgSD: 22
+Start: 2021-02-12 07:00:00,0.0
+End: 2021-02-12 08:15:00,0.0
+Start: 2021-02-15 06:45:00,0.0
+End: 2021-02-15 07:45:00,0.0
+Start: 2021-02-18 03:00:00,0.0
+End: 2021-02-18 04:00:00,0.0
+Start: 2021-02-18 10:45:00,0.0
+End: 2021-02-18 12:00:00,0.0
+Station: alonsa rate: 24
+Station: alonsa rate: 60
+Station: altona rate: 15
+Station: altona rate: 24
+Station: altona rate: 60
+Station: arborg rate: 15
+Column: Air_T: 63
+Start: 2021-02-12 01:30:00,-39.66
+End: 2021-02-12 09:45:00,-39.66
+Start: 2021-02-13 00:00:00,-39.66
+End: 2021-02-13 07:00:00,-39.66
+Column: AvgSD: 5
+Start: 2021-02-19 10:00:00,0.0
+End: 2021-02-19 11:00:00,0.0
+Station: arborg rate: 24
+Column: MinAir_T: 3
+Start: 2021-02-13 00:00:00,-39.66
+End: 2021-02-15 00:00:00,-39.66
+Station: arborg rate: 60
+Column: AvgAir_T: 14
+Start: 2021-02-12 03:00:00,-39.66
+End: 2021-02-12 09:00:00,-39.66
+Start: 2021-02-13 01:00:00,-39.66
+End: 2021-02-13 07:00:00,-39.66
+Column: MaxAir_T: 10
+Start: 2021-02-12 05:00:00,-39.65
+End: 2021-02-12 09:00:00,-39.65
+Start: 2021-02-13 02:00:00,-39.65
+End: 2021-02-13 06:00:00,-39.65
+Column: MinAir_T: 20
+Start: 2021-02-12 01:00:00,-39.66
+End: 2021-02-12 10:00:00,-39.66
+Start: 2021-02-13 00:00:00,-39.66
+End: 2021-02-13 09:00:00,-39.66
+Station: argue rate: 15
+Column: Air_T: 8
+Start: 2021-02-13 06:45:00,-39.66
+End: 2021-02-13 08:30:00,-39.66
+Station: argue rate: 24
+Station: argue rate: 60
+Station: austin rate: 15
+Station: austin rate: 24
+Station: austin rate: 60
+Station: bagot rate: 15
+Station: bagot rate: 24
+Station: bagot rate: 60
+Station: baldur rate: 15
+Column: AvgSD: 5
+Start: 2021-01-26 21:00:00,0.0
+End: 2021-01-26 22:00:00,0.0
+Station: baldur rate: 24
+Station: baldur rate: 60
+Station: beausejour rate: 15
+Column: AvgSD: 5
+Start: 2021-03-04 12:00:00,0.0
+End: 2021-03-04 13:00:00,0.0
+Station: beausejour rate: 24
+Station: beausejour rate: 60
+Column: TBRG_Rain: 5
+Start: 2021-04-13 14:00:00,0.2
+End: 2021-04-13 18:00:00,0.2
+Station: bede rate: 15
+Column: AvgSD: 8
+Start: 2021-01-27 00:30:00,0.0
+End: 2021-01-27 02:15:00,0.0
+Station: bede rate: 24
+Station: bede rate: 60
+Station: birchriver rate: 15
+Station: birchriver rate: 24
+Station: birchriver rate: 60
+Column: AvgWD: 5
+Start: 2021-04-12 23:00:00,14.0
+End: 2021-04-13 03:00:00,14.0
+Station: birtle rate: 15
+Column: Air_T: 8
+Start: 2021-02-13 07:15:00,-39.62
+End: 2021-02-13 09:00:00,-39.62
+Column: AvgWS: 42
+Start: 2021-01-24 05:15:00,0.0
+End: 2021-01-24 09:15:00,0.0
+Start: 2021-01-26 02:45:00,0.0
+End: 2021-01-26 04:30:00,0.0
+Start: 2021-01-26 05:15:00,0.0
+End: 2021-01-26 07:45:00,0.0
+Start: 2021-01-30 12:15:00,0.0
+End: 2021-01-30 13:30:00,0.0
+Column: AvgWD: 31
+Start: 2021-01-24 05:15:00,0.0
+End: 2021-01-24 09:15:00,0.0
+Start: 2021-01-26 02:45:00,0.0
+End: 2021-01-26 04:30:00,0.0
+Start: 2021-01-30 12:15:00,0.0
+End: 2021-01-30 13:30:00,0.0
+Column: AvgSD: 42
+Start: 2021-01-24 05:15:00,0.0
+End: 2021-01-24 09:15:00,0.0
+Start: 2021-01-26 02:45:00,0.0
+End: 2021-01-26 04:30:00,0.0
+Start: 2021-01-26 05:15:00,0.0
+End: 2021-01-26 07:45:00,0.0
+Start: 2021-01-30 12:15:00,0.0
+End: 2021-01-30 13:30:00,0.0
+Column: MaxWS: 31
+Start: 2021-01-24 05:15:00,0.0
+End: 2021-01-24 09:15:00,0.0
+Start: 2021-01-26 02:45:00,0.0
+End: 2021-01-26 04:30:00,0.0
+Start: 2021-01-30 12:15:00,0.0
+End: 2021-01-30 13:30:00,0.0
+Station: birtle rate: 24
+Column: AvgRS_kw: 3
+Start: 2021-02-21 00:00:00,0.121
+End: 2021-02-23 00:00:00,0.121
+Column: TBRG_Rain: 3
+Start: 2021-01-20 00:00:00,0.2
+End: 2021-01-22 00:00:00,0.2
+Station: birtle rate: 60
+Column: WS_10Min: 10
+Start: 2021-01-24 05:00:00,0.0
+End: 2021-01-24 09:00:00,0.0
+Start: 2021-01-26 03:00:00,0.0
+End: 2021-01-26 07:00:00,0.0
+Column: WD_10Min: 5
+Start: 2021-01-24 05:00:00,0.0
+End: 2021-01-24 09:00:00,0.0
+Column: AvgWS: 5
+Start: 2021-01-26 04:00:00,0.0
+End: 2021-01-26 08:00:00,0.0
+Column: WS_2Min: 5
+Start: 2021-01-26 04:00:00,0.0
+End: 2021-01-26 08:00:00,0.0
+Station: boissevain rate: 15
+Column: AvgSD: 5
+Start: 2021-03-31 22:30:00,7.7
+End: 2021-03-31 23:30:00,7.7
+Station: boissevain rate: 24
+Station: boissevain rate: 60
+Station: brunkild rate: 15
+Station: brunkild rate: 24
+Station: brunkild rate: 60
+Station: carberry rate: 15
+Column: AvgWS: 11
+Start: 2021-01-26 22:00:00,0.0
+End: 2021-01-26 23:00:00,0.0
+Start: 2021-01-27 02:15:00,0.0
+End: 2021-01-27 03:30:00,0.0
+Column: AvgWD: 10
+Start: 2021-01-26 22:00:00,0.0
+End: 2021-01-26 23:00:00,0.0
+Start: 2021-01-27 02:30:00,0.0
+End: 2021-01-27 03:30:00,0.0
+Column: AvgSD: 38
+Start: 2021-01-26 21:00:00,0.0
+End: 2021-01-26 23:15:00,0.0
+Start: 2021-01-27 02:15:00,0.0
+End: 2021-01-27 03:30:00,0.0
+Start: 2021-02-17 06:00:00,0.0
+End: 2021-02-17 07:00:00,0.0
+Start: 2021-02-18 01:45:00,0.0
+End: 2021-02-18 02:45:00,0.0
+Start: 2021-03-04 05:45:00,0.0
+End: 2021-03-04 06:45:00,0.0
+Start: 2021-03-18 01:15:00,0.0
+End: 2021-03-18 02:45:00,0.0
+Station: carberry rate: 24
+Station: carberry rate: 60
+Station: carman rate: 15
+Column: AvgSD: 5
+Start: 2021-01-27 07:00:00,0.0
+End: 2021-01-27 08:00:00,0.0
+Station: carman rate: 24
+Station: carman rate: 60
+Station: cartwright rate: 15
+Station: cartwright rate: 24
+Station: cartwright rate: 60
+Station: clearwater rate: 15
+Column: RH: 356
+Start: 2021-01-29 21:00:00,99.8
+End: 2021-01-31 03:30:00,99.8
+Start: 2021-02-01 02:15:00,99.8
+End: 2021-02-03 12:15:00,99.8
+Column: AvgWS: 60
+Start: 2021-01-30 12:45:00,0.0
+End: 2021-01-31 03:30:00,0.0
+Column: AvgWD: 60
+Start: 2021-01-30 12:45:00,0.0
+End: 2021-01-31 03:30:00,0.0
+Column: AvgSD: 60
+Start: 2021-01-30 12:45:00,0.0
+End: 2021-01-31 03:30:00,0.0
+Column: MaxWS: 60
+Start: 2021-01-30 12:45:00,0.0
+End: 2021-01-31 03:30:00,0.0
+Station: clearwater rate: 24
+Station: clearwater rate: 60
+Column: RH: 89
+Start: 2021-01-29 21:00:00,99.8
+End: 2021-01-31 03:00:00,99.8
+Start: 2021-02-01 03:00:00,99.8
+End: 2021-02-03 12:00:00,99.8
+Column: AvgRH: 89
+Start: 2021-01-29 21:00:00,99.8
+End: 2021-01-31 03:00:00,99.8
+Start: 2021-02-01 03:00:00,99.8
+End: 2021-02-03 12:00:00,99.8
+Column: WS_10Min: 15
+Start: 2021-01-30 13:00:00,0.0
+End: 2021-01-31 03:00:00,0.0
+Column: WD_10Min: 15
+Start: 2021-01-30 13:00:00,0.0
+End: 2021-01-31 03:00:00,0.0
+Column: AvgWS: 14
+Start: 2021-01-30 14:00:00,0.0
+End: 2021-01-31 03:00:00,0.0
+Column: AvgWD: 14
+Start: 2021-01-30 14:00:00,0.0
+End: 2021-01-31 03:00:00,0.0
+Column: AvgSD: 14
+Start: 2021-01-30 14:00:00,0.0
+End: 2021-01-31 03:00:00,0.0
+Column: MaxWS_10: 14
+Start: 2021-01-30 14:00:00,0.0
+End: 2021-01-31 03:00:00,0.0
+Column: MaxWD_10: 14
+Start: 2021-01-30 14:00:00,0.0
+End: 2021-01-31 03:00:00,0.0
+Column: MaxWS: 14
+Start: 2021-01-30 14:00:00,0.0
+End: 2021-01-31 03:00:00,0.0
+Column: Max5WS_10: 14
+Start: 2021-01-30 14:00:00,0.0
+End: 2021-01-31 03:00:00,0.0
+Column: WS_2Min: 14
+Start: 2021-01-30 14:00:00,0.0
+End: 2021-01-31 03:00:00,0.0
+Column: WD_2Min: 14
+Start: 2021-01-30 14:00:00,0.0
+End: 2021-01-31 03:00:00,0.0
+Station: dand rate: 15
+Station: dand rate: 24
+Station: dand rate: 60
+Station: deloraine rate: 15
+Station: deloraine rate: 24
+Station: deloraine rate: 60
+Column: AvgWD: 5
+Start: 2021-01-16 18:00:00,235.0
+End: 2021-01-16 22:00:00,235.0
+Station: dominioncity rate: 15
+Station: dominioncity rate: 24
+Station: dominioncity rate: 60
+Column: Soil_TP20_VMC: 38
+Start: 2021-04-01 11:00:00,21.69
+End: 2021-04-03 00:00:00,21.69
+Station: driftingriver rate: 15
+Column: AvgWS: 6
+Start: 2021-01-30 19:00:00,0.0
+End: 2021-01-30 20:15:00,0.0
+Column: AvgWD: 6
+Start: 2021-01-30 19:00:00,0.0
+End: 2021-01-30 20:15:00,0.0
+Column: AvgSD: 6
+Start: 2021-01-30 19:00:00,0.0
+End: 2021-01-30 20:15:00,0.0
+Column: MaxWS: 6
+Start: 2021-01-30 19:00:00,0.0
+End: 2021-01-30 20:15:00,0.0
+Station: driftingriver rate: 24
+Column: MinAir_T: 3
+Start: 2021-02-07 00:00:00,-39.63
+End: 2021-02-09 00:00:00,-39.63
+Station: driftingriver rate: 60
+Column: MinAir_T: 5
+Start: 2021-02-07 05:00:00,-39.63
+End: 2021-02-07 09:00:00,-39.63
+Station: dugald rate: 15
+Station: dugald rate: 24
+Station: dugald rate: 60
+Column: WD_10Min: 6
+Start: 2021-04-13 07:00:00,4.0
+End: 2021-04-13 12:00:00,4.0
+Station: eden rate: 15
+Station: eden rate: 24
+Column: MaxRS_kw: 3
+Start: 2021-02-17 00:00:00,0.501
+End: 2021-02-19 00:00:00,0.501
+Station: eden rate: 60
+Column: Press_hPa: 25
+Start: 2021-02-17 21:00:00,1023.0
+End: 2021-02-18 21:00:00,1023.0
+Station: elie rate: 15
+Column: AvgWS: 6
+Start: 2021-01-27 04:30:00,0.0
+End: 2021-01-27 05:45:00,0.0
+Column: AvgWD: 6
+Start: 2021-01-27 04:30:00,0.0
+End: 2021-01-27 05:45:00,0.0
+Column: AvgSD: 6
+Start: 2021-01-27 04:30:00,0.0
+End: 2021-01-27 05:45:00,0.0
+Column: MaxWS: 6
+Start: 2021-01-27 04:30:00,0.0
+End: 2021-01-27 05:45:00,0.0
+Station: elie rate: 24
+Station: elie rate: 60
+Column: Max5WD_10: 5
+Start: 2021-04-12 08:00:00,351.0
+End: 2021-04-12 12:00:00,351.0
+Station: elma rate: 15
+Column: AvgWS: 6
+Start: 2021-01-27 00:00:00,0.0
+End: 2021-01-27 01:15:00,0.0
+Column: AvgWD: 6
+Start: 2021-01-27 00:00:00,0.0
+End: 2021-01-27 01:15:00,0.0
+Column: AvgSD: 13
+Start: 2021-01-27 00:00:00,0.0
+End: 2021-01-27 01:15:00,0.0
+Start: 2021-02-03 22:00:00,0.0
+End: 2021-02-03 23:30:00,0.0
+Column: MaxWS: 6
+Start: 2021-01-27 00:00:00,0.0
+End: 2021-01-27 01:15:00,0.0
+Station: elma rate: 24
+Column: MinAir_T: 3
+Start: 2021-02-13 00:00:00,-39.93
+End: 2021-02-15 00:00:00,-39.93
+Station: elma rate: 60
+Column: MinAir_T: 7
+Start: 2021-02-12 03:00:00,-39.93
+End: 2021-02-12 09:00:00,-39.93
+Column: Soil_TP20_TempC: 60
+Start: 2021-01-30 11:00:00,1.84
+End: 2021-01-31 12:00:00,1.84
+Start: 2021-02-02 17:00:00,1.84
+End: 2021-02-04 02:00:00,1.84
+Station: elmcreek rate: 15
+Column: AvgWS: 6
+Start: 2021-01-30 17:45:00,0.0
+End: 2021-01-30 19:00:00,0.0
+Column: AvgWD: 6
+Start: 2021-01-30 17:45:00,0.0
+End: 2021-01-30 19:00:00,0.0
+Column: AvgSD: 13
+Start: 2021-01-27 05:15:00,0.0
+End: 2021-01-27 06:45:00,0.0
+Start: 2021-01-30 17:45:00,0.0
+End: 2021-01-30 19:00:00,0.0
+Column: MaxWS: 6
+Start: 2021-01-30 17:45:00,0.0
+End: 2021-01-30 19:00:00,0.0
+Station: elmcreek rate: 24
+Station: elmcreek rate: 60
+Station: eriksdale rate: 15
+Station: eriksdale rate: 24
+Station: eriksdale rate: 60
+Station: ethelbert rate: 15
+Column: AvgSD: 5
+Start: 2021-02-12 05:45:00,0.0
+End: 2021-02-12 06:45:00,0.0
+Station: ethelbert rate: 24
+Station: ethelbert rate: 60
+Station: findlay rate: 15
+Station: findlay rate: 24
+Station: findlay rate: 60
+Station: fisherton rate: 15
+Column: Air_T: 39
+Start: 2021-02-12 05:30:00,-39.66
+End: 2021-02-12 09:30:00,-39.66
+Start: 2021-02-13 01:00:00,-39.66
+End: 2021-02-13 02:45:00,-39.66
+Start: 2021-02-13 03:15:00,-39.66
+End: 2021-02-13 06:30:00,-39.66
+Column: AvgWS: 27
+Start: 2021-03-10 03:15:00,0.02
+End: 2021-03-10 09:45:00,0.02
+Column: MaxWS: 25
+Start: 2021-03-10 03:15:00,0.03
+End: 2021-03-10 06:15:00,0.03
+Start: 2021-03-10 06:45:00,0.03
+End: 2021-03-10 09:30:00,0.03
+Station: fisherton rate: 24
+Station: fisherton rate: 60
+Column: MinAir_T: 5
+Start: 2021-02-12 04:00:00,-39.66
+End: 2021-02-12 08:00:00,-39.66
+Column: AvgWS: 6
+Start: 2021-03-10 04:00:00,0.02
+End: 2021-03-10 09:00:00,0.02
+Column: MaxWS_10: 5
+Start: 2021-03-10 05:00:00,0.02
+End: 2021-03-10 09:00:00,0.02
+Column: MaxWS: 6
+Start: 2021-03-10 04:00:00,0.03
+End: 2021-03-10 09:00:00,0.03
+Column: Max5WS_10: 6
+Start: 2021-03-10 04:00:00,0.03
+End: 2021-03-10 09:00:00,0.03
+Station: forkriver rate: 15
+Column: AvgWS: 5
+Start: 2021-04-04 08:00:00,0.0
+End: 2021-04-04 09:00:00,0.0
+Column: AvgWD: 5
+Start: 2021-04-04 08:00:00,0.0
+End: 2021-04-04 09:00:00,0.0
+Column: AvgSD: 8
+Start: 2021-04-04 07:15:00,0.0
+End: 2021-04-04 09:00:00,0.0
+Column: MaxWS: 5
+Start: 2021-04-04 08:00:00,0.0
+End: 2021-04-04 09:00:00,0.0
+Station: forkriver rate: 24
+Station: forkriver rate: 60
+Column: AvgAir_T: 7
+Start: 2021-02-13 03:00:00,-39.64
+End: 2021-02-13 09:00:00,-39.64
+Column: MinAir_T: 6
+Start: 2021-02-13 03:00:00,-39.66
+End: 2021-02-13 08:00:00,-39.66
+Station: forrest rate: 15
+Column: AvgWS: 16
+Start: 2021-01-30 15:45:00,0.0
+End: 2021-01-30 18:15:00,0.0
+Start: 2021-01-30 20:15:00,0.0
+End: 2021-01-30 21:15:00,0.0
+Column: AvgWD: 21
+Start: 2021-01-30 15:45:00,0.0
+End: 2021-01-30 18:15:00,0.0
+Start: 2021-01-30 19:00:00,220.1
+End: 2021-01-30 20:00:00,220.1
+Start: 2021-01-30 20:15:00,0.0
+End: 2021-01-30 21:15:00,0.0
+Column: AvgSD: 23
+Start: 2021-01-30 15:45:00,0.0
+End: 2021-01-30 21:15:00,0.0
+Column: MaxWS: 16
+Start: 2021-01-30 15:45:00,0.0
+End: 2021-01-30 18:15:00,0.0
+Start: 2021-01-30 20:15:00,0.0
+End: 2021-01-30 21:15:00,0.0
+Station: forrest rate: 24
+Station: forrest rate: 60
+Column: RH: 66
+Start: 2021-01-30 01:00:00,99.9
+End: 2021-01-31 02:00:00,99.9
+Start: 2021-01-31 23:00:00,99.9
+End: 2021-02-02 14:00:00,99.9
+Column: AvgRH: 70
+Start: 2021-01-29 21:00:00,99.9
+End: 2021-01-31 02:00:00,99.9
+Start: 2021-01-31 23:00:00,99.9
+End: 2021-02-02 14:00:00,99.9
+Station: gardenton rate: 15
+Column: AvgWS: 5
+Start: 2021-01-27 07:00:00,0.0
+End: 2021-01-27 08:00:00,0.0
+Column: AvgWD: 5
+Start: 2021-01-27 07:00:00,0.0
+End: 2021-01-27 08:00:00,0.0
+Column: AvgSD: 6
+Start: 2021-01-27 07:00:00,0.0
+End: 2021-01-27 08:15:00,0.0
+Column: MaxWS: 5
+Start: 2021-01-27 07:00:00,0.0
+End: 2021-01-27 08:00:00,0.0
+Station: gardenton rate: 24
+Station: gardenton rate: 60
+Station: gladstone rate: 15
+Station: gladstone rate: 24
+Station: gladstone rate: 60
+Station: glenboro rate: 15
+Station: glenboro rate: 24
+Station: glenboro rate: 60
+Station: grandview rate: 15
+Column: AvgWS: 7
+Start: 2021-01-22 22:00:00,0.0
+End: 2021-01-22 23:30:00,0.0
+Column: AvgWD: 6
+Start: 2021-01-22 22:15:00,0.0
+End: 2021-01-22 23:30:00,0.0
+Column: AvgSD: 10
+Start: 2021-01-22 21:15:00,0.0
+End: 2021-01-22 23:30:00,0.0
+Column: MaxWS: 6
+Start: 2021-01-22 22:15:00,0.0
+End: 2021-01-22 23:30:00,0.0
+Station: grandview rate: 24
+Station: grandview rate: 60
+Column: MinAir_T: 5
+Start: 2021-02-13 05:00:00,-39.92
+End: 2021-02-13 09:00:00,-39.92
+Station: hamiota rate: 15
+Column: Air_T: 15
+Start: 2021-02-13 03:15:00,-39.61
+End: 2021-02-13 06:45:00,-39.61
+Column: AvgWS: 5
+Start: 2021-02-15 07:30:00,0.0
+End: 2021-02-15 08:30:00,0.0
+Column: AvgWD: 5
+Start: 2021-02-15 07:30:00,0.0
+End: 2021-02-15 08:30:00,0.0
+Column: AvgSD: 29
+Start: 2021-02-15 05:45:00,0.0
+End: 2021-02-15 06:45:00,0.0
+Start: 2021-02-15 07:15:00,0.0
+End: 2021-02-15 08:30:00,0.0
+Start: 2021-03-10 18:30:00,0.0
+End: 2021-03-10 19:45:00,0.0
+Start: 2021-03-16 07:00:00,0.0
+End: 2021-03-16 08:30:00,0.0
+Start: 2021-04-06 05:15:00,0.0
+End: 2021-04-06 06:15:00,0.0
+Column: MaxWS: 5
+Start: 2021-02-15 07:30:00,0.0
+End: 2021-02-15 08:30:00,0.0
+Station: hamiota rate: 24
+Station: hamiota rate: 60
+Column: MinAir_T: 7
+Start: 2021-02-13 02:00:00,-39.62
+End: 2021-02-13 08:00:00,-39.62
+Station: holland rate: 15
+Station: holland rate: 24
+Station: holland rate: 60
+Station: inglis rate: 15
+Station: inglis rate: 24
+Station: inglis rate: 60
+Column: Air_T: 5
+Start: 2021-02-13 02:00:00,-39.63
+End: 2021-02-13 06:00:00,-39.63
+Column: AvgAir_T: 8
+Start: 2021-02-13 02:00:00,-39.62
+End: 2021-02-13 09:00:00,-39.62
+Column: MaxAir_T: 7
+Start: 2021-02-13 02:00:00,-39.62
+End: 2021-02-13 08:00:00,-39.62
+Column: MinAir_T: 21
+Start: 2021-02-11 05:00:00,-39.63
+End: 2021-02-11 10:00:00,-39.63
+Start: 2021-02-12 22:00:00,-39.63
+End: 2021-02-13 04:00:00,-39.63
+Start: 2021-02-14 02:00:00,-39.63
+End: 2021-02-14 09:00:00,-39.63
+Station: inwood rate: 15
+Column: AvgSD: 21
+Start: 2021-01-26 22:45:00,0.0
+End: 2021-01-26 23:45:00,0.0
+Start: 2021-01-27 01:00:00,0.0
+End: 2021-01-27 04:45:00,0.0
+Station: inwood rate: 24
+Station: inwood rate: 60
+Column: Air_T: 10
+Start: 2021-02-12 23:00:00,-39.59
+End: 2021-02-13 08:00:00,-39.59
+Column: AvgAir_T: 8
+Start: 2021-02-13 01:00:00,-39.62
+End: 2021-02-13 08:00:00,-39.62
+Column: MaxAir_T: 8
+Start: 2021-02-13 01:00:00,-39.59
+End: 2021-02-13 08:00:00,-39.59
+Column: MinAir_T: 8
+Start: 2021-02-13 02:00:00,-39.63
+End: 2021-02-13 09:00:00,-39.63
+Station: kane rate: 15
+Column: AvgSD: 11
+Start: 2021-01-27 07:15:00,0.0
+End: 2021-01-27 08:15:00,0.0
+Start: 2021-01-27 08:45:00,0.0
+End: 2021-01-27 10:00:00,0.0
+Station: kane rate: 24
+Station: kane rate: 60
+Station: keld rate: 15
+Column: Air_T: 20
+Start: 2021-02-13 01:30:00,-39.59
+End: 2021-02-13 06:15:00,-39.59
+Column: AvgWS: 19
+Start: 2021-01-30 03:45:00,0.0
+End: 2021-01-30 04:45:00,0.0
+Start: 2021-02-12 18:00:00,0.0
+End: 2021-02-12 19:00:00,0.0
+Start: 2021-02-15 15:45:00,0.0
+End: 2021-02-15 17:45:00,0.0
+Column: AvgWD: 17
+Start: 2021-01-30 03:45:00,0.0
+End: 2021-01-30 04:45:00,0.0
+Start: 2021-02-12 18:00:00,0.0
+End: 2021-02-12 19:00:00,0.0
+Start: 2021-02-15 16:15:00,0.0
+End: 2021-02-15 17:45:00,0.0
+Column: AvgSD: 38
+Start: 2021-01-24 15:30:00,0.0
+End: 2021-01-24 16:30:00,0.0
+Start: 2021-01-30 03:30:00,0.0
+End: 2021-01-30 05:00:00,0.0
+Start: 2021-01-31 11:45:00,0.0
+End: 2021-01-31 12:45:00,0.0
+Start: 2021-02-12 17:45:00,0.0
+End: 2021-02-12 19:00:00,0.0
+Start: 2021-02-15 15:45:00,0.0
+End: 2021-02-15 17:45:00,0.0
+Start: 2021-03-03 20:45:00,0.0
+End: 2021-03-03 22:00:00,0.0
+Column: MaxWS: 17
+Start: 2021-01-30 03:45:00,0.0
+End: 2021-01-30 04:45:00,0.0
+Start: 2021-02-12 18:00:00,0.0
+End: 2021-02-12 19:00:00,0.0
+Start: 2021-02-15 16:15:00,0.0
+End: 2021-02-15 17:45:00,0.0
+Station: keld rate: 24
+Column: AvgRS_kw: 3
+Start: 2021-02-08 00:00:00,0.095
+End: 2021-02-10 00:00:00,0.095
+Column: MaxRS_kw: 3
+Start: 2021-02-12 00:00:00,0.416
+End: 2021-02-14 00:00:00,0.416
+Station: keld rate: 60
+Column: Air_T: 6
+Start: 2021-02-13 01:00:00,-39.59
+End: 2021-02-13 06:00:00,-39.59
+Column: MinAir_T: 10
+Start: 2021-02-13 01:00:00,-39.59
+End: 2021-02-13 10:00:00,-39.59
+Column: Soil_TP20_TempC: 30
+Start: 2021-03-25 23:00:00,1.25
+End: 2021-03-27 04:00:00,1.25
+Station: kenton rate: 15
+Column: AvgWS: 5
+Start: 2021-01-26 10:45:00,0.0
+End: 2021-01-26 11:45:00,0.0
+Column: AvgSD: 5
+Start: 2021-01-26 10:45:00,0.0
+End: 2021-01-26 11:45:00,0.0
+Station: kenton rate: 24
+Station: kenton rate: 60
+Station: killarney rate: 15
+Column: AvgWS: 21
+Start: 2021-01-30 13:15:00,0.0
+End: 2021-01-30 18:15:00,0.0
+Column: AvgWD: 21
+Start: 2021-01-30 13:15:00,0.0
+End: 2021-01-30 18:15:00,0.0
+Column: AvgSD: 26
+Start: 2021-01-30 13:15:00,0.0
+End: 2021-01-30 18:15:00,0.0
+Start: 2021-03-05 01:30:00,0.0
+End: 2021-03-05 02:30:00,0.0
+Column: MaxWS: 21
+Start: 2021-01-30 13:15:00,0.0
+End: 2021-01-30 18:15:00,0.0
+Station: killarney rate: 24
+Station: killarney rate: 60
+Column: WS_10Min: 5
+Start: 2021-01-30 14:00:00,0.0
+End: 2021-01-30 18:00:00,0.0
+Column: WD_10Min: 5
+Start: 2021-01-30 14:00:00,0.0
+End: 2021-01-30 18:00:00,0.0
+Column: AvgWS: 5
+Start: 2021-01-30 14:00:00,0.0
+End: 2021-01-30 18:00:00,0.0
+Column: AvgWD: 5
+Start: 2021-01-30 14:00:00,0.0
+End: 2021-01-30 18:00:00,0.0
+Column: AvgSD: 5
+Start: 2021-01-30 14:00:00,0.0
+End: 2021-01-30 18:00:00,0.0
+Column: MaxWS: 5
+Start: 2021-01-30 14:00:00,0.0
+End: 2021-01-30 18:00:00,0.0
+Column: Max5WS_10: 5
+Start: 2021-01-30 14:00:00,0.0
+End: 2021-01-30 18:00:00,0.0
+Column: WS_2Min: 6
+Start: 2021-01-30 13:00:00,0.0
+End: 2021-01-30 18:00:00,0.0
+Column: WD_2Min: 6
+Start: 2021-01-30 13:00:00,0.0
+End: 2021-01-30 18:00:00,0.0
+Station: kola rate: 15
+Station: kola rate: 24
+Station: kola rate: 60
+Station: lacdubonnet rate: 15
+Column: AvgSD: 38
+Start: 2021-01-27 11:45:00,0.0
+End: 2021-01-27 12:45:00,0.0
+Start: 2021-02-01 11:00:00,0.0
+End: 2021-02-01 12:00:00,0.0
+Start: 2021-02-18 19:15:00,0.0
+End: 2021-02-18 20:45:00,0.0
+Start: 2021-03-05 06:00:00,0.0
+End: 2021-03-05 07:00:00,0.0
+Start: 2021-03-18 06:00:00,0.0
+End: 2021-03-18 08:30:00,0.0
+Start: 2021-03-26 08:45:00,6.8
+End: 2021-03-26 09:45:00,6.8
+Station: lacdubonnet rate: 24
+Station: lacdubonnet rate: 60
+Station: lakeaudy rate: 15
+Column: AvgWS: 62
+Start: 2021-01-24 22:45:00,0.0
+End: 2021-01-24 23:45:00,0.0
+Start: 2021-01-26 07:30:00,0.0
+End: 2021-01-26 09:00:00,0.0
+Start: 2021-01-27 07:00:00,0.0
+End: 2021-01-27 08:15:00,0.0
+Start: 2021-01-30 11:45:00,0.0
+End: 2021-01-30 15:15:00,0.0
+Start: 2021-01-31 00:00:00,0.0
+End: 2021-01-31 01:15:00,0.0
+Start: 2021-02-13 04:30:00,0.0
+End: 2021-02-13 05:30:00,0.0
+Start: 2021-02-14 06:15:00,0.0
+End: 2021-02-14 07:15:00,0.0
+Start: 2021-02-17 03:00:00,0.0
+End: 2021-02-17 04:45:00,0.0
+Start: 2021-03-22 04:00:00,0.0
+End: 2021-03-22 05:00:00,0.0
+Column: AvgWD: 56
+Start: 2021-01-16 17:00:00,206.2
+End: 2021-01-16 18:45:00,206.2
+Start: 2021-01-26 07:30:00,0.0
+End: 2021-01-26 09:00:00,0.0
+Start: 2021-01-27 07:15:00,0.0
+End: 2021-01-27 08:15:00,0.0
+Start: 2021-01-30 11:45:00,0.0
+End: 2021-01-30 15:15:00,0.0
+Start: 2021-01-31 00:00:00,0.0
+End: 2021-01-31 01:15:00,0.0
+Start: 2021-02-13 04:30:00,0.0
+End: 2021-02-13 05:30:00,0.0
+Start: 2021-02-17 03:45:00,0.0
+End: 2021-02-17 04:45:00,0.0
+Start: 2021-04-04 04:30:00,257.3
+End: 2021-04-04 05:30:00,257.3
+Column: AvgSD: 199
+Start: 2021-01-16 15:15:00,0.0
+End: 2021-01-16 18:45:00,0.0
+Start: 2021-01-24 22:45:00,0.0
+End: 2021-01-25 00:30:00,0.0
+Start: 2021-01-26 07:30:00,0.0
+End: 2021-01-26 09:00:00,0.0
+Start: 2021-01-27 03:45:00,0.0
+End: 2021-01-27 05:30:00,0.0
+Start: 2021-01-27 07:00:00,0.0
+End: 2021-01-27 08:15:00,0.0
+Start: 2021-01-30 11:45:00,0.0
+End: 2021-01-30 15:15:00,0.0
+Start: 2021-01-31 00:00:00,0.0
+End: 2021-01-31 01:15:00,0.0
+Start: 2021-02-11 03:30:00,0.0
+End: 2021-02-11 04:30:00,0.0
+Start: 2021-02-11 05:45:00,0.0
+End: 2021-02-11 06:45:00,0.0
+Start: 2021-02-13 02:45:00,0.0
+End: 2021-02-13 05:30:00,0.0
+Start: 2021-02-14 06:15:00,0.0
+End: 2021-02-14 07:15:00,0.0
+Start: 2021-02-15 21:00:00,0.0
+End: 2021-02-15 22:15:00,0.0
+Start: 2021-02-16 00:00:00,0.0
+End: 2021-02-16 04:15:00,0.0
+Start: 2021-02-16 05:00:00,0.0
+End: 2021-02-16 06:15:00,0.0
+Start: 2021-02-16 08:15:00,0.0
+End: 2021-02-16 09:45:00,0.0
+Start: 2021-02-17 02:45:00,0.0
+End: 2021-02-17 10:15:00,0.0
+Start: 2021-03-10 08:15:00,0.0
+End: 2021-03-10 09:15:00,0.0
+Start: 2021-03-22 04:00:00,0.0
+End: 2021-03-22 05:15:00,0.0
+Start: 2021-03-31 06:30:00,0.0
+End: 2021-03-31 08:15:00,0.0
+Start: 2021-04-04 04:30:00,0.0
+End: 2021-04-04 07:15:00,0.0
+Start: 2021-04-10 05:15:00,0.0
+End: 2021-04-10 07:00:00,0.0
+Column: MaxWS: 43
+Start: 2021-01-26 07:30:00,0.0
+End: 2021-01-26 09:00:00,0.0
+Start: 2021-01-27 07:15:00,0.0
+End: 2021-01-27 08:15:00,0.0
+Start: 2021-01-30 11:45:00,0.0
+End: 2021-01-30 15:15:00,0.0
+Start: 2021-01-31 00:00:00,0.0
+End: 2021-01-31 01:15:00,0.0
+Start: 2021-02-13 04:30:00,0.0
+End: 2021-02-13 05:30:00,0.0
+Start: 2021-02-17 03:45:00,0.0
+End: 2021-02-17 04:45:00,0.0
+Station: lakeaudy rate: 24
+Station: lakeaudy rate: 60
+Column: AvgWD: 13
+Start: 2021-02-16 01:00:00,286.0
+End: 2021-02-16 06:00:00,286.0
+Start: 2021-02-17 04:00:00,237.0
+End: 2021-02-17 10:00:00,237.0
+Column: AvgSD: 7
+Start: 2021-02-17 04:00:00,0.0
+End: 2021-02-17 10:00:00,0.0
+Column: MaxWD: 13
+Start: 2021-02-16 01:00:00,286.0
+End: 2021-02-16 06:00:00,286.0
+Start: 2021-02-17 04:00:00,237.0
+End: 2021-02-17 10:00:00,237.0
+Column: Max5WD_10: 12
+Start: 2021-02-16 01:00:00,286.0
+End: 2021-02-16 06:00:00,286.0
+Start: 2021-02-17 04:00:00,237.0
+End: 2021-02-17 09:00:00,237.0
+Column: WS_2Min: 5
+Start: 2021-01-26 02:00:00,0.0
+End: 2021-01-26 06:00:00,0.0
+Station: lakefrancis rate: 15
+Column: AvgWD: 5
+Start: 2021-03-26 21:45:00,89.4
+End: 2021-03-26 22:45:00,89.4
+Column: AvgSD: 11
+Start: 2021-01-27 01:00:00,0.0
+End: 2021-01-27 02:15:00,0.0
+Start: 2021-02-01 03:00:00,0.0
+End: 2021-02-01 04:00:00,0.0
+Station: lakefrancis rate: 24
+Station: lakefrancis rate: 60
+Station: lakeland rate: 15
+Column: AvgSD: 5
+Start: 2021-01-26 18:30:00,0.0
+End: 2021-01-26 19:30:00,0.0
+Station: lakeland rate: 24
+Station: lakeland rate: 60
+Column: AvgWD: 5
+Start: 2021-04-10 13:00:00,83.0
+End: 2021-04-10 17:00:00,83.0
+Station: laurier rate: 15
+Station: laurier rate: 24
+Station: laurier rate: 60
+Station: manitou rate: 15
+Station: manitou rate: 24
+Station: manitou rate: 60
+Station: marchand rate: 15
+Column: AvgSD: 13
+Start: 2021-01-26 22:45:00,0.0
+End: 2021-01-26 23:45:00,0.0
+Start: 2021-01-27 07:30:00,0.0
+End: 2021-01-27 09:15:00,0.0
+Station: marchand rate: 24
+Station: marchand rate: 60
+Station: mcauley rate: 15
+Station: mcauley rate: 24
+Station: mcauley rate: 60
+Station: menisino rate: 15
+Column: Air_T: 9
+Start: 2021-04-12 07:30:00,-0.13
+End: 2021-04-12 09:30:00,-0.13
+Column: AvgWS: 5
+Start: 2021-03-16 03:45:00,0.0
+End: 2021-03-16 04:45:00,0.0
+Column: AvgWD: 90
+Start: 2021-01-22 00:30:00,228.6
+End: 2021-01-22 04:15:00,228.6
+Start: 2021-01-22 04:30:00,228.5
+End: 2021-01-22 05:30:00,228.5
+Start: 2021-01-22 06:00:00,228.5
+End: 2021-01-22 07:45:00,228.5
+Start: 2021-01-22 08:00:00,228.4
+End: 2021-01-22 09:15:00,228.4
+Start: 2021-01-22 19:30:00,227.0
+End: 2021-01-22 20:30:00,227.0
+Start: 2021-01-22 20:45:00,226.9
+End: 2021-01-22 23:00:00,226.9
+Start: 2021-01-23 00:00:00,226.7
+End: 2021-01-23 01:30:00,226.7
+Start: 2021-01-23 01:45:00,226.6
+End: 2021-01-23 07:15:00,226.6
+Start: 2021-01-23 09:15:00,226.1
+End: 2021-01-23 10:15:00,226.1
+Start: 2021-03-16 03:45:00,0.0
+End: 2021-03-16 04:45:00,0.0
+Column: AvgSD: 125
+Start: 2021-01-21 23:45:00,0.0
+End: 2021-01-22 09:45:00,0.0
+Start: 2021-01-22 18:45:00,0.0
+End: 2021-01-23 10:45:00,0.0
+Start: 2021-03-04 22:45:00,0.0
+End: 2021-03-04 23:45:00,0.0
+Start: 2021-03-16 03:00:00,0.0
+End: 2021-03-16 05:00:00,0.0
+Start: 2021-03-22 07:30:00,0.0
+End: 2021-03-22 08:30:00,0.0
+Column: MaxWS: 5
+Start: 2021-03-16 03:45:00,0.0
+End: 2021-03-16 04:45:00,0.0
+Station: menisino rate: 24
+Station: menisino rate: 60
+Column: WD_10Min: 22
+Start: 2021-01-22 00:00:00,229.0
+End: 2021-01-22 07:00:00,229.0
+Start: 2021-01-22 19:00:00,227.0
+End: 2021-01-23 08:00:00,227.0
+Column: AvgWD: 21
+Start: 2021-01-22 01:00:00,229.0
+End: 2021-01-22 08:00:00,229.0
+Start: 2021-01-22 20:00:00,227.0
+End: 2021-01-23 08:00:00,227.0
+Column: MaxWD_10: 13
+Start: 2021-01-22 20:00:00,227.0
+End: 2021-01-23 08:00:00,227.0
+Column: MaxWD: 22
+Start: 2021-01-22 00:00:00,229.0
+End: 2021-01-22 08:00:00,229.0
+Start: 2021-01-22 20:00:00,227.0
+End: 2021-01-23 08:00:00,227.0
+Column: Max5WD_10: 21
+Start: 2021-01-22 00:00:00,229.0
+End: 2021-01-22 07:00:00,229.0
+Start: 2021-01-22 20:00:00,227.0
+End: 2021-01-23 08:00:00,227.0
+Column: WD_2Min: 21
+Start: 2021-01-22 02:00:00,229.0
+End: 2021-01-22 08:00:00,229.0
+Start: 2021-01-22 20:00:00,227.0
+End: 2021-01-23 09:00:00,227.0
+Station: miniota rate: 15
+Column: Air_T: 22
+Start: 2021-02-13 04:00:00,-39.66
+End: 2021-02-13 09:15:00,-39.66
+Column: AvgSD: 5
+Start: 2021-04-06 02:15:00,0.0
+End: 2021-04-06 03:15:00,0.0
+Station: miniota rate: 24
+Station: miniota rate: 60
+Column: AvgAir_T: 5
+Start: 2021-02-13 05:00:00,-39.66
+End: 2021-02-13 09:00:00,-39.66
+Column: MaxAir_T: 5
+Start: 2021-02-13 05:00:00,-39.65
+End: 2021-02-13 09:00:00,-39.65
+Column: MinAir_T: 8
+Start: 2021-02-13 03:00:00,-39.66
+End: 2021-02-13 10:00:00,-39.66
+Station: minitonas rate: 15
+Station: minitonas rate: 24
+Station: minitonas rate: 60
+Station: minnedosa rate: 15
+Column: AvgWS: 42
+Start: 2021-01-30 11:15:00,0.0
+End: 2021-01-30 15:30:00,0.0
+Start: 2021-01-30 18:15:00,0.0
+End: 2021-01-31 00:00:00,0.0
+Column: AvgWD: 42
+Start: 2021-01-30 11:15:00,0.0
+End: 2021-01-30 15:30:00,0.0
+Start: 2021-01-30 18:15:00,0.0
+End: 2021-01-31 00:00:00,0.0
+Column: AvgSD: 42
+Start: 2021-01-30 11:15:00,0.0
+End: 2021-01-30 15:30:00,0.0
+Start: 2021-01-30 18:15:00,0.0
+End: 2021-01-31 00:00:00,0.0
+Column: MaxWS: 42
+Start: 2021-01-30 11:15:00,0.0
+End: 2021-01-30 15:30:00,0.0
+Start: 2021-01-30 18:15:00,0.0
+End: 2021-01-31 00:00:00,0.0
+Station: minnedosa rate: 24
+Station: minnedosa rate: 60
+Column: WS_10Min: 11
+Start: 2021-01-30 11:00:00,0.0
+End: 2021-01-30 15:00:00,0.0
+Start: 2021-01-30 19:00:00,0.0
+End: 2021-01-31 00:00:00,0.0
+Column: WD_10Min: 6
+Start: 2021-01-30 19:00:00,0.0
+End: 2021-01-31 00:00:00,0.0
+Column: AvgWS: 6
+Start: 2021-01-30 19:00:00,0.0
+End: 2021-01-31 00:00:00,0.0
+Column: AvgWD: 6
+Start: 2021-01-30 19:00:00,0.0
+End: 2021-01-31 00:00:00,0.0
+Column: AvgSD: 6
+Start: 2021-01-30 19:00:00,0.0
+End: 2021-01-31 00:00:00,0.0
+Column: MaxWS_10: 5
+Start: 2021-01-30 20:00:00,0.0
+End: 2021-01-31 00:00:00,0.0
+Column: MaxWS: 6
+Start: 2021-01-30 19:00:00,0.0
+End: 2021-01-31 00:00:00,0.0
+Column: Max5WS_10: 6
+Start: 2021-01-30 19:00:00,0.0
+End: 2021-01-31 00:00:00,0.0
+Column: WS_2Min: 6
+Start: 2021-01-30 19:00:00,0.0
+End: 2021-01-31 00:00:00,0.0
+Column: WD_2Min: 6
+Start: 2021-01-30 19:00:00,0.0
+End: 2021-01-31 00:00:00,0.0
+Station: minto rate: 15
+Column: AvgWS: 36
+Start: 2021-01-30 13:45:00,0.0
+End: 2021-01-30 22:30:00,0.0
+Column: AvgWD: 30
+Start: 2021-01-30 13:45:00,0.0
+End: 2021-01-30 19:45:00,0.0
+Start: 2021-01-30 20:30:00,0.0
+End: 2021-01-30 21:30:00,0.0
+Column: AvgSD: 37
+Start: 2021-01-30 13:30:00,0.0
+End: 2021-01-30 19:45:00,0.0
+Start: 2021-01-30 20:15:00,0.0
+End: 2021-01-30 21:30:00,0.0
+Start: 2021-02-17 17:15:00,0.0
+End: 2021-02-17 18:15:00,0.0
+Column: MaxWS: 30
+Start: 2021-01-30 13:45:00,0.0
+End: 2021-01-30 19:45:00,0.0
+Start: 2021-01-30 20:30:00,0.0
+End: 2021-01-30 21:30:00,0.0
+Station: minto rate: 24
+Station: minto rate: 60
+Column: WS_10Min: 9
+Start: 2021-01-30 14:00:00,0.0
+End: 2021-01-30 22:00:00,0.0
+Column: WD_10Min: 6
+Start: 2021-01-30 14:00:00,0.0
+End: 2021-01-30 19:00:00,0.0
+Column: AvgWS: 8
+Start: 2021-01-30 15:00:00,0.0
+End: 2021-01-30 22:00:00,0.0
+Column: AvgWD: 5
+Start: 2021-01-30 15:00:00,0.0
+End: 2021-01-30 19:00:00,0.0
+Column: AvgSD: 5
+Start: 2021-01-30 15:00:00,0.0
+End: 2021-01-30 19:00:00,0.0
+Column: MaxWS_10: 8
+Start: 2021-01-30 15:00:00,0.0
+End: 2021-01-30 22:00:00,0.0
+Column: MaxWS: 5
+Start: 2021-01-30 15:00:00,0.0
+End: 2021-01-30 19:00:00,0.0
+Column: Max5WS_10: 5
+Start: 2021-01-30 15:00:00,0.0
+End: 2021-01-30 19:00:00,0.0
+Column: WS_2Min: 8
+Start: 2021-01-30 15:00:00,0.0
+End: 2021-01-30 22:00:00,0.0
+Column: WD_2Min: 5
+Start: 2021-01-30 15:00:00,0.0
+End: 2021-01-30 19:00:00,0.0
+Station: moosehorn rate: 15
+Station: moosehorn rate: 24
+Station: moosehorn rate: 60
+Station: morris rate: 15
+Station: morris rate: 24
+Station: morris rate: 60
+Column: AvgWD: 5
+Start: 2021-02-02 00:00:00,158.0
+End: 2021-02-02 04:00:00,158.0
+Station: mountainside rate: 15
+Station: mountainside rate: 24
+Station: mountainside rate: 60
+Station: narcisse rate: 15
+Column: AvgSD: 5
+Start: 2021-02-19 04:45:00,0.0
+End: 2021-02-19 05:45:00,0.0
+Station: narcisse rate: 24
+Station: narcisse rate: 60
+Column: RH: 28
+Start: 2021-01-30 06:00:00,99.9
+End: 2021-01-31 09:00:00,99.9
+Column: AvgRH: 28
+Start: 2021-01-30 06:00:00,99.9
+End: 2021-01-31 09:00:00,99.9
+Station: neepawa rate: 15
+Column: AvgWS: 10
+Start: 2021-01-31 07:30:00,0.0
+End: 2021-01-31 09:45:00,0.0
+Column: AvgWD: 10
+Start: 2021-01-31 07:30:00,0.0
+End: 2021-01-31 09:45:00,0.0
+Column: AvgSD: 16
+Start: 2021-01-31 07:30:00,0.0
+End: 2021-01-31 09:45:00,0.0
+Start: 2021-03-04 01:45:00,0.0
+End: 2021-03-04 03:00:00,0.0
+Column: MaxWS: 10
+Start: 2021-01-31 07:30:00,0.0
+End: 2021-01-31 09:45:00,0.0
+Station: neepawa rate: 24
+Station: neepawa rate: 60
+Station: newdale rate: 15
+Column: AvgWS: 8
+Start: 2021-01-30 13:15:00,0.0
+End: 2021-01-30 15:00:00,0.0
+Column: AvgWD: 8
+Start: 2021-01-30 13:15:00,0.0
+End: 2021-01-30 15:00:00,0.0
+Column: AvgSD: 8
+Start: 2021-01-30 13:15:00,0.0
+End: 2021-01-30 15:00:00,0.0
+Column: MaxWS: 8
+Start: 2021-01-30 13:15:00,0.0
+End: 2021-01-30 15:00:00,0.0
+Station: newdale rate: 24
+Station: newdale rate: 60
+Station: ninette rate: 15
+Column: AvgWS: 6
+Start: 2021-01-30 12:30:00,0.0
+End: 2021-01-30 13:45:00,0.0
+Column: AvgWD: 6
+Start: 2021-01-30 12:30:00,0.0
+End: 2021-01-30 13:45:00,0.0
+Column: AvgSD: 6
+Start: 2021-01-30 12:30:00,0.0
+End: 2021-01-30 13:45:00,0.0
+Column: MaxWS: 6
+Start: 2021-01-30 12:30:00,0.0
+End: 2021-01-30 13:45:00,0.0
+Station: ninette rate: 24
+Column: AvgRS_kw: 3
+Start: 2021-02-07 00:00:00,0.111
+End: 2021-02-09 00:00:00,0.111
+Station: ninette rate: 60
+Station: oakburn rate: 15
+Column: Air_T: 22
+Start: 2021-02-08 03:30:00,-39.66
+End: 2021-02-08 08:45:00,-39.66
+Column: AvgSD: 76
+Start: 2021-01-24 16:45:00,0.0
+End: 2021-01-24 17:45:00,0.0
+Start: 2021-01-25 18:15:00,0.0
+End: 2021-01-25 19:30:00,0.0
+Start: 2021-01-26 18:30:00,0.0
+End: 2021-01-26 20:30:00,0.0
+Start: 2021-02-15 09:45:00,0.0
+End: 2021-02-15 11:00:00,0.0
+Start: 2021-02-17 20:00:00,0.0
+End: 2021-02-17 22:15:00,0.0
+Start: 2021-02-17 22:45:00,0.0
+End: 2021-02-18 00:45:00,0.0
+Start: 2021-02-18 01:15:00,0.0
+End: 2021-02-18 02:15:00,0.0
+Start: 2021-03-16 19:15:00,0.0
+End: 2021-03-16 21:15:00,0.0
+Start: 2021-03-22 07:00:00,0.0
+End: 2021-03-22 08:00:00,0.0
+Start: 2021-03-27 00:00:00,0.0
+End: 2021-03-27 01:15:00,0.0
+Start: 2021-03-27 23:15:00,0.0
+End: 2021-03-28 00:30:00,0.0
+Station: oakburn rate: 24
+Station: oakburn rate: 60
+Column: Air_T: 5
+Start: 2021-02-08 04:00:00,-39.66
+End: 2021-02-08 08:00:00,-39.66
+Column: MinAir_T: 19
+Start: 2021-02-07 05:00:00,-39.66
+End: 2021-02-07 09:00:00,-39.66
+Start: 2021-02-08 03:00:00,-39.66
+End: 2021-02-08 09:00:00,-39.66
+Start: 2021-02-11 04:00:00,-39.66
+End: 2021-02-11 10:00:00,-39.66
+Column: Max5WD_10: 5
+Start: 2021-01-26 16:00:00,282.0
+End: 2021-01-26 20:00:00,282.0
+Station: pierson rate: 15
+Station: pierson rate: 24
+Station: pierson rate: 60
+Column: Soil_TP5_VMC: 26
+Start: 2021-04-12 23:00:00,5.17
+End: 2021-04-14 00:00:00,5.17
+Station: pipelake rate: 15
+Station: pipelake rate: 24
+Station: pipelake rate: 60
+Station: plumas rate: 15
+Station: plumas rate: 24
+Station: plumas rate: 60
+Station: poplarfield rate: 15
+Column: AvgSD: 14
+Start: 2021-03-04 07:00:00,0.0
+End: 2021-03-04 08:00:00,0.0
+Start: 2021-03-10 19:45:00,0.0
+End: 2021-03-10 21:45:00,0.0
+Station: poplarfield rate: 24
+Column: MaxRS_kw: 3
+Start: 2021-02-13 00:00:00,0.478
+End: 2021-02-15 00:00:00,0.478
+Station: poplarfield rate: 60
+Station: portage rate: 15
+Column: AvgWS: 5
+Start: 2021-01-30 14:45:00,0.0
+End: 2021-01-30 15:45:00,0.0
+Column: AvgWD: 5
+Start: 2021-01-30 14:45:00,0.0
+End: 2021-01-30 15:45:00,0.0
+Column: AvgSD: 25
+Start: 2021-01-30 14:45:00,0.0
+End: 2021-01-30 15:45:00,0.0
+Start: 2021-02-18 05:00:00,0.0
+End: 2021-02-18 07:15:00,0.0
+Start: 2021-03-25 01:00:00,0.0
+End: 2021-03-25 03:15:00,0.0
+Column: MaxWS: 5
+Start: 2021-01-30 14:45:00,0.0
+End: 2021-01-30 15:45:00,0.0
+Station: portage rate: 24
+Station: portage rate: 60
+Column: RH: 24
+Start: 2021-01-30 06:00:00,99.9
+End: 2021-01-31 05:00:00,99.9
+Column: AvgRH: 24
+Start: 2021-01-30 06:00:00,99.9
+End: 2021-01-31 05:00:00,99.9
+Station: prawda rate: 15
+Column: AvgSD: 69
+Start: 2021-01-25 01:00:00,0.0
+End: 2021-01-25 02:15:00,0.0
+Start: 2021-01-25 04:15:00,0.0
+End: 2021-01-25 05:15:00,0.0
+Start: 2021-01-27 08:00:00,0.0
+End: 2021-01-27 09:00:00,0.0
+Start: 2021-01-30 21:00:00,0.0
+End: 2021-01-30 22:15:00,0.0
+Start: 2021-02-11 21:30:00,0.0
+End: 2021-02-11 22:45:00,0.0
+Start: 2021-02-16 23:30:00,0.0
+End: 2021-02-17 00:30:00,0.0
+Start: 2021-02-17 01:15:00,0.0
+End: 2021-02-17 02:30:00,0.0
+Start: 2021-02-18 22:30:00,0.0
+End: 2021-02-18 23:45:00,0.0
+Start: 2021-03-05 05:00:00,0.0
+End: 2021-03-05 07:00:00,0.0
+Start: 2021-03-18 03:45:00,0.0
+End: 2021-03-18 05:30:00,0.0
+Start: 2021-04-07 01:45:00,0.0
+End: 2021-04-07 03:15:00,0.0
+Station: prawda rate: 24
+Station: prawda rate: 60
+Station: reedycreek rate: 15
+Column: Air_T: 14
+Start: 2021-02-14 05:15:00,-39.66
+End: 2021-02-14 08:30:00,-39.66
+Column: AvgSD: 19
+Start: 2021-02-01 02:30:00,0.0
+End: 2021-02-01 03:30:00,0.0
+Start: 2021-02-19 03:00:00,0.0
+End: 2021-02-19 04:00:00,0.0
+Start: 2021-03-04 04:15:00,0.0
+End: 2021-03-04 06:15:00,0.0
+Station: reedycreek rate: 24
+Station: reedycreek rate: 60
+Column: MinAir_T: 5
+Start: 2021-02-14 05:00:00,-39.66
+End: 2021-02-14 09:00:00,-39.66
+Column: Soil_TP5_VMC: 24
+Start: 2021-04-12 23:00:00,33.9
+End: 2021-04-13 22:00:00,33.9
+Column: Soil_TP20_VMC: 40
+Start: 2021-04-12 12:00:00,33.41
+End: 2021-04-14 03:00:00,33.41
+Station: reston rate: 15
+Station: reston rate: 24
+Station: reston rate: 60
+Station: rivers rate: 15
+Column: AvgWS: 7
+Start: 2021-02-19 09:45:00,0.0
+End: 2021-02-19 11:15:00,0.0
+Column: AvgSD: 12
+Start: 2021-02-19 09:45:00,0.0
+End: 2021-02-19 11:15:00,0.0
+Start: 2021-03-16 07:15:00,0.0
+End: 2021-03-16 08:15:00,0.0
+Station: rivers rate: 24
+Station: rivers rate: 60
+Station: riverton rate: 15
+Column: AvgSD: 15
+Start: 2021-02-12 04:00:00,0.0
+End: 2021-02-12 05:00:00,0.0
+Start: 2021-03-03 00:00:00,0.0
+End: 2021-03-03 01:00:00,0.0
+Start: 2021-03-05 16:30:00,0.0
+End: 2021-03-05 17:30:00,0.0
+Station: riverton rate: 24
+Station: riverton rate: 60
+Column: AvgWD: 5
+Start: 2021-04-13 05:00:00,17.0
+End: 2021-04-13 09:00:00,17.0
+Station: rorketon rate: 15
+Column: Air_T: 10
+Start: 2021-02-13 00:45:00,-39.62
+End: 2021-02-13 03:00:00,-39.62
+Column: AvgWS: 5
+Start: 2021-01-31 21:00:00,0.0
+End: 2021-01-31 22:00:00,0.0
+Column: AvgWD: 5
+Start: 2021-01-31 21:00:00,0.0
+End: 2021-01-31 22:00:00,0.0
+Column: AvgSD: 61
+Start: 2021-01-26 20:45:00,0.0
+End: 2021-01-26 21:45:00,0.0
+Start: 2021-01-27 06:15:00,0.0
+End: 2021-01-27 08:15:00,0.0
+Start: 2021-01-31 20:45:00,0.0
+End: 2021-01-31 22:15:00,0.0
+Start: 2021-01-31 22:45:00,0.0
+End: 2021-02-01 00:00:00,0.0
+Start: 2021-02-07 11:15:00,0.0
+End: 2021-02-07 12:15:00,0.0
+Start: 2021-02-16 00:00:00,0.0
+End: 2021-02-16 01:45:00,0.0
+Start: 2021-02-17 21:45:00,0.0
+End: 2021-02-17 23:00:00,0.0
+Start: 2021-03-04 04:30:00,0.0
+End: 2021-03-04 05:30:00,0.0
+Start: 2021-03-05 06:45:00,0.0
+End: 2021-03-05 09:00:00,0.0
+Column: MaxWS: 5
+Start: 2021-01-31 21:00:00,0.0
+End: 2021-01-31 22:00:00,0.0
+Station: rorketon rate: 24
+Station: rorketon rate: 60
+Column: Air_T: 6
+Start: 2021-02-13 02:00:00,-39.6
+End: 2021-02-13 07:00:00,-39.6
+Column: AvgAir_T: 6
+Start: 2021-02-13 02:00:00,-39.62
+End: 2021-02-13 07:00:00,-39.62
+Column: MaxAir_T: 6
+Start: 2021-02-13 02:00:00,-39.6
+End: 2021-02-13 07:00:00,-39.6
+Station: rosa rate: 15
+Column: Air_T: 17
+Start: 2021-01-14 23:30:00,-2.3
+End: 2021-01-15 01:30:00,-2.3
+Start: 2021-02-03 00:15:00,-4.83
+End: 2021-02-03 02:00:00,-4.83
+Column: AvgWS: 19
+Start: 2021-02-18 23:45:00,0.0
+End: 2021-02-19 01:00:00,0.0
+Start: 2021-03-18 04:30:00,0.0
+End: 2021-03-18 06:15:00,0.0
+Start: 2021-03-18 07:15:00,0.0
+End: 2021-03-18 08:15:00,0.0
+Column: AvgWD: 8
+Start: 2021-03-18 04:30:00,0.0
+End: 2021-03-18 06:15:00,0.0
+Column: AvgSD: 53
+Start: 2021-01-27 07:15:00,0.0
+End: 2021-01-27 08:15:00,0.0
+Start: 2021-02-10 20:15:00,0.0
+End: 2021-02-10 21:30:00,0.0
+Start: 2021-02-18 23:45:00,0.0
+End: 2021-02-19 01:45:00,0.0
+Start: 2021-02-19 03:30:00,0.0
+End: 2021-02-19 05:00:00,0.0
+Start: 2021-03-05 00:45:00,0.0
+End: 2021-03-05 02:00:00,0.0
+Start: 2021-03-18 04:15:00,0.0
+End: 2021-03-18 06:15:00,0.0
+Start: 2021-03-18 07:15:00,0.0
+End: 2021-03-18 08:30:00,0.0
+Start: 2021-04-03 04:30:00,0.0
+End: 2021-04-03 05:30:00,0.0
+Column: MaxWS: 8
+Start: 2021-03-18 04:30:00,0.0
+End: 2021-03-18 06:15:00,0.0
+Station: rosa rate: 24
+Station: rosa rate: 60
+Column: WS_2Min: 5
+Start: 2021-02-19 01:00:00,0.0
+End: 2021-02-19 05:00:00,0.0
+Column: WD_2Min: 5
+Start: 2021-02-19 01:00:00,0.0
+End: 2021-02-19 05:00:00,0.0
+Station: russell rate: 15
+Column: AvgWS: 34
+Start: 2021-03-01 02:30:00,0.0
+End: 2021-03-01 04:00:00,0.0
+Start: 2021-03-26 22:00:00,0.0
+End: 2021-03-26 23:00:00,0.0
+Start: 2021-03-27 22:00:00,0.0
+End: 2021-03-27 23:00:00,0.0
+Start: 2021-04-06 04:45:00,0.0
+End: 2021-04-06 05:45:00,0.0
+Start: 2021-04-06 06:30:00,0.0
+End: 2021-04-06 09:15:00,0.0
+Column: AvgWD: 26
+Start: 2021-03-01 02:30:00,0.0
+End: 2021-03-01 04:00:00,0.0
+Start: 2021-03-26 22:00:00,0.0
+End: 2021-03-26 23:00:00,0.0
+Start: 2021-04-06 04:45:00,0.0
+End: 2021-04-06 05:45:00,0.0
+Start: 2021-04-06 07:00:00,0.0
+End: 2021-04-06 09:00:00,0.0
+Column: AvgSD: 36
+Start: 2021-02-15 06:00:00,0.0
+End: 2021-02-15 07:00:00,0.0
+Start: 2021-03-01 02:30:00,0.0
+End: 2021-03-01 04:00:00,0.0
+Start: 2021-03-26 22:00:00,0.0
+End: 2021-03-26 23:00:00,0.0
+Start: 2021-03-27 22:00:00,0.0
+End: 2021-03-27 23:00:00,0.0
+Start: 2021-04-06 04:45:00,0.0
+End: 2021-04-06 05:45:00,0.0
+Start: 2021-04-06 07:00:00,0.0
+End: 2021-04-06 09:00:00,0.0
+Column: MaxWS: 26
+Start: 2021-03-01 02:30:00,0.0
+End: 2021-03-01 04:00:00,0.0
+Start: 2021-03-26 22:00:00,0.0
+End: 2021-03-26 23:00:00,0.0
+Start: 2021-04-06 04:45:00,0.0
+End: 2021-04-06 05:45:00,0.0
+Start: 2021-04-06 07:00:00,0.0
+End: 2021-04-06 09:00:00,0.0
+Station: russell rate: 24
+Station: russell rate: 60
+Station: ruthenia rate: 15
+Column: Air_T: 20
+Start: 2021-02-11 06:45:00,-39.62
+End: 2021-02-11 09:15:00,-39.62
+Start: 2021-02-13 04:30:00,-39.62
+End: 2021-02-13 06:30:00,-39.62
+Column: AvgWS: 88
+Start: 2021-01-27 06:00:00,0.0
+End: 2021-01-27 07:15:00,0.0
+Start: 2021-02-11 06:00:00,0.0
+End: 2021-02-11 07:30:00,0.0
+Start: 2021-02-12 08:00:00,0.0
+End: 2021-02-12 09:30:00,0.0
+Start: 2021-02-14 08:30:00,0.0
+End: 2021-02-14 10:00:00,0.0
+Start: 2021-02-17 01:30:00,0.0
+End: 2021-02-17 03:30:00,0.0
+Start: 2021-02-18 05:00:00,0.0
+End: 2021-02-18 06:15:00,0.0
+Start: 2021-02-18 08:15:00,0.0
+End: 2021-02-18 09:30:00,0.0
+Start: 2021-03-16 04:30:00,0.0
+End: 2021-03-16 07:00:00,0.0
+Start: 2021-03-26 21:30:00,0.0
+End: 2021-03-26 23:15:00,0.0
+Start: 2021-03-27 00:00:00,0.0
+End: 2021-03-27 01:00:00,0.0
+Start: 2021-03-27 21:30:00,0.0
+End: 2021-03-27 22:45:00,0.0
+Start: 2021-03-28 02:15:00,0.0
+End: 2021-03-28 03:15:00,0.0
+Start: 2021-03-31 03:45:00,0.0
+End: 2021-03-31 04:45:00,0.0
+Column: AvgWD: 79
+Start: 2021-02-11 06:15:00,0.0
+End: 2021-02-11 07:30:00,0.0
+Start: 2021-02-12 08:00:00,0.0
+End: 2021-02-12 09:15:00,0.0
+Start: 2021-02-14 08:30:00,0.0
+End: 2021-02-14 10:00:00,0.0
+Start: 2021-02-17 01:45:00,0.0
+End: 2021-02-17 03:30:00,0.0
+Start: 2021-02-18 05:00:00,0.0
+End: 2021-02-18 06:15:00,0.0
+Start: 2021-02-18 08:15:00,0.0
+End: 2021-02-18 09:30:00,0.0
+Start: 2021-03-16 04:30:00,0.0
+End: 2021-03-16 07:00:00,0.0
+Start: 2021-03-26 21:30:00,0.0
+End: 2021-03-26 23:15:00,0.0
+Start: 2021-03-27 00:00:00,0.0
+End: 2021-03-27 01:00:00,0.0
+Start: 2021-03-27 21:30:00,0.0
+End: 2021-03-27 22:45:00,0.0
+Start: 2021-03-28 02:15:00,0.0
+End: 2021-03-28 03:15:00,0.0
+Start: 2021-03-31 03:45:00,0.0
+End: 2021-03-31 04:45:00,0.0
+Column: AvgSD: 203
+Start: 2021-01-27 06:00:00,0.0
+End: 2021-01-27 08:00:00,0.0
+Start: 2021-02-11 06:00:00,0.0
+End: 2021-02-11 09:30:00,0.0
+Start: 2021-02-12 07:45:00,0.0
+End: 2021-02-12 10:45:00,0.0
+Start: 2021-02-14 08:00:00,0.0
+End: 2021-02-14 10:15:00,0.0
+Start: 2021-02-15 06:30:00,0.0
+End: 2021-02-15 08:30:00,0.0
+Start: 2021-02-15 09:15:00,0.0
+End: 2021-02-15 10:45:00,0.0
+Start: 2021-02-16 03:15:00,0.0
+End: 2021-02-16 04:15:00,0.0
+Start: 2021-02-16 07:15:00,0.0
+End: 2021-02-16 09:15:00,0.0
+Start: 2021-02-17 01:15:00,0.0
+End: 2021-02-17 03:30:00,0.0
+Start: 2021-02-17 20:30:00,0.0
+End: 2021-02-17 23:45:00,0.0
+Start: 2021-02-18 04:30:00,0.0
+End: 2021-02-18 07:45:00,0.0
+Start: 2021-02-18 08:15:00,0.0
+End: 2021-02-18 09:30:00,0.0
+Start: 2021-02-21 06:15:00,0.0
+End: 2021-02-21 07:45:00,0.0
+Start: 2021-03-12 00:00:00,0.0
+End: 2021-03-12 01:15:00,0.0
+Start: 2021-03-12 03:45:00,0.0
+End: 2021-03-12 05:00:00,0.0
+Start: 2021-03-16 03:00:00,0.0
+End: 2021-03-16 07:00:00,0.0
+Start: 2021-03-22 06:45:00,0.0
+End: 2021-03-22 08:00:00,0.0
+Start: 2021-03-26 21:30:00,0.0
+End: 2021-03-26 23:15:00,0.0
+Start: 2021-03-26 23:45:00,0.0
+End: 2021-03-27 01:00:00,0.0
+Start: 2021-03-27 02:00:00,0.0
+End: 2021-03-27 03:00:00,0.0
+Start: 2021-03-27 21:30:00,0.0
+End: 2021-03-27 22:45:00,0.0
+Start: 2021-03-28 02:15:00,0.0
+End: 2021-03-28 03:15:00,0.0
+Start: 2021-03-31 03:45:00,0.0
+End: 2021-03-31 04:45:00,0.0
+Start: 2021-04-07 05:45:00,0.0
+End: 2021-04-07 06:45:00,0.0
+Column: MaxWS: 79
+Start: 2021-02-11 06:15:00,0.0
+End: 2021-02-11 07:30:00,0.0
+Start: 2021-02-12 08:00:00,0.0
+End: 2021-02-12 09:15:00,0.0
+Start: 2021-02-14 08:30:00,0.0
+End: 2021-02-14 10:00:00,0.0
+Start: 2021-02-17 01:45:00,0.0
+End: 2021-02-17 03:30:00,0.0
+Start: 2021-02-18 05:00:00,0.0
+End: 2021-02-18 06:15:00,0.0
+Start: 2021-02-18 08:15:00,0.0
+End: 2021-02-18 09:30:00,0.0
+Start: 2021-03-16 04:30:00,0.0
+End: 2021-03-16 07:00:00,0.0
+Start: 2021-03-26 21:30:00,0.0
+End: 2021-03-26 23:15:00,0.0
+Start: 2021-03-27 00:00:00,0.0
+End: 2021-03-27 01:00:00,0.0
+Start: 2021-03-27 21:30:00,0.0
+End: 2021-03-27 22:45:00,0.0
+Start: 2021-03-28 02:15:00,0.0
+End: 2021-03-28 03:15:00,0.0
+Start: 2021-03-31 03:45:00,0.0
+End: 2021-03-31 04:45:00,0.0
+Station: ruthenia rate: 24
+Column: MinAir_T: 3
+Start: 2021-02-12 00:00:00,-39.63
+End: 2021-02-14 00:00:00,-39.63
+Station: ruthenia rate: 60
+Column: MinAir_T: 7
+Start: 2021-02-11 04:00:00,-39.63
+End: 2021-02-11 10:00:00,-39.63
+Column: WS_10Min: 6
+Start: 2021-03-26 22:00:00,0.0
+End: 2021-03-27 03:00:00,0.0
+Column: WD_10Min: 6
+Start: 2021-03-26 22:00:00,0.0
+End: 2021-03-27 03:00:00,0.0
+Column: Max5WS_10: 5
+Start: 2021-03-26 23:00:00,0.0
+End: 2021-03-27 03:00:00,0.0
+Column: WS_2Min: 11
+Start: 2021-02-18 05:00:00,0.0
+End: 2021-02-18 10:00:00,0.0
+Start: 2021-03-26 23:00:00,0.0
+End: 2021-03-27 03:00:00,0.0
+Column: WD_2Min: 11
+Start: 2021-02-18 05:00:00,0.0
+End: 2021-02-18 10:00:00,0.0
+Start: 2021-03-26 23:00:00,0.0
+End: 2021-03-27 03:00:00,0.0
+Station: sanclara rate: 15
+Column: Air_T: 38
+Start: 2021-02-11 04:15:00,-39.91
+End: 2021-02-11 07:45:00,-39.91
+Start: 2021-02-13 02:30:00,-39.91
+End: 2021-02-13 05:45:00,-39.91
+Start: 2021-02-13 08:00:00,-39.91
+End: 2021-02-13 10:00:00,-39.91
+Column: AvgWS: 14
+Start: 2021-02-18 00:15:00,0.0
+End: 2021-02-18 01:30:00,0.0
+Start: 2021-02-18 05:15:00,0.0
+End: 2021-02-18 07:00:00,0.0
+Column: AvgWD: 14
+Start: 2021-02-18 00:15:00,0.0
+End: 2021-02-18 01:30:00,0.0
+Start: 2021-02-18 05:15:00,0.0
+End: 2021-02-18 07:00:00,0.0
+Column: AvgSD: 23
+Start: 2021-02-11 04:15:00,0.0
+End: 2021-02-11 05:15:00,0.0
+Start: 2021-02-18 00:15:00,0.0
+End: 2021-02-18 01:30:00,0.0
+Start: 2021-02-18 05:15:00,0.0
+End: 2021-02-18 08:00:00,0.0
+Column: MaxWS: 14
+Start: 2021-02-18 00:15:00,0.0
+End: 2021-02-18 01:30:00,0.0
+Start: 2021-02-18 05:15:00,0.0
+End: 2021-02-18 07:00:00,0.0
+Station: sanclara rate: 24
+Column: AvgRS_kw: 3
+Start: 2021-01-31 00:00:00,0.047
+End: 2021-02-02 00:00:00,0.047
+Station: sanclara rate: 60
+Column: AvgAir_T: 6
+Start: 2021-02-13 03:00:00,-39.91
+End: 2021-02-13 08:00:00,-39.91
+Column: MinAir_T: 17
+Start: 2021-02-11 03:00:00,-39.92
+End: 2021-02-11 09:00:00,-39.92
+Start: 2021-02-13 01:00:00,-39.92
+End: 2021-02-13 10:00:00,-39.92
+Column: AvgWD: 5
+Start: 2021-02-09 02:00:00,281.0
+End: 2021-02-09 06:00:00,281.0
+Column: WS_2Min: 5
+Start: 2021-02-18 06:00:00,0.0
+End: 2021-02-18 10:00:00,0.0
+Column: WD_2Min: 5
+Start: 2021-02-18 06:00:00,0.0
+End: 2021-02-18 10:00:00,0.0
+Station: selkirk rate: 15
+Column: AvgWS: 5
+Start: 2021-01-27 01:00:00,0.0
+End: 2021-01-27 02:00:00,0.0
+Column: AvgWD: 5
+Start: 2021-01-27 01:00:00,0.0
+End: 2021-01-27 02:00:00,0.0
+Column: AvgSD: 5
+Start: 2021-01-27 01:00:00,0.0
+End: 2021-01-27 02:00:00,0.0
+Column: MaxWS: 5
+Start: 2021-01-27 01:00:00,0.0
+End: 2021-01-27 02:00:00,0.0
+Station: selkirk rate: 24
+Column: AvgRS_kw: 3
+Start: 2021-02-12 00:00:00,0.121
+End: 2021-02-14 00:00:00,0.121
+Station: selkirk rate: 60
+Station: shilo rate: 15
+Column: AvgSD: 11
+Start: 2021-02-17 19:15:00,0.0
+End: 2021-02-17 21:45:00,0.0
+Station: shilo rate: 24
+Station: shilo rate: 60
+Column: MinAir_T: 5
+Start: 2021-02-13 05:00:00,-39.66
+End: 2021-02-13 09:00:00,-39.66
+Station: sinclair rate: 15
+Station: sinclair rate: 24
+Station: sinclair rate: 60
+Station: snowflake rate: 15
+Column: RH: 278
+Start: 2021-01-30 05:30:00,99.8
+End: 2021-01-31 09:45:00,99.8
+Start: 2021-02-01 17:45:00,99.8
+End: 2021-02-03 10:30:00,99.8
+Station: snowflake rate: 24
+Station: snowflake rate: 60
+Column: RH: 89
+Start: 2021-01-30 01:00:00,99.8
+End: 2021-01-31 09:00:00,99.8
+Start: 2021-02-01 04:00:00,99.8
+End: 2021-02-03 11:00:00,99.8
+Column: AvgRH: 89
+Start: 2021-01-30 01:00:00,99.8
+End: 2021-01-31 09:00:00,99.8
+Start: 2021-02-01 04:00:00,99.8
+End: 2021-02-03 11:00:00,99.8
+Station: somerset rate: 15
+Column: RH: 251
+Start: 2021-01-29 22:45:00,99.9
+End: 2021-01-31 06:45:00,99.9
+Start: 2021-02-01 05:15:00,99.9
+End: 2021-02-02 11:30:00,99.9
+Column: AvgSD: 14
+Start: 2021-01-30 13:15:00,0.0
+End: 2021-01-30 15:00:00,0.0
+Start: 2021-04-06 02:30:00,0.0
+End: 2021-04-06 03:45:00,0.0
+Station: somerset rate: 24
+Station: somerset rate: 60
+Column: RH: 69
+Start: 2021-01-30 00:00:00,99.9
+End: 2021-01-31 14:00:00,99.9
+Start: 2021-02-01 06:00:00,99.9
+End: 2021-02-02 11:00:00,99.9
+Column: AvgRH: 69
+Start: 2021-01-30 00:00:00,99.9
+End: 2021-01-31 14:00:00,99.9
+Start: 2021-02-01 06:00:00,99.9
+End: 2021-02-02 11:00:00,99.9
+Station: souris rate: 15
+Station: souris rate: 24
+Station: souris rate: 60
+Station: spraguelake rate: 15
+Column: AvgWS: 49
+Start: 2021-01-27 06:30:00,0.0
+End: 2021-01-27 08:15:00,0.0
+Start: 2021-02-12 23:30:00,0.0
+End: 2021-02-13 02:15:00,0.0
+Start: 2021-02-17 02:00:00,0.0
+End: 2021-02-17 03:15:00,0.0
+Start: 2021-02-18 05:45:00,0.0
+End: 2021-02-18 06:45:00,0.0
+Start: 2021-02-19 00:30:00,0.0
+End: 2021-02-19 02:00:00,0.0
+Start: 2021-03-04 22:00:00,0.0
+End: 2021-03-04 23:15:00,0.0
+Start: 2021-03-05 03:15:00,0.0
+End: 2021-03-05 04:15:00,0.0
+Column: AvgWD: 44
+Start: 2021-01-27 06:30:00,0.0
+End: 2021-01-27 08:15:00,0.0
+Start: 2021-02-12 23:30:00,0.0
+End: 2021-02-13 02:15:00,0.0
+Start: 2021-02-17 02:00:00,0.0
+End: 2021-02-17 03:15:00,0.0
+Start: 2021-02-19 00:30:00,0.0
+End: 2021-02-19 02:00:00,0.0
+Start: 2021-03-04 22:00:00,0.0
+End: 2021-03-04 23:15:00,0.0
+Start: 2021-03-05 03:15:00,0.0
+End: 2021-03-05 04:15:00,0.0
+Column: AvgSD: 70
+Start: 2021-01-27 06:30:00,0.0
+End: 2021-01-27 08:15:00,0.0
+Start: 2021-02-12 19:30:00,0.0
+End: 2021-02-12 20:30:00,0.0
+Start: 2021-02-12 23:30:00,0.0
+End: 2021-02-13 02:15:00,0.0
+Start: 2021-02-16 22:30:00,0.0
+End: 2021-02-17 00:15:00,0.0
+Start: 2021-02-17 02:00:00,0.0
+End: 2021-02-17 04:15:00,0.0
+Start: 2021-02-18 00:00:00,0.0
+End: 2021-02-18 01:00:00,0.0
+Start: 2021-02-19 00:30:00,0.0
+End: 2021-02-19 02:00:00,0.0
+Start: 2021-03-04 22:00:00,0.0
+End: 2021-03-04 23:15:00,0.0
+Start: 2021-03-05 02:15:00,0.0
+End: 2021-03-05 04:15:00,0.0
+Column: MaxWS: 44
+Start: 2021-01-27 06:30:00,0.0
+End: 2021-01-27 08:15:00,0.0
+Start: 2021-02-12 23:30:00,0.0
+End: 2021-02-13 02:15:00,0.0
+Start: 2021-02-17 02:00:00,0.0
+End: 2021-02-17 03:15:00,0.0
+Start: 2021-02-19 00:30:00,0.0
+End: 2021-02-19 02:00:00,0.0
+Start: 2021-03-04 22:00:00,0.0
+End: 2021-03-04 23:15:00,0.0
+Start: 2021-03-05 03:15:00,0.0
+End: 2021-03-05 04:15:00,0.0
+Station: spraguelake rate: 60
+Column: WS_2Min: 5
+Start: 2021-01-27 04:00:00,0.0
+End: 2021-01-27 08:00:00,0.0
+Station: spraguelakebog rate: 24
+Station: stadolphe rate: 15
+Station: stadolphe rate: 24
+Station: stadolphe rate: 60
+Station: starbuck rate: 15
+Column: AvgSD: 5
+Start: 2021-03-06 17:00:00,4.8
+End: 2021-03-06 18:00:00,4.8
+Station: starbuck rate: 24
+Station: starbuck rate: 60
+Station: stclaude rate: 15
+Column: AvgSD: 10
+Start: 2021-01-27 07:45:00,0.0
+End: 2021-01-27 08:45:00,0.0
+Start: 2021-04-07 01:45:00,0.0
+End: 2021-04-07 02:45:00,0.0
+Station: stclaude rate: 24
+Station: stclaude rate: 60
+Station: stead rate: 15
+Column: AvgSD: 13
+Start: 2021-01-27 07:45:00,0.0
+End: 2021-01-27 09:15:00,0.0
+Start: 2021-03-04 11:45:00,0.0
+End: 2021-03-04 13:00:00,0.0
+Station: stead rate: 24
+Station: stead rate: 60
+Station: steinbach rate: 15
+Column: RH: 191
+Start: 2021-04-12 03:30:00,99.9
+End: 2021-04-14 03:00:00,99.9
+Column: AvgSD: 5
+Start: 2021-01-26 22:45:00,0.0
+End: 2021-01-26 23:45:00,0.0
+Station: steinbach rate: 24
+Column: AvgRS_kw: 3
+Start: 2021-01-10 00:00:00,0.002
+End: 2021-01-12 00:00:00,0.002
+Station: steinbach rate: 60
+Column: RH: 54
+Start: 2021-04-11 22:00:00,99.9
+End: 2021-04-14 03:00:00,99.9
+Column: AvgRH: 54
+Start: 2021-04-11 22:00:00,99.9
+End: 2021-04-14 03:00:00,99.9
+Station: sterose rate: 15
+Column: AvgWS: 5
+Start: 2021-03-05 09:45:00,0.0
+End: 2021-03-05 10:45:00,0.0
+Column: AvgWD: 5
+Start: 2021-03-05 09:45:00,0.0
+End: 2021-03-05 10:45:00,0.0
+Column: AvgSD: 5
+Start: 2021-03-05 09:45:00,0.0
+End: 2021-03-05 10:45:00,0.0
+Column: MaxWS: 5
+Start: 2021-03-05 09:45:00,0.0
+End: 2021-03-05 10:45:00,0.0
+Station: sterose rate: 24
+Station: sterose rate: 60
+Station: stlazare rate: 15
+Column: Air_T: 16
+Start: 2021-02-13 05:45:00,-39.61
+End: 2021-02-13 09:30:00,-39.61
+Station: stlazare rate: 24
+Station: stlazare rate: 60
+Column: Air_T: 5
+Start: 2021-02-13 05:00:00,-39.61
+End: 2021-02-13 09:00:00,-39.61
+Column: MinAir_T: 5
+Start: 2021-02-13 06:00:00,-39.62
+End: 2021-02-13 10:00:00,-39.62
+Station: stonewall rate: 15
+Column: AvgWS: 16
+Start: 2021-01-26 18:00:00,0.0
+End: 2021-01-26 19:00:00,0.0
+Start: 2021-01-27 06:30:00,0.0
+End: 2021-01-27 07:45:00,0.0
+Start: 2021-01-27 08:15:00,0.0
+End: 2021-01-27 09:15:00,0.0
+Column: AvgWD: 6
+Start: 2021-01-27 06:30:00,0.0
+End: 2021-01-27 07:45:00,0.0
+Column: AvgSD: 36
+Start: 2021-01-26 18:00:00,0.0
+End: 2021-01-26 19:00:00,0.0
+Start: 2021-01-27 06:15:00,0.0
+End: 2021-01-27 07:45:00,0.0
+Start: 2021-01-27 08:15:00,0.0
+End: 2021-01-27 09:45:00,0.0
+Start: 2021-02-18 21:45:00,0.0
+End: 2021-02-18 22:45:00,0.0
+Start: 2021-02-19 06:00:00,0.0
+End: 2021-02-19 07:00:00,0.0
+Start: 2021-03-18 04:45:00,0.0
+End: 2021-03-18 06:15:00,0.0
+Column: MaxWS: 6
+Start: 2021-01-27 06:30:00,0.0
+End: 2021-01-27 07:45:00,0.0
+Station: stonewall rate: 24
+Station: stonewall rate: 60
+Station: stpierre rate: 15
+Column: MaxWS: 5
+Start: 2021-01-27 14:45:00,2.19
+End: 2021-01-27 15:45:00,2.19
+Station: stpierre rate: 24
+Station: stpierre rate: 60
+Column: WD_10Min: 10
+Start: 2021-02-15 03:00:00,190.0
+End: 2021-02-15 07:00:00,190.0
+Start: 2021-04-02 04:00:00,178.0
+End: 2021-04-02 08:00:00,178.0
+Station: swanvalley rate: 15
+Column: Air_T: 20
+Start: 2021-02-13 04:45:00,-39.66
+End: 2021-02-13 09:30:00,-39.66
+Column: AvgWS: 20
+Start: 2021-03-05 00:15:00,0.0
+End: 2021-03-05 01:30:00,0.0
+Start: 2021-03-05 10:00:00,0.0
+End: 2021-03-05 13:15:00,0.0
+Column: AvgWD: 14
+Start: 2021-03-05 10:00:00,0.0
+End: 2021-03-05 13:15:00,0.0
+Column: AvgSD: 25
+Start: 2021-02-12 17:30:00,0.0
+End: 2021-02-12 18:30:00,0.0
+Start: 2021-03-05 00:15:00,0.0
+End: 2021-03-05 01:30:00,0.0
+Start: 2021-03-05 10:00:00,0.0
+End: 2021-03-05 13:15:00,0.0
+Column: MaxWS: 14
+Start: 2021-03-05 10:00:00,0.0
+End: 2021-03-05 13:15:00,0.0
+Station: swanvalley rate: 24
+Station: swanvalley rate: 60
+Column: MinAir_T: 7
+Start: 2021-02-13 04:00:00,-39.66
+End: 2021-02-13 10:00:00,-39.66
+Column: WD_10Min: 5
+Start: 2021-03-05 09:00:00,0.0
+End: 2021-03-05 13:00:00,0.0
+Station: taylorspoint rate: 15
+Column: AvgSD: 11
+Start: 2021-01-16 21:00:00,0.0
+End: 2021-01-16 22:00:00,0.0
+Start: 2021-01-26 22:45:00,0.0
+End: 2021-01-27 00:00:00,0.0
+Station: taylorspoint rate: 24
+Column: MinAir_T: 3
+Start: 2021-02-13 00:00:00,-39.66
+End: 2021-02-15 00:00:00,-39.66
+Station: taylorspoint rate: 60
+Column: MinAir_T: 5
+Start: 2021-02-13 02:00:00,-39.66
+End: 2021-02-13 06:00:00,-39.66
+Station: teulon rate: 15
+Column: AvgSD: 6
+Start: 2021-01-27 09:15:00,0.0
+End: 2021-01-27 10:30:00,0.0
+Station: teulon rate: 24
+Column: AvgRS_kw: 3
+Start: 2021-01-07 00:00:00,0.034
+End: 2021-01-09 00:00:00,0.034
+Station: teulon rate: 60
+Column: Pluvio_Rain: 5
+Start: 2021-04-12 07:00:00,0.05
+End: 2021-04-12 11:00:00,0.05
+Station: treherne rate: 15
+Station: treherne rate: 24
+Station: treherne rate: 60
+Station: virden rate: 15
+Station: virden rate: 24
+Station: virden rate: 60
+Station: vivian rate: 15
+Column: AvgWS: 6
+Start: 2021-01-30 21:00:00,0.0
+End: 2021-01-30 22:15:00,0.0
+Column: AvgWD: 6
+Start: 2021-01-30 21:00:00,0.0
+End: 2021-01-30 22:15:00,0.0
+Column: AvgSD: 19
+Start: 2021-01-25 01:30:00,0.0
+End: 2021-01-25 02:30:00,0.0
+Start: 2021-01-30 20:15:00,0.0
+End: 2021-01-30 22:15:00,0.0
+Start: 2021-02-16 19:00:00,0.0
+End: 2021-02-16 20:00:00,0.0
+Column: MaxWS: 6
+Start: 2021-01-30 21:00:00,0.0
+End: 2021-01-30 22:15:00,0.0
+Station: vivian rate: 24
+Station: vivian rate: 60
+Station: waskada rate: 15
+Column: Air_T: 12
+Start: 2021-02-13 05:30:00,-39.61
+End: 2021-02-13 08:15:00,-39.61
+Station: waskada rate: 24
+Station: waskada rate: 60
+Station: wawanesa rate: 15
+Column: AvgWS: 49
+Start: 2021-01-30 12:30:00,0.0
+End: 2021-01-30 23:15:00,0.0
+Start: 2021-02-17 22:00:00,0.0
+End: 2021-02-17 23:00:00,0.0
+Column: AvgWD: 49
+Start: 2021-01-30 12:30:00,0.0
+End: 2021-01-30 23:15:00,0.0
+Start: 2021-02-17 22:00:00,0.0
+End: 2021-02-17 23:00:00,0.0
+Column: AvgSD: 55
+Start: 2021-01-30 12:30:00,0.0
+End: 2021-01-30 23:15:00,0.0
+Start: 2021-02-17 19:45:00,0.0
+End: 2021-02-17 20:45:00,0.0
+Start: 2021-02-17 21:45:00,0.0
+End: 2021-02-17 23:00:00,0.0
+Column: MaxWS: 49
+Start: 2021-01-30 12:30:00,0.0
+End: 2021-01-30 23:15:00,0.0
+Start: 2021-02-17 22:00:00,0.0
+End: 2021-02-17 23:00:00,0.0
+Station: wawanesa rate: 24
+Station: wawanesa rate: 60
+Column: WS_10Min: 11
+Start: 2021-01-30 13:00:00,0.0
+End: 2021-01-30 23:00:00,0.0
+Column: WD_10Min: 11
+Start: 2021-01-30 13:00:00,0.0
+End: 2021-01-30 23:00:00,0.0
+Column: AvgWS: 10
+Start: 2021-01-30 14:00:00,0.0
+End: 2021-01-30 23:00:00,0.0
+Column: AvgWD: 10
+Start: 2021-01-30 14:00:00,0.0
+End: 2021-01-30 23:00:00,0.0
+Column: AvgSD: 10
+Start: 2021-01-30 14:00:00,0.0
+End: 2021-01-30 23:00:00,0.0
+Column: MaxWS_10: 10
+Start: 2021-01-30 14:00:00,0.0
+End: 2021-01-30 23:00:00,0.0
+Column: MaxWD_10: 10
+Start: 2021-01-30 14:00:00,0.0
+End: 2021-01-30 23:00:00,0.0
+Column: MaxWS: 10
+Start: 2021-01-30 14:00:00,0.0
+End: 2021-01-30 23:00:00,0.0
+Column: Max5WS_10: 10
+Start: 2021-01-30 14:00:00,0.0
+End: 2021-01-30 23:00:00,0.0
+Column: WS_2Min: 10
+Start: 2021-01-30 14:00:00,0.0
+End: 2021-01-30 23:00:00,0.0
+Column: WD_2Min: 10
+Start: 2021-01-30 14:00:00,0.0
+End: 2021-01-30 23:00:00,0.0
+Station: windygates rate: 15
+Column: AvgWS: 11
+Start: 2021-01-30 13:15:00,0.0
+End: 2021-01-30 15:45:00,0.0
+Column: AvgWD: 10
+Start: 2021-01-30 13:30:00,0.0
+End: 2021-01-30 15:45:00,0.0
+Column: AvgSD: 11
+Start: 2021-01-30 13:15:00,0.0
+End: 2021-01-30 15:45:00,0.0
+Column: MaxWS: 10
+Start: 2021-01-30 13:30:00,0.0
+End: 2021-01-30 15:45:00,0.0
+Station: windygates rate: 24
+Station: windygates rate: 60
+Station: winkler rate: 15
+Column: AvgWD: 17
+Start: 2021-03-29 20:15:00,0.0
+End: 2021-03-29 21:15:00,0.0
+Start: 2021-03-29 22:00:00,0.0
+End: 2021-03-29 23:15:00,0.0
+Start: 2021-03-30 01:00:00,0.0
+End: 2021-03-30 02:15:00,0.0
+Column: AvgSD: 17
+Start: 2021-03-29 20:15:00,0.0
+End: 2021-03-29 21:15:00,0.0
+Start: 2021-03-29 22:00:00,0.0
+End: 2021-03-29 23:15:00,0.0
+Start: 2021-03-30 01:00:00,0.0
+End: 2021-03-30 02:15:00,0.0
+Station: winkler rate: 24
+Station: winkler rate: 60
+Column: AvgWD: 7
+Start: 2021-03-29 21:00:00,0.0
+End: 2021-03-30 03:00:00,0.0
+Column: AvgSD: 7
+Start: 2021-03-29 21:00:00,0.0
+End: 2021-03-30 03:00:00,0.0
+Column: Press_hPa: 24
+Start: 2021-02-17 19:00:00,1025.0
+End: 2021-02-18 18:00:00,1025.0
+Station: woodlands rate: 15
+Column: AvgWS: 21
+Start: 2021-01-30 16:30:00,0.04
+End: 2021-01-30 21:30:00,0.04
+Column: AvgWD: 19
+Start: 2021-03-30 03:15:00,0.0
+End: 2021-03-30 07:45:00,0.0
+Column: AvgSD: 25
+Start: 2021-01-30 17:45:00,0.0
+End: 2021-01-30 19:00:00,0.0
+Start: 2021-03-30 03:15:00,0.0
+End: 2021-03-30 07:45:00,0.0
+Column: MaxWS: 15
+Start: 2021-01-30 18:00:00,0.05
+End: 2021-01-30 21:30:00,0.05
+Station: woodlands rate: 24
+Station: woodlands rate: 60
+Column: WS_10Min: 5
+Start: 2021-01-30 17:00:00,0.04
+End: 2021-01-30 21:00:00,0.04
+Column: AvgWD: 6
+Start: 2021-03-30 04:00:00,0.0
+End: 2021-03-30 09:00:00,0.0
+Column: AvgSD: 6
+Start: 2021-03-30 04:00:00,0.0
+End: 2021-03-30 09:00:00,0.0
+Column: Soil_TP20_TempC: 27
+Start: 2021-02-02 12:00:00,1.0
+End: 2021-02-03 14:00:00,1.0
+Station: zhoda rate: 15
+Column: AvgWS: 31
+Start: 2021-01-27 04:45:00,0.0
+End: 2021-01-27 05:45:00,0.0
+Start: 2021-01-27 08:45:00,0.0
+End: 2021-01-27 10:15:00,0.0
+Start: 2021-03-05 03:30:00,0.0
+End: 2021-03-05 04:30:00,0.0
+Start: 2021-03-05 06:30:00,0.0
+End: 2021-03-05 07:45:00,0.0
+Start: 2021-04-03 04:00:00,0.0
+End: 2021-04-03 05:45:00,0.0
+Column: AvgWD: 31
+Start: 2021-01-27 04:45:00,0.0
+End: 2021-01-27 05:45:00,0.0
+Start: 2021-01-27 08:45:00,0.0
+End: 2021-01-27 10:15:00,0.0
+Start: 2021-03-05 03:30:00,0.0
+End: 2021-03-05 04:30:00,0.0
+Start: 2021-03-05 06:30:00,0.0
+End: 2021-03-05 07:45:00,0.0
+Start: 2021-04-03 04:00:00,0.0
+End: 2021-04-03 05:45:00,0.0
+Column: AvgSD: 31
+Start: 2021-01-27 04:45:00,0.0
+End: 2021-01-27 05:45:00,0.0
+Start: 2021-01-27 08:45:00,0.0
+End: 2021-01-27 10:15:00,0.0
+Start: 2021-03-05 03:30:00,0.0
+End: 2021-03-05 04:30:00,0.0
+Start: 2021-03-05 06:30:00,0.0
+End: 2021-03-05 07:45:00,0.0
+Start: 2021-04-03 04:00:00,0.0
+End: 2021-04-03 05:45:00,0.0
+Column: MaxWS: 31
+Start: 2021-01-27 04:45:00,0.0
+End: 2021-01-27 05:45:00,0.0
+Start: 2021-01-27 08:45:00,0.0
+End: 2021-01-27 10:15:00,0.0
+Start: 2021-03-05 03:30:00,0.0
+End: 2021-03-05 04:30:00,0.0
+Start: 2021-03-05 06:30:00,0.0
+End: 2021-03-05 07:45:00,0.0
+Start: 2021-04-03 04:00:00,0.0
+End: 2021-04-03 05:45:00,0.0
+Station: zhoda rate: 24
+Station: zhoda rate: 60
+Station: spraguelakebog rate: 15
+Column: AvgWS: 49
+Start: 2021-01-27 06:30:00,0.0
+End: 2021-01-27 08:15:00,0.0
+Start: 2021-02-12 23:30:00,0.0
+End: 2021-02-13 02:15:00,0.0
+Start: 2021-02-17 02:00:00,0.0
+End: 2021-02-17 03:15:00,0.0
+Start: 2021-02-18 05:45:00,0.0
+End: 2021-02-18 06:45:00,0.0
+Start: 2021-02-19 00:30:00,0.0
+End: 2021-02-19 02:00:00,0.0
+Start: 2021-03-04 22:00:00,0.0
+End: 2021-03-04 23:15:00,0.0
+Start: 2021-03-05 03:15:00,0.0
+End: 2021-03-05 04:15:00,0.0
+Column: AvgWD: 44
+Start: 2021-01-27 06:30:00,0.0
+End: 2021-01-27 08:15:00,0.0
+Start: 2021-02-12 23:30:00,0.0
+End: 2021-02-13 02:15:00,0.0
+Start: 2021-02-17 02:00:00,0.0
+End: 2021-02-17 03:15:00,0.0
+Start: 2021-02-19 00:30:00,0.0
+End: 2021-02-19 02:00:00,0.0
+Start: 2021-03-04 22:00:00,0.0
+End: 2021-03-04 23:15:00,0.0
+Start: 2021-03-05 03:15:00,0.0
+End: 2021-03-05 04:15:00,0.0
+Column: AvgSD: 70
+Start: 2021-01-27 06:30:00,0.0
+End: 2021-01-27 08:15:00,0.0
+Start: 2021-02-12 19:30:00,0.0
+End: 2021-02-12 20:30:00,0.0
+Start: 2021-02-12 23:30:00,0.0
+End: 2021-02-13 02:15:00,0.0
+Start: 2021-02-16 22:30:00,0.0
+End: 2021-02-17 00:15:00,0.0
+Start: 2021-02-17 02:00:00,0.0
+End: 2021-02-17 04:15:00,0.0
+Start: 2021-02-18 00:00:00,0.0
+End: 2021-02-18 01:00:00,0.0
+Start: 2021-02-19 00:30:00,0.0
+End: 2021-02-19 02:00:00,0.0
+Start: 2021-03-04 22:00:00,0.0
+End: 2021-03-04 23:15:00,0.0
+Start: 2021-03-05 02:15:00,0.0
+End: 2021-03-05 04:15:00,0.0
+Column: MaxWS: 44
+Start: 2021-01-27 06:30:00,0.0
+End: 2021-01-27 08:15:00,0.0
+Start: 2021-02-12 23:30:00,0.0
+End: 2021-02-13 02:15:00,0.0
+Start: 2021-02-17 02:00:00,0.0
+End: 2021-02-17 03:15:00,0.0
+Start: 2021-02-19 00:30:00,0.0
+End: 2021-02-19 02:00:00,0.0
+Start: 2021-03-04 22:00:00,0.0
+End: 2021-03-04 23:15:00,0.0
+Start: 2021-03-05 03:15:00,0.0
+End: 2021-03-05 04:15:00,0.0
+Station: spraguelakebog rate: 60
+Column: WS_2Min: 5
+Start: 2021-01-27 04:00:00,0.0
+End: 2021-01-27 08:00:00,0.0
+Station: spraguelakebog rate: 15
+Column: AvgWS: 49
+Start: 2021-01-27 06:30:00,0.0
+End: 2021-01-27 08:15:00,0.0
+Start: 2021-02-12 23:30:00,0.0
+End: 2021-02-13 02:15:00,0.0
+Start: 2021-02-17 02:00:00,0.0
+End: 2021-02-17 03:15:00,0.0
+Start: 2021-02-18 05:45:00,0.0
+End: 2021-02-18 06:45:00,0.0
+Start: 2021-02-19 00:30:00,0.0
+End: 2021-02-19 02:00:00,0.0
+Start: 2021-03-04 22:00:00,0.0
+End: 2021-03-04 23:15:00,0.0
+Start: 2021-03-05 03:15:00,0.0
+End: 2021-03-05 04:15:00,0.0
+Column: AvgWD: 44
+Start: 2021-01-27 06:30:00,0.0
+End: 2021-01-27 08:15:00,0.0
+Start: 2021-02-12 23:30:00,0.0
+End: 2021-02-13 02:15:00,0.0
+Start: 2021-02-17 02:00:00,0.0
+End: 2021-02-17 03:15:00,0.0
+Start: 2021-02-19 00:30:00,0.0
+End: 2021-02-19 02:00:00,0.0
+Start: 2021-03-04 22:00:00,0.0
+End: 2021-03-04 23:15:00,0.0
+Start: 2021-03-05 03:15:00,0.0
+End: 2021-03-05 04:15:00,0.0
+Column: AvgSD: 70
+Start: 2021-01-27 06:30:00,0.0
+End: 2021-01-27 08:15:00,0.0
+Start: 2021-02-12 19:30:00,0.0
+End: 2021-02-12 20:30:00,0.0
+Start: 2021-02-12 23:30:00,0.0
+End: 2021-02-13 02:15:00,0.0
+Start: 2021-02-16 22:30:00,0.0
+End: 2021-02-17 00:15:00,0.0
+Start: 2021-02-17 02:00:00,0.0
+End: 2021-02-17 04:15:00,0.0
+Start: 2021-02-18 00:00:00,0.0
+End: 2021-02-18 01:00:00,0.0
+Start: 2021-02-19 00:30:00,0.0
+End: 2021-02-19 02:00:00,0.0
+Start: 2021-03-04 22:00:00,0.0
+End: 2021-03-04 23:15:00,0.0
+Start: 2021-03-05 02:15:00,0.0
+End: 2021-03-05 04:15:00,0.0
+Column: MaxWS: 44
+Start: 2021-01-27 06:30:00,0.0
+End: 2021-01-27 08:15:00,0.0
+Start: 2021-02-12 23:30:00,0.0
+End: 2021-02-13 02:15:00,0.0
+Start: 2021-02-17 02:00:00,0.0
+End: 2021-02-17 03:15:00,0.0
+Start: 2021-02-19 00:30:00,0.0
+End: 2021-02-19 02:00:00,0.0
+Start: 2021-03-04 22:00:00,0.0
+End: 2021-03-04 23:15:00,0.0
+Start: 2021-03-05 03:15:00,0.0
+End: 2021-03-05 04:15:00,0.0
+Station: spraguelakebog rate: 60
+Column: WS_2Min: 5
+Start: 2021-01-27 04:00:00,0.0
+End: 2021-01-27 08:00:00,0.0
