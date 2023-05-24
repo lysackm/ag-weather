@@ -49,7 +49,7 @@ def replace_furthest(closest_stations, new_data):
 def n_closest_stations(n=3):
     stations = []
 
-    f = open("neighboring-stations.csv", "w")
+    f = open("../neighboring-stations.csv", "w")
     f.write("Station")
     for i in range(n):
         f.write(f",Neighbor{i}")
@@ -79,7 +79,7 @@ def n_closest_stations(n=3):
             elif check_lowest(closest_stations, dist):
                 closest_stations = replace_furthest(closest_stations, [dist, neighbor])
 
-        f = open("neighboring-stations.csv", "a")
+        f = open("../neighboring-stations.csv", "a")
         output = [station[name_index]]
         for closest_station in closest_stations:
             output.append(closest_station[1][name_index])

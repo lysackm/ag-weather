@@ -5,41 +5,41 @@ import time
 import pandas
 
 
+# dependents are values that are derived or only have meaning with the attribute
 def replace_outliers(df, date_col, attributes, attr_offsets, dependents):
     count = 0
     neighbor_frame = pandas.read_csv("neighboring-stations.csv")
     dates = df[date_col].unique()
 
+    # iterate through every similar datetime
     for datetime in dates:
         start_time = time.time()
         # filter by datetime
         date_block = df[df[date_col] == datetime]
 
         for index, station in date_block.iterrows():
+            # find neighbor stations
             neighbor_ids = get_neighbors(station["StnID"], neighbor_frame)
             neighbor_data = date_block[date_block["StnID"].isin(neighbor_ids)]
 
-            # t=0.11 sec per day
+            # average neighbor attribute values
             attributes_avg = neighbor_data[attributes].mean()
 
             for attribute in attributes:
-                # Remove outlier values
+                # compare to neighbor avg, remove outlier values
                 if station[attribute] > attributes_avg[attribute] + attr_offsets[attribute]:
                     print(f"Station {station['StnID']} ({station['Station']}) reading for attribute {attribute} "
                           f"(avg: {attributes_avg[attribute]}) was past the offset. Its reading was {station[attribute]}")
+
                     date_block.loc[index, attribute] = None
                     for attr_dep in dependents[attribute]:
                         date_block.loc[index, attr_dep] = None
-                    print(neighbor_data[attribute])
-                    print(neighbor_data["Station"])
                     count += 1
 
                 elif station[attribute] < attributes_avg[attribute] - attr_offsets[attribute]:
                     print(f"Station {station['StnID']} ({station['Station']}) reading for attribute {attribute} "
                           f"(avg: {attributes_avg[attribute]}) was past the offset. Its reading was {station[attribute]}")
-                    date_block.loc[index, attribute] = None
-                    print(neighbor_data[attribute])
-                    print(neighbor_data["Station"])
+
                     date_block.loc[index, attribute] = None
                     for attr_dep in dependents:
                         date_block.loc[index, attr_dep] = None
@@ -138,8 +138,8 @@ def qa_consecutive_24(df_24):
     start_time = time.time()
     # find every group all the data points into groups where it is consecutively below 0, group of size 1 if it is
     # above zero
+    # if TotRS_MJ is below 5 for more than 5 days we want to remove the data
     for index, group in df_24[df_24["TotRS_MJ"] < 5].groupby((df_24['TotRS_MJ'] >= 5).cumsum()):
-        # if EvapTot24 is less than 5 then we want to remove the data
         if len(group.index) > 5:
             df_24.iloc[group.index] = None
 
