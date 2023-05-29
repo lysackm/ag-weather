@@ -79,7 +79,7 @@ the webscraper I ran into several 503 http responses, and when
 using curl there were large chunks of data (months) that were not 
 properly downloaded.
 
-### Data Downloaded
+### Merra-2 Data Downloaded
 
 All attributes are downloaded for the years 2018 to 2022, inclusive
 
@@ -94,6 +94,8 @@ All attributes are downloaded for the years 2018 to 2022, inclusive
 | M2T1NXLND | GWETROOT                                 | Root zone soil wetness                   | %          |
 | M2T1NXLND | GWETTOP                                  | Surface soil wetness                     | %          |
 | M2T1NXRAD | SWGDN                                    | Incident shortwave land                  | W/m^2      |
+
+Note that kg per meter squared is equivalent to mm of rain.
 
 Note that for TSOIL1-4, GWETPROF, GWETROOT, and GWETTOP there is a 
 static data set for each location that describes the depth of the 
@@ -142,18 +144,21 @@ file.
 This download process can take a while to complete. (~2 hours per 
 5 years per attribute)
 
-### Downloaded Data
+### Era5-Land Downloaded Data
 
-| Attribute Name                    | Units  |
-|-----------------------------------|--------|
-| 2m temperature                    | Kelvin |
-| soil temperature level 1-3        | Kelvin |
-| surface solar radiation downwards | J/m^2  |
-| total precipitation               | m      |
-| volumetric soil water layer 1-3   | %      |
+| Attribute Name                    | Short Name    | Units  |
+|-----------------------------------|---------------|--------|
+| 2m temperature                    | T2M           | Kelvin |
+| Wind speed vectorized             | v10m, u10m    | m/s    |
+| soil temperature level 1-3        | st1, st2, st3 | Kelvin |
+| surface solar radiation downwards | rad           | J/m^2  |
+| total precipitation               | totprec       | m      |
+| volumetric soil water layer 1-3   | sw1, sw2, sw3 | %      |
 
 Note the temperature levels and layers are a predetermined depth 
 range. 0-7 cm for level 1, 7-28 cm for level 2, 28-100 cm for level 3.
+
+[Documentation for attributes](https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=overview)
 
 
 ## CaSPAr
@@ -171,7 +176,13 @@ recieve an email with a link to the data in the Globus file
 sharing system. To download this data directly to your computer 
 you will need to install a version of Globus Connect Personal. It 
 is offered for Windows, Linux, and macOS. 
-[Download link](https://www.globus.org/globus-connect-personal)
+[Download link.](https://www.globus.org/globus-connect-personal)
+Once the software is downloaded, and you have given access to one 
+of your drives or folders in your drive you go back to the browser 
+Globus file share and once you have both file locations set up you 
+can press `start` to start the file transfer process.
+
+
 This is something that the executable is unable to be downloaded 
 onto government computers due to firewalls and compartmentalization 
 computer. If you are able to run an executable in a drive with 
@@ -192,8 +203,9 @@ found [here.](https://caspar-data.ca/caspar)
 
 
 ### Downloaded HRDPS Data
-'HRDPS_P_FB_SFC', 'HRDPS_P_LA_SFC', 'HRDPS_P_LO_SFC', 
-'HRDPS_P_PR_SFC', 'HRDPS_P_TT_10000', 'HRDPS_P_UU_10000', 'HRDPS_P_VV_10000'
+
+Note these were chosen somewhat arbitrarily to test the data 
+download process.
 
 | Attribute Short Name | Attribute Description               | units           |
 |----------------------|-------------------------------------|-----------------|
@@ -223,7 +235,6 @@ This can be by following this syntax:
 SELECT * FROM data_60
 INTO OUTFILE 'output-data.csv'
 FIELDS TERMINATED BY ','
-ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 ```
 
@@ -235,7 +246,27 @@ remote server. You are able to add directories in the
 You can find more information on the weather station attributes 
 and units in the file `Data-Definition-Table.xlsx`.
 
-Whe
+### Station Data Used
+| Attribute Name                    | Units   |
+|-----------------------------------|---------|
+| AvgAir_T                          | Celsius |
+| AvgWS                             | m/s     |
+| RH                                | %       |
+| Soil_TP5_TempC - Soil_TP100_TempC | Celsius |
+| SolarRad                          | MJ/m^2  |
+| TBRG_Rain or Pluvio_Rain          | mm      |
+| Soil_TP5_VMC - Soil_TP100_VMC     | %       |
+
+Other attributes taken from our data table
+
+| Attribute Name | Table Name  |
+|----------------|-------------|
+| Station ID     | StnID       |
+| Station Name   | StationName |
+| Latitude       | LatDD       |
+| Longitude      | LongDD      |
+| TMSTAMP        | Time stamp  |
+
 
 ## File Format of Compiled Data
 It is good to notice that while the human-readable format exists, 
