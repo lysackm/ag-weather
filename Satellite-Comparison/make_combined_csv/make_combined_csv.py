@@ -1,5 +1,4 @@
-import traceback
-from datetime import date, timedelta, datetime
+from datetime import date, timedelta
 from math import sqrt
 from numpy import arctan, pi
 import xarray as xr
@@ -31,7 +30,7 @@ M2T1NXRAD = ["SWGDN"]
 
 
 # attribute is assumed to be the name of the merra_attr
-def get_merra_filename(date, attribute):
+def get_merra_filename(cur_date, attribute):
     folder = ""
     tag = ""
     if attribute in M2T1NXSLV:
@@ -45,7 +44,7 @@ def get_merra_filename(date, attribute):
         tag = "rad"
 
     # format date
-    date_str = date.strftime("%Y%m%d")
+    date_str = cur_date.strftime("%Y%m%d")
 
     return "merra/" + folder + "/MERRA2_400.tavg1_2d_" + tag + "_Nx." + date_str + ".SUB.nc"
 
@@ -60,18 +59,18 @@ def get_stn_filename(year):
     return "station-csv/MBAg-60min-" + str(year) + ".csv"
 
 
-def merra_time_array(date):
+def merra_time_array(cur_date):
     times = []
     for i in range(0, 24):
-        times.append(date.isoformat() + "T%.2f:00:00" % i)
+        times.append(cur_date.isoformat() + "T%.2f:00:00" % i)
     return times
 
 
-def era5_time_array(date):
+def era5_time_array(cur_date):
     times = []
     for i in range(1, 24):
-        times.append(date.isoformat() + "T%.2f:00:00" % i)
-    tomorrow = date + timedelta(days=1)
+        times.append(cur_date.isoformat() + "T%.2f:00:00" % i)
+    tomorrow = cur_date + timedelta(days=1)
     times.append(tomorrow.isoformat() + "T00:00:00")
     return times
 
@@ -179,7 +178,8 @@ def stn_metadata_preprocessing(stn_meta):
     return stn_meta
 
 
-def load_era5_data(era5_attr):
+# load era5 data from the file and return a xarray data array
+def load_era5_data(era5_attr, year):
     # era5 has files per attribute per year
     if isinstance(era5_attr, str) and era5_attr is not None:
         era5_file = get_era_filename(year, era5_attr)
@@ -191,7 +191,8 @@ def load_era5_data(era5_attr):
         str("do nothing")
 
 
-def load_stn_data(year):
+# load station data from the csv and return it as a dataframe
+def load_stn_data(year, stn_attr):
     # station data is per year
     if isinstance(stn_attr, str) and stn_attr is not None:
         stn_file = get_stn_filename(year)
@@ -203,6 +204,102 @@ def load_stn_data(year):
         # print("This is a special case")
         str("do nothing")
 
+
+# load and return a singular days worth of merra data of attribute
+# merra_attr
+def load_merra_data(merra_attr, day, stn_attr):
+    try:
+        if isinstance(merra_attr, str) and merra_attr is not None:  # standard cases
+            merra_file = get_merra_filename(day, merra_attr)
+
+            # data set since multiple attributes per file
+            merra_ds = xr.open_dataset(data_dir + merra_file)
+
+            merra_times = merra_time_array(day)
+            merra_data = merra_ds.sel(lon=long, lat=lat, time=merra_times, method="nearest")
+            merra_data = merra_data[merra_attr]
+            merra_data = shift_merra_timescale(merra_data)
+
+        elif merra_attr is not None:  # special cases
+            str("handle array as input")
+
+        else:  # missing data
+            # raise error that there is missing data when important
+            raise AttributeError
+    except Exception as e:
+        print(e)
+        exit(1)
+        # traceback.print_exc()
+
+    merra_df = merra_data.to_dataframe()
+    merra_df[merra_attr] = merra_df[merra_attr].apply(conversions.get(merra_attr, lambda x: x))
+    merra_df = merra_df.rename(columns={"lat": "merra_lat", "lon": "merra_lon", "T2M": "merra_" + stn_attr})
+    return merra_df
+
+
+# Given a years worth of station data in stn_df return a singular days worth of data on
+# attribute stn_attr
+def filter_stn_by_day(stn_df, day, stn_attr):
+    timestamp_today = pd.Timestamp(day + timedelta(hours=1), tz=pytz.utc)
+    timestamp_tomorrow = pd.Timestamp(day + timedelta(days=1), tz=pytz.utc)
+    early_bound = pd.Timestamp(day + timedelta(hours=-6))
+    late_bound = pd.Timestamp(day + timedelta(hours=(24 + 8)))
+
+    try:
+        stn_data = stn_df[["StnID", "time", "Station", stn_attr]]
+        stn_data["time"] = stn_data["time"] + pd.Timedelta(hours=-1)
+        stn_data = stn_data[(stn_data["time"] >= early_bound) & (stn_data["time"] < late_bound)]
+
+        local = pytz.timezone('America/Winnipeg')
+        stn_data["time"] = stn_data["time"].dt.tz_localize(local, ambiguous='infer')
+        stn_data["time"] = stn_data["time"].apply(lambda x: x.astimezone(pytz.utc))
+
+        # https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.between_time.html
+        stn_data = stn_data[(stn_data["time"] >= timestamp_today) & (stn_data["time"] <= timestamp_tomorrow)]
+
+        stn_data = stn_data.merge(stn_metadata, on=["Station"], how="left")
+        stn_data = stn_data.rename(columns={"LatDD": "stn_lat", "LongDD": "stn_long", stn_attr: "stn_" + stn_attr})
+        return stn_data
+    except NonExistentTimeError as nete:
+        print(nete)
+        # want to skip this day if there is a non-existent time error raised
+        raise AttributeError
+    except Exception as e:
+        print(e)
+        # traceback.print_exc(e)
+
+
+# Given a years worth of data in era5_da get the current days worth of data from the era dataset
+# returns a dataframe with data for era5_attr for the hourly time in day
+def filter_era5_by_day(day, era5_da, era5_attr, stn_attr):
+    era5_times = era5_time_array(day)
+    era5_data = era5_da.sel(longitude=long, latitude=lat, time=era5_times, method="nearest")
+    era5_df = era5_data.to_dataframe()
+    era5_df[era5_attr] = era5_df[era5_attr].apply(conversions.get(era5_attr, lambda x: x))
+    era5_df = era5_df.rename(
+        columns={"latitude": "era5_lat", "longitude": "era5_long", "t2m": "era5_" + stn_attr})
+    return era5_df
+
+
+# merge together data from era5, merra, and our station data
+# Joins on time and location. For example every data point can be
+# identified by a time and specific station at it.
+def merge_data(merra_df, era5_df, stn_data):
+    try:
+        merged_df = era5_df.merge(merra_df, on=["location", "time"], how="outer")
+        # df_index = merged_df.index.to_frame()
+
+        stn_data["time"] = stn_data["time"].dt.tz_localize(tz=None)
+
+        merged_df = stn_data.merge(merged_df, on=["location", "time"], how="inner")
+        merged_df.to_csv("./testing.csv")
+    except Exception as e:
+        # print(merged_df)
+        # print(stn_data)
+        print(e)
+
+
+# global variables
 
 # An array which holds metadata that is not recorded in the hourly table.
 # Includes name, id (station number), longitude, and latitude
@@ -218,7 +315,7 @@ long = xr.DataArray(stn_metadata['LongDD'].tolist(), dims=['location'])
 
 # plain text names for all the stations in order. Each index is
 # will be the same as the index mapping in lat and long
-station_names = stn_metadata['StationName'].tolist()
+station_names = stn_metadata['Station'].tolist()
 
 # index to have the correct plaintext station name for every row
 station_index = location_names()
@@ -226,96 +323,37 @@ station_index = location_names()
 # relative directory for where data is being held on this machine.
 # outside this GitHub repo. Change if needed
 data_dir = "../../../../data/"
-stn_df = ""
 
-# loop through the named attributes of each of the different file types
-# all the attributes should be a mapping to each other.
-for stn_attr, era5_attr, merra_attr in zip(stn_attrs, era5_attrs, merra_attrs):
-    for year in years:
 
-        # da = dataarray, df = dataframe
-        era5_da = load_era5_data(era5_attr)
-        stn_df = load_stn_data(year)
+def main():
+    # loop through the named attributes of each of the different file types
+    # all the attributes should be a mapping to each other.
+    for stn_attr, era5_attr, merra_attr in zip(stn_attrs, era5_attrs, merra_attrs):
+        for year in years:
 
-        # initialize the start and end date
-        start_date = date(year, 1, 1)
-        end_date = date(year, 12, 31)
-        time_delta = end_date - start_date
+            # da = data array, df = dataframe
+            era5_da = load_era5_data(era5_attr, year)
+            stn_df = load_stn_data(year, stn_attr)
 
-        for i in range(time_delta.days + 1):
-            day = start_date + timedelta(days=i)
-            merra_data = []
-            timestamp_today = pd.Timestamp(day + timedelta(hours=1), tz=pytz.utc)
-            timestamp_tomorrow = pd.Timestamp(day + timedelta(days=1), tz=pytz.utc)
-            early_bound = pd.Timestamp(day + timedelta(hours=-6))
-            late_bound = pd.Timestamp(day + timedelta(hours=(24 + 8)))
+            # initialize the start and end date
+            start_date = date(year, 1, 1)
+            end_date = date(year, 12, 31)
+            time_delta = end_date - start_date
 
-            # handling one chunk of data written to the csv
-            try:
-                if isinstance(era5_attr, str) and era5_attr is not None:  # standard cases
-                    merra_file = get_merra_filename(day, merra_attr)
+            for i in range(time_delta.days + 1):
+                day = start_date + timedelta(days=i)
 
-                    # data set since multiple attributes per file
-                    merra_ds = xr.open_dataset(data_dir + merra_file)
-
-                    merra_times = merra_time_array(day)
-                    merra_data = merra_ds.sel(lon=long, lat=lat, time=merra_times, method="nearest")
-                    merra_data = merra_data[merra_attr]
-                    merra_data = shift_merra_timescale(merra_data)
-                    # print(merra_data)
-
-                elif era5_attr is not None:  # special cases
-                    str("handle array as input")
-
-                else:  # missing data
+                # handling one chunk of data written to the csv
+                try:
+                    merra_df = load_merra_data(merra_attr, day, stn_attr)
+                    era5_df = filter_era5_by_day(day, era5_da, era5_attr, stn_attr)
+                    stn_data = filter_stn_by_day(stn_df, day, stn_attr)
+                except AttributeError:
+                    print(day)
                     continue
-            except Exception as e:
-                print(e)
-                # traceback.print_exc()
 
-            era5_times = era5_time_array(day)
-            era5_data = era5_da.sel(longitude=long, latitude=lat, time=era5_times, method="nearest")
-            # print(era5_data.time)
+                merge_data(merra_df, era5_df, stn_data)
 
-            try:
-                stn_data = stn_df[["StnID", "time", "Station", stn_attr]]
-                stn_data["time"] = stn_data["time"] + pd.Timedelta(hours=-1)
-                stn_data = stn_data[(stn_data["time"] >= early_bound) & (stn_data["time"] < late_bound)]
 
-                local = pytz.timezone('America/Winnipeg')
-                stn_data["time"] = stn_data["time"].dt.tz_localize(local, ambiguous='infer')
-                stn_data["time"] = stn_data["time"].apply(lambda x: x.astimezone(pytz.utc))
-
-                # https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.between_time.html
-                stn_data = stn_data[(stn_data["time"] >= timestamp_today) & (stn_data["time"] <= timestamp_tomorrow)]
-                stn_data = stn_data.merge(stn_metadata, on=["Station"], how="left")
-            except NonExistentTimeError as nete:
-                print(nete)
-                continue
-            except Exception as e:
-                print(e)
-                # traceback.print_exc(e)
-
-            era5_df = era5_data.to_dataframe()
-            era5_df[era5_attr] = era5_df[era5_attr].apply(conversions.get(era5_attr, lambda x: x))
-            era5_df = era5_df.rename(
-                columns={"latitude": "era5_lat", "longitude": "era5_long", "t2m": "era5_" + stn_attr})
-
-            merra_df = merra_data.to_dataframe()
-            merra_df[merra_attr] = merra_df[merra_attr].apply(conversions.get(merra_attr, lambda x: x))
-            merra_df = merra_df.rename(columns={"lat": "merra_lat", "lon": "merra_lon", "T2M": "merra_" + stn_attr})
-
-            stn_data = stn_data.rename(columns={"LatDD": "stn_lat", "LongDD": "stn_long", stn_attr: "stn_" + stn_attr})
-
-            try:
-                merged_df = era5_df.merge(merra_df, on=["location", "time"], how="outer")
-                df_index = merged_df.index.to_frame()
-
-                stn_data["time"] = stn_data["time"].dt.tz_localize(tz=None)
-
-                merged_df = stn_data.merge(merged_df, on=["location", "time"], how="inner")
-                merged_df.to_csv("./testing.csv")
-            except Exception as e:
-                print(merged_df)
-                print(stn_data)
-                print(e)
+# bootstrap
+main()
