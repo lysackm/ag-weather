@@ -1,3 +1,6 @@
+import glob
+import os
+import traceback
 from datetime import date, timedelta
 from math import sqrt
 from numpy import arctan, pi
@@ -5,7 +8,7 @@ import xarray as xr
 import pandas as pd
 import numpy as np
 import pytz
-from pytz.exceptions import NonExistentTimeError
+from pytz.exceptions import NonExistentTimeError, AmbiguousTimeError
 
 pd.options.mode.chained_assignment = None  # default='warn'
 
@@ -227,7 +230,7 @@ def load_merra_data(merra_attr, day, stn_attr):
             # raise error that there is missing data when important
             raise AttributeError
     except Exception as e:
-        print(e)
+        print("load_merra_data", e)
         exit(1)
         # traceback.print_exc()
 
@@ -260,13 +263,13 @@ def filter_stn_by_day(stn_df, day, stn_attr):
         stn_data = stn_data.merge(stn_metadata, on=["Station"], how="left")
         stn_data = stn_data.rename(columns={"LatDD": "stn_lat", "LongDD": "stn_long", stn_attr: "stn_" + stn_attr})
         return stn_data
-    except NonExistentTimeError as nete:
-        print(nete)
-        # want to skip this day if there is a non-existent time error raised
+    except (NonExistentTimeError, AmbiguousTimeError) as time_error:
+        print("filter_stn_by_day (time_error)", time_error)
+        # want to skip this day if there is a non-existent or an ambiguousTimeError time error raised
         raise AttributeError
     except Exception as e:
-        print(e)
-        # traceback.print_exc(e)
+        print("filter_stn_by_day", e)
+        # traceback.print_exc()
 
 
 # Given a years worth of data in era5_da get the current days worth of data from the era dataset
@@ -292,11 +295,36 @@ def merge_data(merra_df, era5_df, stn_data):
         stn_data["time"] = stn_data["time"].dt.tz_localize(tz=None)
 
         merged_df = stn_data.merge(merged_df, on=["location", "time"], how="inner")
-        merged_df.to_csv("./testing.csv")
+        return merged_df
     except Exception as e:
         # print(merged_df)
         # print(stn_data)
-        print(e)
+        print('merge_data', e)
+
+
+def calculate_sqr_error(merged_df, stn_attr):
+    merra_col = "merra_" + stn_attr
+    era5_col = "era5_" + stn_attr
+    stn_col = "stn_" + stn_attr
+
+    try:
+        merged_df["merra_sqr_err"] = (merged_df[stn_col] - merged_df[merra_col]) ** 2
+        merged_df["era5_sqr_err"] = (merged_df[stn_col] - merged_df[era5_col]) ** 2
+        append_csv(merged_df, stn_attr)
+        return merged_df
+    except TypeError as e:
+        print("calculate_sqr_error", e)
+
+
+def append_csv(merged_df, stn_attr):
+    output_file = "./output/" + stn_attr + "_output.csv"
+    merged_df.to_csv(output_file, mode='a', header=not os.path.exists(output_file))
+
+
+def clear_output():
+    files = glob.glob('./output')
+    for file in files:
+        os.remove(file)
 
 
 # global variables
@@ -349,10 +377,12 @@ def main():
                     era5_df = filter_era5_by_day(day, era5_da, era5_attr, stn_attr)
                     stn_data = filter_stn_by_day(stn_df, day, stn_attr)
                 except AttributeError:
-                    print(day)
+                    print("main", day)
                     continue
 
-                merge_data(merra_df, era5_df, stn_data)
+                merged_df = merge_data(merra_df, era5_df, stn_data)
+                merged_df = calculate_sqr_error(merged_df, stn_attr)
+                # merged_df.to_csv("./testing.csv")
 
 
 # bootstrap

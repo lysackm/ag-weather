@@ -253,6 +253,15 @@ remote server. You are able to add directories in the
 You can find more information on the weather station attributes 
 and units in the file `Data-Definition-Table.xlsx`.
 
+#### Missing Data
+Holland has significant missing data from `2018-03-12 17:00` to 
+`2018-04-20 15:00`
+
+There has also been some preprocessing that has been done on the 
+2022 data that was used. The current database has preprocessing 
+done on it, but the csvs that are hosted on the server do not have 
+any preprocessing done to it.
+
 ### Station Data Used
 | Attribute Name                    | Units   |
 |-----------------------------------|---------|
