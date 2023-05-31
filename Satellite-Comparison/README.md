@@ -83,17 +83,19 @@ properly downloaded.
 
 All attributes are downloaded for the years 2018 to 2022, inclusive
 
-| Database  | Attribute Short Name                     | Attribute Long Name                      | Units      |
-|-----------|------------------------------------------|------------------------------------------|------------|
-| M2T1NXSLV | T2M                                      | Temperature 2 meters                     | Kelvin     |
-| M2T1NXSLV | V10M and U10M                            | Vectorized wind components               | m/s        |
-| M2T1NXSLV | QV2M                                     | 2 meter specific humidity                | %          |
-| M2T1NXLND | TSOIL1, TSOIL2, TSOIL3, <br/> and TSOIL4 | Soil temperature, level 1-4              | Kelvin     |
-| M2T1NXLND | PRECTOTLAND                              | Total precipitation land; bias corrected | Kg/(m^2 s) |
-| M2T1NXLND | GWETPROF                                 | Ave prof soil moisture                   | %          |
-| M2T1NXLND | GWETROOT                                 | Root zone soil wetness                   | %          |
-| M2T1NXLND | GWETTOP                                  | Surface soil wetness                     | %          |
-| M2T1NXRAD | SWGDN                                    | Incident shortwave land                  | W/m^2      |
+| Database   | Attribute Short Name               | Attribute Long Name                      | Units      |     |
+|------------|------------------------------------|------------------------------------------|------------|-----|
+| M2T1NXSLV  | T2M                                | Temperature 2 meters                     | Kelvin     |     |
+| M2T1NXSLV  | V10M and U10M                      | Vectorized wind components               | m/s        |     |
+| M2T1NXSLV  | QV2M                               | 2 meter specific humidity                | Kg/Kg      |     |
+| M2T1NXSLV  | PS                                 | Surface pressure                         | Pa         | new |
+| M2T1NXSLV  | T2MDEW                             | dew point temperature at 2m              | Kelvin     | new |
+| M2T1NXLND  | TSOIL1, TSOIL2, TSOIL3, and TSOIL4 | Soil temperature, level 1-4              | Kelvin     |     |
+| M2T1NXLND  | PRECTOTLAND                        | Total precipitation land; bias corrected | Kg/(m^2 s) |     |
+| M2T1NXLND  | RZMC                               |                                          | m^3/m^3    | new |
+| M2T1NXLND  | SFMC                               |                                          | m^3/m^3    | new |
+| M2T1NXLND  | PRMC                               |                                          | m^3/m^3    | new |
+| M2T1NXRAD  | SWGDN                              | Incident shortwave land                  | W/m^2      |     |
 
 Note that kg per meter squared is equivalent to mm of rain.
 
@@ -146,17 +148,22 @@ This download process can take a while to complete. (~2 hours per
 
 ### Era5-Land Downloaded Data
 
-| Attribute Name                    | Short Name    | Units  |
-|-----------------------------------|---------------|--------|
-| 2m temperature                    | T2M           | Kelvin |
-| Wind speed vectorized             | v10m, u10m    | m/s    |
-| soil temperature level 1-3        | st1, st2, st3 | Kelvin |
-| surface solar radiation downwards | rad           | J/m^2  |
-| total precipitation               | totprec       | m      |
-| volumetric soil water layer 1-3   | sw1, sw2, sw3 | %      |
+| Attribute Name                    | Short Name    | Units   |     |
+|-----------------------------------|---------------|---------|-----|
+| 2m temperature                    | T2M           | Kelvin  |     |
+| Wind speed vectorized             | v10m, u10m    | m/s     |     |
+| soil temperature level 1-3        | st1, st2, st3 | Kelvin  |     |
+| surface solar radiation downwards | rad           | J/m^2   |     |
+| total precipitation               | totprec       | m       |     |
+| volumetric soil water layer 1-3   | sw1, sw2, sw3 | m^3/m^3 |     |
+| 2m dewpoint temperature           |               | Kelvin  | new |
+| Surface pressure                  |               | Pa      | new |
 
 Note the temperature levels and layers are a predetermined depth 
 range. 0-7 cm for level 1, 7-28 cm for level 2, 28-100 cm for level 3.
+
+Note that humidity would be calculated using pressure, temperature,
+and 2m dewpoint temperature. It would become a derived value.
 
 [Documentation for attributes](https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=overview)
 
@@ -251,21 +258,27 @@ and units in the file `Data-Definition-Table.xlsx`.
 |-----------------------------------|---------|
 | AvgAir_T                          | Celsius |
 | AvgWS                             | m/s     |
+| AvgWD                             | Degrees |
 | RH                                | %       |
 | Soil_TP5_TempC - Soil_TP100_TempC | Celsius |
 | SolarRad                          | MJ/m^2  |
 | TBRG_Rain or Pluvio_Rain          | mm      |
 | Soil_TP5_VMC - Soil_TP100_VMC     | %       |
+| press_hPa                         | hPa     |
+
+Note for wind direction, 0 and 360 degrees is true north.
+Note when available use Pluvio.
 
 Other attributes taken from our data table
 
-| Attribute Name | Table Name  |
-|----------------|-------------|
-| Station ID     | StnID       |
-| Station Name   | StationName |
-| Latitude       | LatDD       |
-| Longitude      | LongDD      |
-| TMSTAMP        | Time stamp  |
+| Attribute Name | Table Name  | Units |
+|----------------|-------------|-------|
+| Station ID     | StnID       |       |
+| Station Name   | StationName |       |
+| Latitude       | LatDD       |       |
+| Longitude      | LongDD      |       |
+| TMSTAMP        | Time stamp  |       |
+| Elevation      | Elevation   | m     |
 
 
 ## File Format of Compiled Data
@@ -289,4 +302,42 @@ station is not exactly the center of the grid. This also means
 that there can be several mappings to one grid if weather stations 
 are sufficiently close together. There will be a separate csv for 
 every attribute that the analysis is done on.
+
+#### Analysis
+The statistical analysis done on the columns will be root square 
+mean error. This will happen per station, per month for the 
+ability to create human-readable data that can easily be charted. 
+There will also be columns made for every row to have the 
+individual root square mean error. The function to calculate the 
+root square mean error is 
+[math.dist](https://docs.python.org/3/library/math.html#math.dist)
+which is used to calculate the distance between two points. The 
+equation is equivalent to
+`sqrt(sum((px - qx) ** 2.0 for px, qx in zip(p, q)))`.
+
+Given two vectors with n dimensions (ie a column of size n) this 
+function will return the root square mean error.
+
+#### Time Shift
+Merra2 and Era5 are both in UTC while our station data is in 
+central time. This means that in the winter our station time will 
+need to be offset by 6 +- 1 hours and 6 hours in the summer.
+
+Because of this timeshift the first and last day of the data will 
+be discarded. This is because our data will not be perfectly 
+aligned with the data provided from Merra-2 and Era5.
+
+A note on time change for the weather stations. Normally in 
+Manitoba time change will happen by skipping the hour between 2 am 
+and 3 am in the spring, and in the winter from 2 am to 1 am. 
+Weather stations will only skip the hour once they make a 
+connection to send data. This can be day in some cases. The 
+weather stations will update their own local time using their 
+internal clock but there is zero consideration for time zone 
+corrections. This is a problem for trying to align the data 
+perfectly with data that UTC time. Especially if the time skip 
+happens a full day after the timezone incident. Our current method 
+of dealing with this is to remove any days of data that is 
+incomplete and to note that days around the time change in the 
+spring and winter may have off by one inaccuracies.  
 
