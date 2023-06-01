@@ -1,12 +1,9 @@
 import glob
 import os
-import traceback
 from datetime import date, timedelta
-from math import sqrt
 from numpy import arctan, pi
 import xarray as xr
 import pandas as pd
-import numpy as np
 import pytz
 from pytz.exceptions import NonExistentTimeError, AmbiguousTimeError
 
@@ -21,14 +18,26 @@ stn_attrs = ['AvgAir_T', 'AvgWS', 'RH', 'Soil_TP5_TempC', 'Soil_TP20_TempC', 'So
              ['Soil_TP50_VMC', 'Soil_TP100_VMC'], "press_hPa"]
 
 # attribute names for era5
-era5_attrs = ['t2m', ['v10m', 'u10m'], None, 'st1', 'st2', 'st3', None, 'rad', 'totprec', 'sw1', 'sw2', 'sw3']
+era5_attrs = ['t2m', ['v10m', 'u10m'], None, 'st1', 'st2', 'st3', None, 'rad', 'totprec', 'sw1', 'sw2', 'sw3',
+              'sp', 't2mdew']
 # attribute names for merra2
 merra_attrs = ["T2M", ["V10M", "U10M"], "QV2M", "TSOIL1", "TSOIL2", "TSOIL3", "TSOIL4", "SWGDN", "PRECTOTLAND",
-               "GWETTOP", "GWETROOT", "GWETPROF"]
+               "SFMC", "RZMC", "PRMC", "PS", "T2MDEW"]
+
+
+# For testing purposes
+# stn_attrs = ['AvgWS']
+# era5_attrs = [['v10m', 'u10m']]
+# merra_attrs = [["V10M", "U10M"]]
+
 
 # attribute names for merra broken down by database
+# _2 folders were there since they were added outside the
+# original data scope and had to be downloaded later
 M2T1NXSLV = ["T2M", ["V10M", "U10M"], "QV2M"]
-M2T1NXLND = ["TSOIL1", "TSOIL2", "TSOIL3", "TSOIL4", "PRECTOTLAND", "GWETPROF", "GWETROOT", "GWETTOP"]
+M2T1NXSLV_2 = ["PS", "T2MDEW"]
+M2T1NXLND = ["TSOIL1", "TSOIL2", "TSOIL3", "TSOIL4", "PRECTOTLAND"]
+M2T1NXLND_2 = ["SFMC", "RZMC", "PRMC"]
 M2T1NXRAD = ["SWGDN"]
 
 
@@ -45,6 +54,12 @@ def get_merra_filename(cur_date, attribute):
     elif attribute in M2T1NXRAD:
         folder = "M2T1NXRAD"
         tag = "rad"
+    elif attribute in M2T1NXSLV_2:
+        folder = "M2T1NXSLV-2"
+        tag = "slv"
+    elif attribute in M2T1NXLND_2:
+        folder = "M2T1NXLND-2"
+        tag = "lnd"
 
     # format date
     date_str = cur_date.strftime("%Y%m%d")
@@ -116,7 +131,7 @@ def kelvin_to_celsius(kelvin):
 
 # given two vectorized components of wind which are perpendicular
 # to each other find the wind direction in degrees
-def wind_vector_to_direction(u, v):
+def wind_vector_to_direction(v, u):
     if v > 0:
         return (180 / pi) * arctan(u / v) + 180
     if u < 0 & v < 0:
@@ -127,9 +142,11 @@ def wind_vector_to_direction(u, v):
 
 # given two vectorized components of wind which are perpendicular
 # to each other find the scalar wind speed
-def wind_vector_to_scalar(u, v):
+def wind_vector_to_scalar(v, u, v_col, u_col):
     # is this fast?
-    return sqrt(np.power(u, 2) + np.power(v, 2))
+    v[v_col] = (v[v_col] ** 2 + u[u_col] ** 2) ** (1/2)
+    v = v.rename(columns={v_col: "AvgWS"})
+    return v
 
 
 # takes in watts per meter squared and need to multiplied by the time
@@ -181,6 +198,16 @@ def stn_metadata_preprocessing(stn_meta):
     return stn_meta
 
 
+def load_era5_wind_data(era5_attr, year):
+    v_file = get_era_filename(year, era5_attr[0])
+    u_file = get_era_filename(year, era5_attr[1])
+
+    v_da = xr.open_dataarray(data_dir + v_file)
+    u_da = xr.open_dataarray(data_dir + u_file)
+
+    return [v_da, u_da]
+
+
 # load era5 data from the file and return a xarray data array
 def load_era5_data(era5_attr, year):
     # era5 has files per attribute per year
@@ -190,8 +217,9 @@ def load_era5_data(era5_attr, year):
         era5_da = xr.open_dataarray(data_dir + era5_file)
         return era5_da
     else:
-        # print("This is a special case")
-        str("do nothing")
+        # handle special cases
+        if era5_attr[0] == "v10m":
+            return load_era5_wind_data(era5_attr, year)
 
 
 # load station data from the csv and return it as a dataframe
@@ -208,23 +236,37 @@ def load_stn_data(year, stn_attr):
         str("do nothing")
 
 
+def load_merra_wind_data(merra_attr, merra_data):
+    merra_data = shift_merra_timescale(merra_data)
+
+    v_df = merra_data[merra_attr[0]].to_dataframe()
+    u_df = merra_data[merra_attr[1]].to_dataframe()
+
+    merra_df = wind_vector_to_scalar(v_df, u_df, "V10M", "U10M")
+    return merra_df
+
+
 # load and return a singular days worth of merra data of attribute
 # merra_attr
 def load_merra_data(merra_attr, day, stn_attr):
     try:
+        merra_file = get_merra_filename(day, merra_attr)
+        # data set since multiple attributes per file
+        merra_ds = xr.open_dataset(data_dir + merra_file)
+
+        merra_times = merra_time_array(day)
+        merra_data = merra_ds.sel(lon=long, lat=lat, time=merra_times, method="nearest")
+
         if isinstance(merra_attr, str) and merra_attr is not None:  # standard cases
-            merra_file = get_merra_filename(day, merra_attr)
-
-            # data set since multiple attributes per file
-            merra_ds = xr.open_dataset(data_dir + merra_file)
-
-            merra_times = merra_time_array(day)
-            merra_data = merra_ds.sel(lon=long, lat=lat, time=merra_times, method="nearest")
             merra_data = merra_data[merra_attr]
             merra_data = shift_merra_timescale(merra_data)
+            merra_df = merra_data.to_dataframe()
 
         elif merra_attr is not None:  # special cases
             str("handle array as input")
+            if stn_attr == "AvgWS":
+                merra_df = load_merra_wind_data(merra_attr, merra_data)
+                merra_attr = stn_attr
 
         else:  # missing data
             # raise error that there is missing data when important
@@ -234,9 +276,8 @@ def load_merra_data(merra_attr, day, stn_attr):
         exit(1)
         # traceback.print_exc()
 
-    merra_df = merra_data.to_dataframe()
     merra_df[merra_attr] = merra_df[merra_attr].apply(conversions.get(merra_attr, lambda x: x))
-    merra_df = merra_df.rename(columns={"lat": "merra_lat", "lon": "merra_lon", "T2M": "merra_" + stn_attr})
+    merra_df = merra_df.rename(columns={"lat": "merra_lat", "lon": "merra_lon", merra_attr: "merra_" + stn_attr})
     return merra_df
 
 
@@ -276,11 +317,26 @@ def filter_stn_by_day(stn_df, day, stn_attr):
 # returns a dataframe with data for era5_attr for the hourly time in day
 def filter_era5_by_day(day, era5_da, era5_attr, stn_attr):
     era5_times = era5_time_array(day)
-    era5_data = era5_da.sel(longitude=long, latitude=lat, time=era5_times, method="nearest")
-    era5_df = era5_data.to_dataframe()
-    era5_df[era5_attr] = era5_df[era5_attr].apply(conversions.get(era5_attr, lambda x: x))
+
+    if isinstance(era5_attr, str) and era5_attr is not None:  # standard cases
+        era5_data = era5_da.sel(longitude=long, latitude=lat, time=era5_times, method="nearest")
+        era5_df = era5_data.to_dataframe()
+        era5_df[era5_attr] = era5_df[era5_attr].apply(conversions.get(era5_attr, lambda x: x))
+    else:
+        if stn_attr == 'AvgWS':
+            v_data = era5_da[0].sel(longitude=long, latitude=lat, time=era5_times, method="nearest")
+            u_data = era5_da[1].sel(longitude=long, latitude=lat, time=era5_times, method="nearest")
+            # print(u_data)
+
+            v_df = v_data.to_dataframe()
+            u_df = u_data.to_dataframe()
+
+            era5_df = wind_vector_to_scalar(v_df, u_df, "v10", "u10")
+            era5_attr = stn_attr
+
     era5_df = era5_df.rename(
-        columns={"latitude": "era5_lat", "longitude": "era5_long", "t2m": "era5_" + stn_attr})
+        columns={"latitude": "era5_lat", "longitude": "era5_long", era5_attr: "era5_" + stn_attr})
+    # print(era5_df)
     return era5_df
 
 
@@ -297,8 +353,6 @@ def merge_data(merra_df, era5_df, stn_data):
         merged_df = stn_data.merge(merged_df, on=["location", "time"], how="inner")
         return merged_df
     except Exception as e:
-        # print(merged_df)
-        # print(stn_data)
         print('merge_data', e)
 
 
@@ -307,18 +361,14 @@ def calculate_sqr_error(merged_df, stn_attr):
     era5_col = "era5_" + stn_attr
     stn_col = "stn_" + stn_attr
 
-    try:
-        merged_df["merra_sqr_err"] = (merged_df[stn_col] - merged_df[merra_col]) ** 2
-        merged_df["era5_sqr_err"] = (merged_df[stn_col] - merged_df[era5_col]) ** 2
-        append_csv(merged_df, stn_attr)
-        return merged_df
-    except TypeError as e:
-        print("calculate_sqr_error", e)
+    merged_df["merra_sqr_err"] = (merged_df[stn_col] - merged_df[merra_col]) ** 2
+    merged_df["era5_sqr_err"] = (merged_df[stn_col] - merged_df[era5_col]) ** 2
+    return merged_df
 
 
 def append_csv(merged_df, stn_attr):
     output_file = "./output/" + stn_attr + "_output.csv"
-    merged_df.to_csv(output_file, mode='a', header=not os.path.exists(output_file))
+    merged_df.to_csv(output_file, mode='a', header=not os.path.exists(output_file), index=False)
 
 
 def clear_output():
@@ -381,8 +431,11 @@ def main():
                     continue
 
                 merged_df = merge_data(merra_df, era5_df, stn_data)
-                merged_df = calculate_sqr_error(merged_df, stn_attr)
-                # merged_df.to_csv("./testing.csv")
+                try:
+                    merged_df = calculate_sqr_error(merged_df, stn_attr)
+                    append_csv(merged_df, stn_attr)
+                except TypeError as e:
+                    print("main", e)
 
 
 # bootstrap
