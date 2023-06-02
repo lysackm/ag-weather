@@ -99,6 +99,18 @@ All attributes are downloaded for the years 2018 to 2022, inclusive
 
 Note that kg per meter squared is equivalent to mm of rain.
 
+
+| Attribute                  | depth           | units  | locations |
+|----------------------------|-----------------|--------|-----------|
+| TSOIL1                     | 9.88            | cm     | all       |
+| TSOIL2                     | 19.52           | cm     | all       |
+| TSOIL3                     | 38.59           | cm     | all       |
+| TSOIL4                     | 76.26           | cm     | all       |
+| SFMC                       | 5               | cm     | all       |
+| RZMC                       | 100             | cm     | all       |
+| PRMC                       | 133.3 - 382.0   | cm     | varies    |
+| Max Water Holding Capacity | 296.59 - 1171.5 | kg m^2 | varies    |
+
 Note that for TSOIL1-4, GWETPROF, GWETROOT, and GWETTOP there is a 
 static data set for each location that describes the depth of the 
 attributes there. This can be found in 
@@ -276,7 +288,7 @@ any preprocessing done to it.
 | press_hPa                         | hPa     |
 
 Note for wind direction, 0 and 360 degrees is true north.
-Note when available use Pluvio.
+Note when available use Pluvio for measuring precipitation.
 
 Other attributes taken from our data table
 

@@ -1,6 +1,6 @@
 import glob
 import os
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from numpy import arctan, pi
 import xarray as xr
 import pandas as pd
@@ -13,22 +13,22 @@ pd.options.mode.chained_assignment = None  # default='warn'
 years = [2018, 2019, 2020, 2021, 2022]
 
 # column names for manitoba weather station data
-stn_attrs = ['AvgAir_T', 'AvgWS', 'RH', 'Soil_TP5_TempC', 'Soil_TP20_TempC', 'Soil_TP50_TempC', 'Soil_TP100_TempC',
-             'SolarRad', ['TBRG_Rain', 'Pluvio_Rain'], 'Soil_TP5_VMC', 'Soil_TP20_VMC',
-             ['Soil_TP50_VMC', 'Soil_TP100_VMC'], "press_hPa"]
-
-# attribute names for era5
-era5_attrs = ['t2m', ['v10m', 'u10m'], None, 'st1', 'st2', 'st3', None, 'rad', 'totprec', 'sw1', 'sw2', 'sw3',
-              'sp', 't2mdew']
-# attribute names for merra2
-merra_attrs = ["T2M", ["V10M", "U10M"], "QV2M", "TSOIL1", "TSOIL2", "TSOIL3", "TSOIL4", "SWGDN", "PRECTOTLAND",
-               "SFMC", "RZMC", "PRMC", "PS", "T2MDEW"]
+# stn_attrs = ['AvgAir_T', 'AvgWS', 'RH', 'Soil_TP5_TempC', 'Soil_TP20_TempC', 'Soil_TP50_TempC', 'Soil_TP100_TempC',
+#              'SolarRad', ['TBRG_Rain', 'Pluvio_Rain'], 'Soil_TP5_VMC', 'Soil_TP20_VMC',
+#              ['Soil_TP50_VMC', 'Soil_TP100_VMC'], "Press_hPa"]
+#
+# # attribute names for era5
+# era5_attrs = ['t2m', ['v10m', 'u10m'], None, 'stl1', 'stl2', 'stl3', 'ssrd', 'tp', 'swvl1', 'swvl2', 'swvl3',
+#               'sp', 'd2m']
+# # attribute names for merra2
+# merra_attrs = ["T2M", ["V10M", "U10M"], "QV2M", "TSOIL1", "TSOIL2", "TSOIL3", "TSOIL4", "SWGDN", "PRECTOTLAND",
+#                "SFMC", "RZMC", "PRMC", "PS", "T2MDEW"]
 
 
 # For testing purposes
-# stn_attrs = ['AvgWS']
-# era5_attrs = [['v10m', 'u10m']]
-# merra_attrs = [["V10M", "U10M"]]
+stn_attrs = ['Soil_TP5_VMC']
+era5_attrs = ['swvl1']
+merra_attrs = ["SFMC"]
 
 
 # attribute names for merra broken down by database
@@ -151,18 +151,26 @@ def wind_vector_to_scalar(v, u, v_col, u_col):
 
 # takes in watts per meter squared and need to multiplied by the time
 # elapsed measured in seconds. That is 1 hour = 60 * 60 = 3600 seconds
-def watts_to_millijoules(wm2):
-    return float(wm2 * 3600) * 1000
+def watts_to_megajoules(wm2):
+    return float(wm2 * 3600) / 1000000.0
 
 
 # is actually used for joules per meter squared but the conversion
 # is the same
-def joules_to_millijoules(j):
-    return j * 1000
+def joules_to_megajoules(j):
+    return j / 1000000.0
 
 
 def meters_to_mm(m):
     return m * 1000
+
+
+def pa_to_hpa(pa):
+    return pa / 100.0
+
+
+def decimal_to_percent(dec):
+    return dec * 100
 
 
 # mapping of attribute names to correct conversion function
@@ -170,18 +178,28 @@ def meters_to_mm(m):
 # are not included
 conversions = {
     "t2m": kelvin_to_celsius,
-    "st1": kelvin_to_celsius,
-    "st2": kelvin_to_celsius,
-    "st3": kelvin_to_celsius,
-    "rad": joules_to_millijoules,
-    "totprec": meters_to_mm,
+    "stl1": kelvin_to_celsius,
+    "stl2": kelvin_to_celsius,
+    "stl3": kelvin_to_celsius,
+    "ssrd": joules_to_megajoules,
+    "tp": meters_to_mm,
+    "d2m": kelvin_to_celsius,
+    "sp": pa_to_hpa,
+    "swvl1": decimal_to_percent,
+    "swvl2": decimal_to_percent,
+    "swvl3": decimal_to_percent,
     "T2M": kelvin_to_celsius,
     "TSOIL1": kelvin_to_celsius,
     "TSOIL2": kelvin_to_celsius,
     "TSOIL3": kelvin_to_celsius,
     "TSOIL4": kelvin_to_celsius,
-    "SWGDN": watts_to_millijoules,
+    "SWGDN": watts_to_megajoules,
     "PRECTOTLAND": meters_to_mm,
+    "T2MDEW": kelvin_to_celsius,
+    "PS": pa_to_hpa,
+    "SFMC": decimal_to_percent,
+    "RZMC": decimal_to_percent,
+    "PRMC": decimal_to_percent,
 }
 
 
@@ -222,18 +240,36 @@ def load_era5_data(era5_attr, year):
             return load_era5_wind_data(era5_attr, year)
 
 
-# load station data from the csv and return it as a dataframe
-def load_stn_data(year, stn_attr):
-    # station data is per year
-    if isinstance(stn_attr, str) and stn_attr is not None:
-        stn_file = get_stn_filename(year)
-        stn_df = pd.read_csv(data_dir + stn_file, na_values="\\N")
-        stn_df = stn_df.rename(columns={"TMSTAMP": "time"})
-        stn_df["time"] = pd.to_datetime(stn_df["time"])
-        return stn_df
+# TODO this isnt necessarily complete. For instance what if a station got a pluvio station during the middle of the year
+# It would select pluvio still even thought it would have bad data for half of the year. Not sure what the best way to
+# do this is.
+def get_rain_column(stn_df, year):
+    start_time = datetime.strptime(str(year) + "-01-01 00:00:00", "%Y-%m-%d %H:%M:%S")
+    end_time = datetime.strptime(str(year) + "-12-31 00:00:00", "%Y-%m-%d %H:%M:%S")
+    # Pluvio_Rain is preferable to TBRG_Rain
+    # stn_data = stn_data[(stn_data["time"] >= early_bound) & (stn_data["time"] < late_bound)]
+    year_df = stn_df[(stn_df["time"] >= start_time) & (stn_df["time"] < end_time)]
+    pluvio = year_df["Pluvio_Rain"].sum()
+    tbrg_rain = year_df["TBRG_Rain"].sum()
+
+    if pluvio != 0:
+        return "Pluvio_Rain"
+    elif tbrg_rain != 0:
+        return "TBRG_Rain"
     else:
-        # print("This is a special case")
-        str("do nothing")
+        print("no precipitation values for all years, something is probably broken. Sorry!")
+        exit(1)
+
+
+# load station data from the csv and return it as a dataframe
+def load_stn_data(year):
+    # station data is per year
+
+    stn_file = get_stn_filename(year)
+    stn_df = pd.read_csv(data_dir + stn_file, na_values="\\N")
+    stn_df = stn_df.rename(columns={"TMSTAMP": "time"})
+    stn_df["time"] = pd.to_datetime(stn_df["time"])
+    return stn_df
 
 
 def load_merra_wind_data(merra_attr, merra_data):
@@ -298,7 +334,6 @@ def filter_stn_by_day(stn_df, day, stn_attr):
         stn_data["time"] = stn_data["time"].dt.tz_localize(local, ambiguous='infer')
         stn_data["time"] = stn_data["time"].apply(lambda x: x.astimezone(pytz.utc))
 
-        # https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.between_time.html
         stn_data = stn_data[(stn_data["time"] >= timestamp_today) & (stn_data["time"] <= timestamp_tomorrow)]
 
         stn_data = stn_data.merge(stn_metadata, on=["Station"], how="left")
@@ -326,7 +361,6 @@ def filter_era5_by_day(day, era5_da, era5_attr, stn_attr):
         if stn_attr == 'AvgWS':
             v_data = era5_da[0].sel(longitude=long, latitude=lat, time=era5_times, method="nearest")
             u_data = era5_da[1].sel(longitude=long, latitude=lat, time=era5_times, method="nearest")
-            # print(u_data)
 
             v_df = v_data.to_dataframe()
             u_df = u_data.to_dataframe()
@@ -411,7 +445,10 @@ def main():
 
             # da = data array, df = dataframe
             era5_da = load_era5_data(era5_attr, year)
-            stn_df = load_stn_data(year, stn_attr)
+            stn_df = load_stn_data(year)
+
+            if stn_attr == ['TBRG_Rain', 'Pluvio_Rain']:
+                stn_attr = get_rain_column(stn_df, year)
 
             # initialize the start and end date
             start_date = date(year, 1, 1)
