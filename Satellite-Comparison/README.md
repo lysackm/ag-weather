@@ -1,5 +1,13 @@
 # Comparison of Satellite Reanalysis Data and Weather Station Data
 
+
+# Table of Contents
+1. [Merra-2](#merra-2)
+2. [Era-5 Land](#era-5-land)
+3. [CaSPAr](#caspar)
+4. [Station Data](#station-data)
+
+## <a name="merra-2"></a>
 ## Merra-2
 Merra 2 is a data set provided by NASA that describes weather 
 conditions globally since 1980. 
@@ -100,24 +108,36 @@ All attributes are downloaded for the years 2018 to 2022, inclusive
 Note that kg per meter squared is equivalent to mm of rain.
 
 
-| Attribute                  | depth           | units  | locations |
-|----------------------------|-----------------|--------|-----------|
-| TSOIL1                     | 9.88            | cm     | all       |
-| TSOIL2                     | 19.52           | cm     | all       |
-| TSOIL3                     | 38.59           | cm     | all       |
-| TSOIL4                     | 76.26           | cm     | all       |
-| SFMC                       | 5               | cm     | all       |
-| RZMC                       | 100             | cm     | all       |
-| PRMC                       | 133.3 - 382.0   | cm     | varies    |
-| Max Water Holding Capacity | 296.59 - 1171.5 | kg m^2 | varies    |
+| Attribute                  | depth           | units  | locations | mapped to        |
+|----------------------------|-----------------|--------|-----------|------------------|
+| TSOIL1                     | 9.88            | cm     | all       | Soil_TP5_TempC   |
+| TSOIL2                     | 19.52           | cm     | all       | Soil_TP20_TempC  |
+| TSOIL3                     | 38.59           | cm     | all       | Soil_TP50_TempC  |
+| TSOIL4                     | 76.26           | cm     | all       | Soil_TP100_TempC |
+| TSOIL5                     | 150.71          | cm     | all       | None             |
+| SFMC                       | 5               | cm     | all       | Soil_TP5_VMC     |
+| RZMC                       | 100             | cm     | all       | Soil_TP100_VMC   |
+| PRMC                       | 133.3 - 382.0   | cm     | varies    | None             |
+| Max Water Holding Capacity | 296.59 - 1171.5 | kg m^2 | varies    | None             |
 
-Note that for TSOIL1-4, GWETPROF, GWETROOT, and GWETTOP there is a 
-static data set for each location that describes the depth of the 
-attributes there. This can be found in 
+Note that for TSOIL1-4, SFMC, RZMC, and PRMC the constant data 
+summerized above can be found in 
 [this document](https://gmao.gsfc.nasa.gov/pubs/docs/Bosilovich785.pdf)
-if you search for the corresponding attribute.
+if you search for the corresponding attribute. It is held in the 
+database M2CONXLND.
 
-## ERA-5 Land
+You can use this link for your convience to download the data for 
+southern manitoba:
+[link](ap/MERRA2_MONTHLY/M2C0NXLND.5.12.4/1980/MERRA2_100.const_2d_lnd_Nx.00000000.nc4.nc4?cdcr2[0:0][277:292][125:137],dzgt1[0:0][277:292][125:137],dzgt2[0:0][277:292][125:137],dzgt3[0:0][277:292][125:137],dzgt4[0:0][277:292][125:137],dzgt5[0:0][277:292][125:137],dzgt6[0:0][277:292][125:137],dzpr[0:0][277:292][125:137],dzrz[0:0][277:292][125:137],dzsf[0:0][277:292][125:137],time,lat[277:292],lon[125:137])
+
+#### Derived Values
+Using the equation outlined in this 
+[forum post](https://earthscience.stackexchange.com/questions/2360/how-do-i-convert-specific-humidity-to-relative-humidity)
+to derive the **relative humidity** from specific humidity, 
+temperature, and pressure.
+
+## <a name="era-5-land"></a>
+## ERA-5 Land 
 ERA-5 Land is a reanalysis of weather data ran by Copernicus, 
 which is based in the EU.
 
@@ -179,7 +199,7 @@ and 2m dewpoint temperature. It would become a derived value.
 
 [Documentation for attributes](https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land?tab=overview)
 
-
+## <a name="caspar"></a>
 ## CaSPAr
 CaSPAr is the Canadian Surface Prediction Archive, which is made 
 in conjunction with several Canadian universities and Environment 
@@ -237,6 +257,7 @@ download process.
 | HRDPS_P_VV_10000     | Forecast: V component of wind       |                 |
 
 
+## <a name="station-data"></a>
 ## Station Data
 There are several ways to access our own weather station data to 
 use for comparison against Merra and Era datasets. One of the 
