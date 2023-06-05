@@ -108,17 +108,17 @@ All attributes are downloaded for the years 2018 to 2022, inclusive
 Note that kg per meter squared is equivalent to mm of rain.
 
 
-| Attribute                  | depth           | units  | locations | mapped to        |
-|----------------------------|-----------------|--------|-----------|------------------|
-| TSOIL1                     | 9.88            | cm     | all       | Soil_TP5_TempC   |
-| TSOIL2                     | 19.52           | cm     | all       | Soil_TP20_TempC  |
-| TSOIL3                     | 38.59           | cm     | all       | Soil_TP50_TempC  |
-| TSOIL4                     | 76.26           | cm     | all       | Soil_TP100_TempC |
-| TSOIL5                     | 150.71          | cm     | all       | None             |
-| SFMC                       | 5               | cm     | all       | Soil_TP5_VMC     |
-| RZMC                       | 100             | cm     | all       | Soil_TP100_VMC   |
-| PRMC                       | 133.3 - 382.0   | cm     | varies    | None             |
-| Max Water Holding Capacity | 296.59 - 1171.5 | kg m^2 | varies    | None             |
+| Attribute                  | depth           | units  | locations | mapped to                          |
+|----------------------------|-----------------|--------|-----------|------------------------------------|
+| TSOIL1                     | 9.88            | cm     | all       | Soil_TP5_TempC + Soil_TP20_TempC   |
+| TSOIL2                     | 19.52           | cm     | all       | Soil_TP20_TempC                    |
+| TSOIL3                     | 38.59           | cm     | all       | Soil_TP50_TempC                    |
+| TSOIL4                     | 76.26           | cm     | all       | Soil_TP50_TempC + Soil_TP100_TempC |
+| TSOIL5                     | 150.71          | cm     | all       | None                               |
+| SFMC                       | 5               | cm     | all       | Soil_TP5_VMC                       |
+| RZMC                       | 100             | cm     | all       | Soil_TP100_VMC                     |
+| PRMC                       | 133.3 - 382.0   | cm     | varies    | None                               |
+| Max Water Holding Capacity | 296.59 - 1171.5 | kg m^2 | varies    | None                               |
 
 Note that for TSOIL1-4, SFMC, RZMC, and PRMC the constant data 
 summerized above can be found in 
@@ -192,7 +192,8 @@ This download process can take a while to complete. (~2 hours per
 | Surface pressure                  |               | Pa      | new |
 
 Note the temperature levels and layers are a predetermined depth 
-range. 0-7 cm for level 1, 7-28 cm for level 2, 28-100 cm for level 3.
+range. 0-7 cm for level 1, 7-28 cm for level 2, 28-100 cm for 
+level 3. We will be averaging station data at 20cm, 50cm, 100cm.
 
 Note that humidity would be calculated using pressure, temperature,
 and 2m dewpoint temperature. It would become a derived value.

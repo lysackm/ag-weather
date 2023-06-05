@@ -1,4 +1,5 @@
 import glob
+import math
 import os
 from datetime import date, timedelta, datetime
 from numpy import arctan, pi
@@ -13,23 +14,38 @@ pd.options.mode.chained_assignment = None  # default='warn'
 years = [2018, 2019, 2020, 2021, 2022]
 
 # column names for manitoba weather station data
-# stn_attrs = ['AvgAir_T', 'AvgWS', 'RH', 'Soil_TP5_TempC', 'Soil_TP20_TempC', 'Soil_TP50_TempC', 'Soil_TP100_TempC',
-#              'SolarRad', ['TBRG_Rain', 'Pluvio_Rain'], 'Soil_TP5_VMC', 'Soil_TP20_VMC',
-#              ['Soil_TP50_VMC', 'Soil_TP100_VMC'], "Press_hPa"]
+# stn_attrs = ['AvgAir_T', 'AvgWS', 'Soil_TP5_TempC', ['Soil_TP5_TempC', 'Soil_TP20_TempC'], 'Soil_TP20_TempC',
+#              'Soil_TP50_TempC', ['Soil_TP50_TempC', 'Soil_TP100_TempC'],
+#              ['Soil_TP20_TempC', 'Soil_TP50_TempC', 'Soil_TP100_TempC'], 'SolarRad', ['TBRG_Rain', 'Pluvio_Rain'],
+#              "Press_hPa", 'Soil_TP5_VMC', 'Soil_TP20_VMC', ['Soil_TP20_VMC', 'Soil_TP50_VMC', 'Soil_TP100_VMC'],
+#              'Soil_TP100_VMC', 'RH']
 #
 # # attribute names for era5
-# era5_attrs = ['t2m', ['v10m', 'u10m'], None, 'stl1', 'stl2', 'stl3', 'ssrd', 'tp', 'swvl1', 'swvl2', 'swvl3',
-#               'sp', 'd2m']
+# era5_attrs = ['t2m', ['v10m', 'u10m'], 'stl1', None, 'stl2',
+#               None, None,
+#               'stl3', 'ssrd', 'tp',
+#               'sp', 'swvl1', 'swvl2', 'swvl3',
+#               None, ['t2m', 'd2m'], 'd2m']
 # # attribute names for merra2
-# merra_attrs = ["T2M", ["V10M", "U10M"], "QV2M", "TSOIL1", "TSOIL2", "TSOIL3", "TSOIL4", "SWGDN", "PRECTOTLAND",
-#                "SFMC", "RZMC", "PRMC", "PS", "T2MDEW"]
+# merra_attrs = ["T2M", ["V10M", "U10M"], None, "TSOIL1", "TSOIL2",
+#               "TSOIL3", "TSOIL4",
+#               None, "SWGDN", "PRECTOTLAND",
+#               "PS", "SFMC", None, None,
+#               "RZMC", ["T2M", "T2MDEW"], "T2MDEW"]
 
 
 # For testing purposes
-stn_attrs = ['Soil_TP5_VMC']
-era5_attrs = ['swvl1']
-merra_attrs = ["SFMC"]
+stn_attrs = [['TBRG_Rain', 'Pluvio_Rain'],
+             "Press_hPa", 'Soil_TP5_VMC', 'Soil_TP20_VMC', ['Soil_TP20_VMC', 'Soil_TP50_VMC', 'Soil_TP100_VMC'],
+             'Soil_TP100_VMC', 'RH']
+era5_attrs = ['tp',
+              'sp', 'swvl1', 'swvl2', 'swvl3',
+              None, ['t2m', 'd2m'], 'd2m']
+merra_attrs = ["PRECTOTLAND",
+               "PS", "SFMC", None, None,
+               "RZMC", ["T2M", "T2MDEW"], "T2MDEW"]
 
+# TODO re-download M2T1NXSLV so that T2M and T2MDEW can be in the same db
 
 # attribute names for merra broken down by database
 # _2 folders were there since they were added outside the
@@ -144,7 +160,7 @@ def wind_vector_to_direction(v, u):
 # to each other find the scalar wind speed
 def wind_vector_to_scalar(v, u, v_col, u_col):
     # is this fast?
-    v[v_col] = (v[v_col] ** 2 + u[u_col] ** 2) ** (1/2)
+    v[v_col] = (v[v_col] ** 2 + u[u_col] ** 2) ** (1 / 2)
     v = v.rename(columns={v_col: "AvgWS"})
     return v
 
@@ -200,7 +216,27 @@ conversions = {
     "SFMC": decimal_to_percent,
     "RZMC": decimal_to_percent,
     "PRMC": decimal_to_percent,
+    "QV2M": decimal_to_percent,
 }
+
+
+# using the equation
+# RH = 100 x [e^((17.625 * DP) / (243.04 + DP)) / e^((17.625 * T) / (243.04 + T))]
+# taken from the website https://www.omnicalculator.com/physics/relative-humidity
+def calculate_relative_humidity(temp, dew_point):
+    rh_df = temp.copy()
+    rh_df = rh_df.rename(columns={'t2m': "rh"})
+    rh_df["rh"] = rh_df["rh"] * 0 + math.e
+
+    temp["t2m"] = temp["t2m"].apply(kelvin_to_celsius)
+    dew_point["d2m"] = dew_point["d2m"].apply(kelvin_to_celsius)
+
+    numerator = rh_df["rh"].pow((17.625 * dew_point["d2m"]).div(243.04 + dew_point["d2m"]))
+    denominator = rh_df["rh"].pow((17.625 * temp["t2m"]).div(243.04 + temp["t2m"]))
+
+    col = numerator.div(denominator) * 100
+    rh_df["rh"] = col
+    return rh_df
 
 
 def stn_metadata_preprocessing(stn_meta):
@@ -226,6 +262,16 @@ def load_era5_wind_data(era5_attr, year):
     return [v_da, u_da]
 
 
+def load_humidity_data(era5_attr, year):
+    t2m = get_era_filename(year, era5_attr[0])
+    d2m = get_era_filename(year, era5_attr[1])
+
+    t2m_da = xr.open_dataarray(data_dir + t2m)
+    d2m_da = xr.open_dataarray(data_dir + d2m)
+
+    return [t2m_da, d2m_da]
+
+
 # load era5 data from the file and return a xarray data array
 def load_era5_data(era5_attr, year):
     # era5 has files per attribute per year
@@ -236,18 +282,23 @@ def load_era5_data(era5_attr, year):
         return era5_da
     else:
         # handle special cases
+        if era5_attr is None:
+            return None
         if era5_attr[0] == "v10m":
             return load_era5_wind_data(era5_attr, year)
+        if era5_attr[0] == "t2m":
+            return load_humidity_data(era5_attr, year)
 
 
 # TODO this isnt necessarily complete. For instance what if a station got a pluvio station during the middle of the year
 # It would select pluvio still even thought it would have bad data for half of the year. Not sure what the best way to
 # do this is.
+
+# Another reason this won't work is that it's not looking at specific stations, It's looking at all stations for the year
 def get_rain_column(stn_df, year):
     start_time = datetime.strptime(str(year) + "-01-01 00:00:00", "%Y-%m-%d %H:%M:%S")
     end_time = datetime.strptime(str(year) + "-12-31 00:00:00", "%Y-%m-%d %H:%M:%S")
     # Pluvio_Rain is preferable to TBRG_Rain
-    # stn_data = stn_data[(stn_data["time"] >= early_bound) & (stn_data["time"] < late_bound)]
     year_df = stn_df[(stn_df["time"] >= start_time) & (stn_df["time"] < end_time)]
     pluvio = year_df["Pluvio_Rain"].sum()
     tbrg_rain = year_df["TBRG_Rain"].sum()
@@ -257,8 +308,33 @@ def get_rain_column(stn_df, year):
     elif tbrg_rain != 0:
         return "TBRG_Rain"
     else:
-        print("no precipitation values for all years, something is probably broken. Sorry!")
+        print("no precipitation values for both Pluvio and TBRG, something is probably broken. Sorry!")
+        print("date range: ", start_time, end_time)
         exit(1)
+
+
+def get_soil_column(stn_df, stn_attr, col_name):
+    if stn_attr == ['Soil_TP5_TempC', 'Soil_TP20_TempC']:
+        stn_df[col_name] = (stn_df['Soil_TP5_TempC'] * 0.675 + stn_df['Soil_TP20_TempC'] * 0.325) / 2.0
+    elif stn_attr == ['Soil_TP50_TempC', 'Soil_TP100_TempC']:
+        stn_df[col_name] = (stn_df['Soil_TP50_TempC'] + stn_df['Soil_TP100_TempC']) / 2.0
+    elif stn_attr == ['Soil_TP20_TempC', 'Soil_TP50_TempC', 'Soil_TP100_TempC']:
+        stn_df[col_name] = (stn_df['Soil_TP20_TempC'] + stn_df['Soil_TP50_TempC'] + stn_df['Soil_TP100_TempC']) / 3.0
+    elif stn_attr == ['Soil_TP20_VMC', 'Soil_TP50_VMC', 'Soil_TP100_VMC']:
+        stn_df[col_name] = (stn_df['Soil_TP20_VMC'] + stn_df['Soil_TP50_VMC'] + stn_df['Soil_TP100_VMC']) / 3.0
+
+    return stn_df
+
+
+def get_soil_column_name(stn_attr):
+    if stn_attr == ['Soil_TP5_TempC', 'Soil_TP20_TempC']:
+        return "Soil_5_20_avg_TempC"
+    elif stn_attr == ['Soil_TP50_TempC', 'Soil_TP100_TempC']:
+        return "Soil_50_100_avg_TempC"
+    elif stn_attr == ['Soil_TP20_TempC', 'Soil_TP50_TempC', 'Soil_TP100_TempC']:
+        return "Soil_20_50_100_avg_TempC"
+    elif stn_attr == ['Soil_TP20_VMC', 'Soil_TP50_VMC', 'Soil_TP100_VMC']:
+        return "Soil_20_50_100_avg_VMC"
 
 
 # load station data from the csv and return it as a dataframe
@@ -282,6 +358,26 @@ def load_merra_wind_data(merra_attr, merra_data):
     return merra_df
 
 
+def load_merra_rh_data(merra_attr, merra_data, stn_attr):
+    temp = merra_data[merra_attr[0]].to_dataframe()
+    dew_point = merra_data[merra_attr[1]].to_dataframe()
+
+    rh_df = temp.copy()
+    rh_df = rh_df.rename(columns={'T2M': stn_attr})
+    rh_df[stn_attr] = rh_df[stn_attr] * 0 + math.e
+
+    temp["T2M"] = temp["T2M"].apply(kelvin_to_celsius)
+    dew_point["T2MDEW"] = dew_point["T2MDEW"].apply(kelvin_to_celsius)
+
+    numerator = rh_df[stn_attr].pow((17.625 * dew_point["T2MDEW"]).div(243.04 + dew_point["T2MDEW"]))
+    denominator = rh_df[stn_attr].pow((17.625 * temp["T2M"]).div(243.04 + temp["T2M"]))
+
+    col = numerator.div(denominator) * 100
+    rh_df[stn_attr] = col
+    print(rh_df)
+    return rh_df
+
+
 # load and return a singular days worth of merra data of attribute
 # merra_attr
 def load_merra_data(merra_attr, day, stn_attr):
@@ -303,14 +399,18 @@ def load_merra_data(merra_attr, day, stn_attr):
             if stn_attr == "AvgWS":
                 merra_df = load_merra_wind_data(merra_attr, merra_data)
                 merra_attr = stn_attr
+            elif stn_attr == "RH":
+                merra_df = load_merra_rh_data(merra_attr, merra_data, stn_attr)
+                merra_attr = stn_attr
 
         else:  # missing data
             # raise error that there is missing data when important
             raise AttributeError
-    except Exception as e:
-        print("load_merra_data", e)
+    except FileNotFoundError as file_not_found:
+        if merra_attr is None:
+            return None
+        print("load_merra_data", file_not_found)
         exit(1)
-        # traceback.print_exc()
 
     merra_df[merra_attr] = merra_df[merra_attr].apply(conversions.get(merra_attr, lambda x: x))
     merra_df = merra_df.rename(columns={"lat": "merra_lat", "lon": "merra_lon", merra_attr: "merra_" + stn_attr})
@@ -367,6 +467,17 @@ def filter_era5_by_day(day, era5_da, era5_attr, stn_attr):
 
             era5_df = wind_vector_to_scalar(v_df, u_df, "v10", "u10")
             era5_attr = stn_attr
+        elif stn_attr == "RH":
+            t2m_data = era5_da[0].sel(longitude=long, latitude=lat, time=era5_times, method="nearest")
+            d2m_data = era5_da[1].sel(longitude=long, latitude=lat, time=era5_times, method="nearest")
+
+            t2m_data = t2m_data.to_dataframe()
+            d2m_data = d2m_data.to_dataframe()
+
+            era5_df = calculate_relative_humidity(t2m_data, d2m_data)
+            era5_attr = "rh"
+        elif era5_attr is None:
+            return None
 
     era5_df = era5_df.rename(
         columns={"latitude": "era5_lat", "longitude": "era5_long", era5_attr: "era5_" + stn_attr})
@@ -379,15 +490,21 @@ def filter_era5_by_day(day, era5_da, era5_attr, stn_attr):
 # identified by a time and specific station at it.
 def merge_data(merra_df, era5_df, stn_data):
     try:
+        stn_data["time"] = stn_data["time"].dt.tz_localize(tz=None)
+
         merged_df = era5_df.merge(merra_df, on=["location", "time"], how="outer")
         # df_index = merged_df.index.to_frame()
 
-        stn_data["time"] = stn_data["time"].dt.tz_localize(tz=None)
-
         merged_df = stn_data.merge(merged_df, on=["location", "time"], how="inner")
         return merged_df
-    except Exception as e:
-        print('merge_data', e)
+    except Exception as err:
+
+        if merra_df is None:
+            return stn_data.merge(era5_df, on=["location", "time"], how="inner")
+        elif era5_df is None:
+            return stn_data.merge(merra_df, on=["location", "time"], how="inner")
+        else:
+            print("merge data: uncaught", err)
 
 
 def calculate_sqr_error(merged_df, stn_attr):
@@ -395,9 +512,21 @@ def calculate_sqr_error(merged_df, stn_attr):
     era5_col = "era5_" + stn_attr
     stn_col = "stn_" + stn_attr
 
-    merged_df["merra_sqr_err"] = (merged_df[stn_col] - merged_df[merra_col]) ** 2
-    merged_df["era5_sqr_err"] = (merged_df[stn_col] - merged_df[era5_col]) ** 2
+    if merra_col in merged_df.columns:
+        merged_df["merra_err"] = (merged_df[stn_col] - merged_df[merra_col])
+        merged_df["merra_sqr_err"] = (merged_df[stn_col] - merged_df[merra_col]) ** 2
+
+    if era5_col in merged_df.columns:
+        merged_df["era5_err"] = (merged_df[stn_col] - merged_df[era5_col])
+        merged_df["era5_sqr_err"] = (merged_df[stn_col] - merged_df[era5_col]) ** 2
     return merged_df
+
+
+def prune_missing_data(df, stn_attr):
+    col = "stn_" + stn_attr
+    drop_index = df[pd.isna(df[col])].index
+    df.drop(drop_index, inplace=True)
+    return df
 
 
 def append_csv(merged_df, stn_attr):
@@ -442,6 +571,7 @@ def main():
     # all the attributes should be a mapping to each other.
     for stn_attr, era5_attr, merra_attr in zip(stn_attrs, era5_attrs, merra_attrs):
         for year in years:
+            col_name = stn_attr
 
             # da = data array, df = dataframe
             era5_da = load_era5_data(era5_attr, year)
@@ -449,6 +579,13 @@ def main():
 
             if stn_attr == ['TBRG_Rain', 'Pluvio_Rain']:
                 stn_attr = get_rain_column(stn_df, year)
+                col_name = stn_attr
+            elif (stn_attr == ['Soil_TP5_TempC', 'Soil_TP20_TempC']
+                  or stn_attr == ['Soil_TP50_TempC', 'Soil_TP100_TempC']
+                  or stn_attr == ['Soil_TP20_TempC', 'Soil_TP50_TempC', 'Soil_TP100_TempC']
+                  or stn_attr == ['Soil_TP20_VMC', 'Soil_TP50_VMC', 'Soil_TP100_VMC']):
+                col_name = get_soil_column_name(stn_attr)
+                stn_df = get_soil_column(stn_df, stn_attr, col_name)
 
             # initialize the start and end date
             start_date = date(year, 1, 1)
@@ -460,17 +597,18 @@ def main():
 
                 # handling one chunk of data written to the csv
                 try:
-                    merra_df = load_merra_data(merra_attr, day, stn_attr)
-                    era5_df = filter_era5_by_day(day, era5_da, era5_attr, stn_attr)
-                    stn_data = filter_stn_by_day(stn_df, day, stn_attr)
+                    merra_df = load_merra_data(merra_attr, day, col_name)
+                    era5_df = filter_era5_by_day(day, era5_da, era5_attr, col_name)
+                    stn_data = filter_stn_by_day(stn_df, day, col_name)
                 except AttributeError:
                     print("main", day)
                     continue
 
                 merged_df = merge_data(merra_df, era5_df, stn_data)
                 try:
-                    merged_df = calculate_sqr_error(merged_df, stn_attr)
-                    append_csv(merged_df, stn_attr)
+                    merged_df = calculate_sqr_error(merged_df, col_name)
+                    merged_df = prune_missing_data(merged_df, col_name)
+                    append_csv(merged_df, col_name)
                 except TypeError as e:
                     print("main", e)
 
