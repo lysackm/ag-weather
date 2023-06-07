@@ -82,7 +82,7 @@ for index, station in df.iterrows():
             coord_dict[(lat_closest, lon_closest)] = []
         coord_dict[(lat_closest, lon_closest)].append(station["StationName"])
 
-# Print the results in a format that can be copied into code.
+# Print the sqr-err in a format that can be copied into code.
 print("\n\n")
 for key in coord_dict.keys():
     names = ""

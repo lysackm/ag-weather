@@ -35,23 +35,16 @@ years = [2018, 2019, 2020, 2021, 2022]
 
 
 # For testing purposes
-stn_attrs = [['TBRG_Rain', 'Pluvio_Rain'],
-             "Press_hPa", 'Soil_TP5_VMC', 'Soil_TP20_VMC', ['Soil_TP20_VMC', 'Soil_TP50_VMC', 'Soil_TP100_VMC'],
-             'Soil_TP100_VMC', 'RH']
-era5_attrs = ['tp',
-              'sp', 'swvl1', 'swvl2', 'swvl3',
-              None, ['t2m', 'd2m'], 'd2m']
-merra_attrs = ["PRECTOTLAND",
-               "PS", "SFMC", None, None,
-               "RZMC", ["T2M", "T2MDEW"], "T2MDEW"]
+stn_attrs = ['RH']
+era5_attrs = [['t2m', 'd2m']]
+merra_attrs = [["T2M", "T2MDEW"]]
 
 # TODO re-download M2T1NXSLV so that T2M and T2MDEW can be in the same db
 
 # attribute names for merra broken down by database
 # _2 folders were there since they were added outside the
 # original data scope and had to be downloaded later
-M2T1NXSLV = ["T2M", ["V10M", "U10M"], "QV2M"]
-M2T1NXSLV_2 = ["PS", "T2MDEW"]
+M2T1NXSLV = ["T2M", ["V10M", "U10M"], "QV2M", "PS", "T2MDEW", ["T2M", "T2MDEW"]]
 M2T1NXLND = ["TSOIL1", "TSOIL2", "TSOIL3", "TSOIL4", "PRECTOTLAND"]
 M2T1NXLND_2 = ["SFMC", "RZMC", "PRMC"]
 M2T1NXRAD = ["SWGDN"]
@@ -70,9 +63,6 @@ def get_merra_filename(cur_date, attribute):
     elif attribute in M2T1NXRAD:
         folder = "M2T1NXRAD"
         tag = "rad"
-    elif attribute in M2T1NXSLV_2:
-        folder = "M2T1NXSLV-2"
-        tag = "slv"
     elif attribute in M2T1NXLND_2:
         folder = "M2T1NXLND-2"
         tag = "lnd"
@@ -294,7 +284,8 @@ def load_era5_data(era5_attr, year):
 # It would select pluvio still even thought it would have bad data for half of the year. Not sure what the best way to
 # do this is.
 
-# Another reason this won't work is that it's not looking at specific stations, It's looking at all stations for the year
+# Another reason this won't work is that it's not looking at specific stations, It's looking at all stations for the
+# year
 def get_rain_column(stn_df, year):
     start_time = datetime.strptime(str(year) + "-01-01 00:00:00", "%Y-%m-%d %H:%M:%S")
     end_time = datetime.strptime(str(year) + "-12-31 00:00:00", "%Y-%m-%d %H:%M:%S")
@@ -359,6 +350,7 @@ def load_merra_wind_data(merra_attr, merra_data):
 
 
 def load_merra_rh_data(merra_attr, merra_data, stn_attr):
+    merra_data = shift_merra_timescale(merra_data)
     temp = merra_data[merra_attr[0]].to_dataframe()
     dew_point = merra_data[merra_attr[1]].to_dataframe()
 
@@ -374,7 +366,6 @@ def load_merra_rh_data(merra_attr, merra_data, stn_attr):
 
     col = numerator.div(denominator) * 100
     rh_df[stn_attr] = col
-    print(rh_df)
     return rh_df
 
 
@@ -498,7 +489,6 @@ def merge_data(merra_df, era5_df, stn_data):
         merged_df = stn_data.merge(merged_df, on=["location", "time"], how="inner")
         return merged_df
     except Exception as err:
-
         if merra_df is None:
             return stn_data.merge(era5_df, on=["location", "time"], how="inner")
         elif era5_df is None:
