@@ -36,11 +36,14 @@ def graph_mean(is_sqr=False, is_daily=False):
 
         for date_delta in df.index:
             # drop index column
-            if is_daily:
-                df_no_index = df.drop(columns="date")
-            else:
-                df_no_index = df.drop(columns="Unnamed: 0")
-                print(df.columns)
+            try:
+                if is_daily:
+                    df_no_index = df.drop(columns="date")
+                else:
+                    df_no_index = df.drop(columns="Unnamed: 0")
+            except KeyError:
+                df_no_index = df
+
             month_df = df_no_index.loc[date_delta]
             no_nan_df = month_df.dropna()
 
