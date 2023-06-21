@@ -14,32 +14,30 @@ pd.options.mode.chained_assignment = None  # default='warn'
 years = [2018, 2019, 2020, 2021, 2022]
 
 # column names for manitoba weather station data
-# stn_attrs = ['AvgAir_T', 'AvgWS', 'Soil_TP5_TempC', ['Soil_TP5_TempC', 'Soil_TP20_TempC'], 'Soil_TP20_TempC',
-#              'Soil_TP50_TempC', ['Soil_TP50_TempC', 'Soil_TP100_TempC'],
-#              ['Soil_TP20_TempC', 'Soil_TP50_TempC', 'Soil_TP100_TempC'], 'SolarRad', ['TBRG_Rain', 'Pluvio_Rain'],
-#              "Press_hPa", 'Soil_TP5_VMC', 'Soil_TP20_VMC', ['Soil_TP20_VMC', 'Soil_TP50_VMC', 'Soil_TP100_VMC'],
-#              'Soil_TP100_VMC', 'RH']
-#
-# # attribute names for era5
-# era5_attrs = ['t2m', ['v10m', 'u10m'], 'stl1', None, 'stl2',
-#               None, None,
-#               'stl3', 'ssrd', 'tp',
-#               'sp', 'swvl1', 'swvl2', 'swvl3',
-#               None, ['t2m', 'd2m'], 'd2m']
-# # attribute names for merra2
-# merra_attrs = ["T2M", ["V10M", "U10M"], None, "TSOIL1", "TSOIL2",
-#               "TSOIL3", "TSOIL4",
-#               None, "SWGDN", "PRECTOTLAND",
-#               "PS", "SFMC", None, None,
-#               "RZMC", ["T2M", "T2MDEW"], "T2MDEW"]
+stn_attrs = ['AvgAir_T', 'AvgWS', 'Soil_TP5_TempC', ['Soil_TP5_TempC', 'Soil_TP20_TempC'], 'Soil_TP20_TempC',
+             'Soil_TP50_TempC', ['Soil_TP50_TempC', 'Soil_TP100_TempC'],
+             ['Soil_TP20_TempC', 'Soil_TP50_TempC', 'Soil_TP100_TempC'], 'SolarRad', ['TBRG_Rain', 'Pluvio_Rain'],
+             "Press_hPa", 'Soil_TP5_VMC', 'Soil_TP20_VMC', ['Soil_TP20_VMC', 'Soil_TP50_VMC', 'Soil_TP100_VMC'],
+             'Soil_TP100_VMC', 'RH']
+
+# attribute names for era5
+era5_attrs = ['t2m', ['v10m', 'u10m'], 'stl1', None, 'stl2',
+              None, None,
+              'stl3', 'ssrd', 'tp',
+              'sp', 'swvl1', 'swvl2', 'swvl3',
+              None, ['t2m', 'd2m'], 'd2m']
+# attribute names for merra2
+merra_attrs = ["T2M", ["V10M", "U10M"], None, "TSOIL1", "TSOIL2",
+              "TSOIL3", "TSOIL4",
+              None, "SWGDN", "PRECTOTLAND",
+              "PS", "SFMC", None, None,
+              "RZMC", ["T2M", "T2MDEW"], "T2MDEW"]
 
 
 # For testing purposes
-stn_attrs = ['RH']
-era5_attrs = [['t2m', 'd2m']]
-merra_attrs = [["T2M", "T2MDEW"]]
-
-# TODO re-download M2T1NXSLV so that T2M and T2MDEW can be in the same db
+# stn_attrs = ['RH']
+# era5_attrs = ['d2m']
+# merra_attrs = ["T2MDEW"]
 
 # attribute names for merra broken down by database
 # _2 folders were there since they were added outside the
@@ -269,6 +267,10 @@ def load_era5_data(era5_attr, year):
         era5_file = get_era_filename(year, era5_attr)
         # data array since 1 attribute per file
         era5_da = xr.open_dataarray(data_dir + era5_file)
+
+        if era5_attr == "ssrd":
+            era5_da = undo_cumulative_sum(era5_da)
+
         return era5_da
     else:
         # handle special cases
@@ -520,14 +522,20 @@ def prune_missing_data(df, stn_attr):
 
 
 def append_csv(merged_df, stn_attr):
-    output_file = "./output/" + stn_attr + "_output.csv"
+    output_file = "./output/pre_cleaning/" + stn_attr + "_output.csv"
     merged_df.to_csv(output_file, mode='a', header=not os.path.exists(output_file), index=False)
 
 
 def clear_output():
-    files = glob.glob('./output')
+    files = glob.glob('./output/pre_cleaning')
     for file in files:
         os.remove(file)
+
+
+# used to undo the cumulative sum done on the column of data that is era5 for solar radiation
+def undo_cumulative_sum(data_array):
+    # xarray function, not pandas
+    return data_array.diff("time")
 
 
 # global variables

@@ -89,4 +89,4 @@ def n_closest_stations(n=3):
 
 
 n_closest_stations(3)
-print("Program finished successfully, check 'neighboring-stations.csv' in the dir of this script to find the sqr-err.")
+print("Program finished successfully, check 'neighboring-stations.csv' in the dir of this script to find the output.")

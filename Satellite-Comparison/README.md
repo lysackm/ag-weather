@@ -384,3 +384,27 @@ of dealing with this is to remove any days of data that is
 incomplete and to note that days around the time change in the 
 spring and winter may have off by one inaccuracies.  
 
+## Tracing the Data
+The program `make_combined_csv.py` is used to take data from all 3 
+data sources and create a singular data source. This data results 
+are stored in the output directory where you run 
+`make_combinged_csv.py`, which is `./make_combined_csv/output` in 
+this repository. The CSVs that are created by that process store 
+information on the actual station, the equivalent data on that 
+hour for merra and era 5. The files are sorted by attribute. One 
+row in the file represents an hour time frame. It stores the 
+station data, reanalysis data unaltered, metadata, 
+difference, and square error. This is for both merra and Era 5. 
+The calculation for error is `stn_data - reanalysis_data`. The 
+calculation for square error is `(stn_data - reanalysis_data)^2`.
+
+Since the amount of significant figures in the CSVs is quite a lot 
+you can use `truncate_decimals.py` to limit the number of decimals 
+stored in each value.
+
+From the combined csvs the program `get_graphable_data.py` can 
+further process the data by mapping the data to specific ways that 
+can be graphed. In particular, `get_line_chart_data`, averages the 
+data over a month for one particular station. Calculating the 
+root-mean-square error. This data can then be charted to see the 
+rmse over time.
