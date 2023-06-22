@@ -1,6 +1,6 @@
 import glob
 
-import numpy
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from numpy import NaN
@@ -91,7 +91,7 @@ def graph_mean(is_sqr=False, is_daily=False):
         print(filename)
 
         # if the graph isn't empty save it
-        if not numpy.isnan(x).all():
+        if not np.isnan(x).all():
             plt.savefig(filename)
         plt.clf()
 
@@ -149,9 +149,66 @@ def graph_all_stns(is_sqr=False, is_daily=False):
         else:
             filename = root_path + file.replace("_output.csv", ".png").replace("./err", "")
         print(filename)
-        if not numpy.isnan(df).all().all():
+        if not np.isnan(df).all().all():
             plt.savefig(filename)
         plt.clf()
+
+
+# Get the root-mean-square error data averaged over the 5 years for varying time
+# differences. Can be set to be yearly average, monthly average, daily average,
+# or hourly average (single point). If you want to change the time then some slight
+# modifications of the function will have to be made
+def get_averaged_time():
+    dates = pd.date_range(start="2018-01-01", periods=744, freq="H")
+    files = glob.glob("D:/data/processed-data/*.csv")
+    root_path = "D:\\data\\graphs\\interesting\\month_hourly_avg\\"
+
+    data_fetched = ["era5_err", "merra_err"]
+
+    for file in files:
+        attr_df = pd.read_csv(file)
+        attr_df["time"] = pd.to_datetime(attr_df["time"])
+
+        columns = attr_df.columns
+
+        # get the right columns depending on the attr
+        if "merra_err" in columns and "era5_err" in columns:
+            filtered = attr_df[
+                ["Station", "stn_long", "stn_lat", "merra_err", "merra_sqr_err", "era5_err", "era5_sqr_err"]]
+            mean_cols = ["merra_err", "merra_sqr_err", "era5_err", "era5_sqr_err"]
+        elif "merra_err" in columns:
+            filtered = attr_df[["Station", "stn_long", "stn_lat", "merra_err", "merra_sqr_err"]]
+            mean_cols = ["merra_err", "merra_sqr_err"]
+        elif "era5_err" in columns:
+            filtered = attr_df[["Station", "stn_long", "stn_lat", "era5_err", "era5_sqr_err"]]
+            mean_cols = ["era5_err", "era5_sqr_err"]
+        else:
+            print("no comparison to merra or era dont, this should not happen")
+            exit(1)
+
+        date_index = filtered.set_index(attr_df["time"])
+
+        # change this line to change where the average is happening
+        result = date_index.groupby([date_index.index.day, date_index.index.hour])[mean_cols].mean()
+        print(file)
+
+        for attr in data_fetched:
+            if attr in columns:
+                # plot both err and sqr-err
+                filename = root_path + "err\\" + file.replace("_output.csv", ".png").replace(
+                    "D:/data/processed-data\\", attr)
+                plt.plot(dates, result[attr], linewidth=0.5)
+                plt.title(file.replace("D:/data/processed-data\\", "").replace("_output.csv", "") + " " + attr)
+                plt.savefig(filename)
+                plt.clf()
+
+                filename = root_path + "sqr-err\\" + file.replace("_output.csv", ".png").replace(
+                    "D:/data/processed-data\\", attr)
+                plt.plot(dates, np.sqrt(result[attr.replace("_err", "_sqr_err")]), linewidth=0.5)
+                plt.title(file.replace("D:/data/processed-data\\", "").replace("_output.csv", "") + " " + attr.replace(
+                    "_err", "_sqr_err"))
+                plt.savefig(filename)
+                plt.clf()
 
 
 def generate_all_graphs():
@@ -166,4 +223,4 @@ def generate_all_graphs():
     graph_mean(False, True)
 
 
-generate_all_graphs()
+get_averaged_time()

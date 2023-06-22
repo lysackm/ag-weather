@@ -237,39 +237,7 @@ def get_map_data():
         print("./map_graph_data/" + file.replace("output\\", ""))
 
 
-# Get the root-mean-square error data averaged over the 5 years to get 1 year of averaged error.
-# Mathematical Procedure: Get the average of every day's error in a year and then graph the resulting 365 averaged days.
-def get_averaged_year():
-    dates = pd.date_range(start="2018-01-01", periods=366, freq="D")
-    files = glob.glob("D:/data/processed-data/*.csv")
-
-    data_fetched = "merra_err"
-
-    for file in files:
-        attr_df = pd.read_csv(file)
-        attr_df["time"] = pd.to_datetime(attr_df["time"])
-
-        columns = attr_df.columns
-
-        if "merra_err" in columns and "era5_err" in columns:
-            filtered = attr_df[
-                ["Station", "stn_long", "stn_lat", "merra_err", "merra_sqr_err", "era5_err", "era5_sqr_err"]]
-        elif "merra_err" in columns:
-            filtered = attr_df[["Station", "stn_long", "stn_lat", "merra_err", "merra_sqr_err"]]
-        elif "era5_err" in columns:
-            filtered = attr_df[["Station", "stn_long", "stn_lat", "era5_err", "era5_sqr_err"]]
-
-        date_index = filtered.set_index(attr_df["time"])
-
-        result = date_index.groupby([date_index.index.month, date_index.index.day]).mean()
-        print(file)
-        if data_fetched in columns:
-            plt.plot(dates, result[data_fetched])
-            plt.title(file.replace("D:/data/processed-data\\", "").replace("_output.csv", "") + " " + data_fetched)
-            plt.show()
-
-
 # call the function that you want to generate the new data
 
-get_line_chart_data_daily()
-get_line_chart_data()
+# get_line_chart_data_daily()
+# get_line_chart_data()
