@@ -43,6 +43,18 @@ def seasonal_breakdown(df, col):
     return seasons
 
 
+# monthly_breakdown
+#
+# Break down data for each month. Then find the root-mean-square error
+# for each of the months over all the years.
+def monthly_breakdown(df, col):
+    df["time"] = pd.to_datetime(df["time"])
+    df.set_index(df["time"], inplace=True)
+    all_years = np.sqrt(df.groupby([df.index.month])[col].mean())
+
+    return all_years.to_list()
+
+
 # spacial_correlation
 #
 # Data format is a dictionary where the keys are the station names
@@ -51,7 +63,7 @@ def seasonal_breakdown(df, col):
 # Set show_graph to be true to generate graphs to represent the data on a map of
 # Manitoba.
 #
-def spacial_correlation(df, col, show_graph=False):
+def spacial_correlation(df, col, show_graph=False, output_file="", title=""):
     stn_metadata = pd.read_csv("../../Cleaning-Data/cleaning-data/util/station-metadata.csv")
     stn_metadata["StationName"] = stn_metadata["StationName"].apply(
         lambda x: x.lower().strip().replace('.', '').replace(' ', ''))
@@ -72,7 +84,7 @@ def spacial_correlation(df, col, show_graph=False):
         except Exception as e:
             print(e)
 
-        stn_data[station] = (stn_lat, stn_long, np.sqrt(stn_df[col].mean()))
+        stn_data[station] = (stn_lat, stn_long, stn_df[col].mean())
 
     stats_df = pd.DataFrame.from_dict(stn_data, orient='index', columns=["lat", "long", "value"])
 
@@ -86,25 +98,26 @@ def spacial_correlation(df, col, show_graph=False):
                                 hover_name=stats_df.index.tolist(),
                                 color="value",
                                 color_continuous_scale=color_scale,
-                                size="value",
+                                size=np.abs(stats_df["value"]),
                                 size_max=25,
-                                zoom=8,
-                                opacity=0.60)
+                                opacity=0.60,
+                                title=title)
 
         fig.update_layout(mapbox_style="open-street-map")
-        fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
-        fig.show()
+        fig.update_layout(margin={"r": 0, "t": 80, "l": 0, "b": 0})
+        fig.write_html(output_file)
 
     return stn_data
 
 
 def main():
     files = glob.glob("output/*.csv")
+    root_path = "D:\\data\\graphs\\interesting\\manitoba_map\\"
 
     generic_merra_all = {}
     generic_era5_all = {}
-    seasonal_merra_all = {}
-    seasonal_era5_all = {}
+    monthly_merra_all = {}
+    monthly_era5_all = {}
     spacial_merra_all = {}
     spacial_era5_all = {}
 
@@ -113,33 +126,38 @@ def main():
         print(file)
 
         if "merra_sqr_err" in df.columns:
-            generic_merra = generic_performance(df, "merra_sqr_err")
+            generic_merra = generic_performance(df, "merra_err")
             generic_merra_all[file] = generic_merra
         if "era5_sqr_err" in df.columns:
-            generic_era5 = generic_performance(df, "era5_sqr_err")
+            generic_era5 = generic_performance(df, "era5_err")
             generic_era5_all[file] = generic_era5
 
         # print(file, generic_merra, generic_era5)
 
         if "merra_sqr_err" in df.columns:
-            seasonal_merra = seasonal_breakdown(df, "merra_sqr_err")
-            seasonal_merra_all[file] = seasonal_merra
+            monthly_merra = monthly_breakdown(df, "merra_err")
+            monthly_merra_all[file] = monthly_merra
         if "era5_sqr_err" in df.columns:
-            seasonal_era5 = seasonal_breakdown(df, "era5_sqr_err")
-            seasonal_era5_all[file] = seasonal_era5
+            monthly_era5 = monthly_breakdown(df, "era5_err")
+            monthly_era5_all[file] = monthly_era5
 
         # print(seasonal_merra, seasonal_era5)
 
         if "merra_sqr_err" in df.columns:
-            spacial_merra = spacial_correlation(df, "merra_sqr_err")
+            output_file = root_path + file.replace("_output.csv", ".html").replace("output\\", "merra_")
+            title = "merra " + file.replace("_output.csv", "").replace("output\\", "")
+
+            spacial_merra = spacial_correlation(df, "merra_err", True, output_file, title)
             spacial_merra_all[file] = spacial_merra
         if "era5_sqr_err" in df.columns:
-            spacial_era5 = spacial_correlation(df, "era5_sqr_err")
+            output_file = root_path + file.replace("_output.csv", ".html").replace("output\\", "era5_")
+            title = "era5 " + file.replace("_output.csv", "").replace("output\\", "")
+
+            spacial_era5 = spacial_correlation(df, "era5_err", True, output_file, title)
             spacial_era5_all[file] = spacial_era5
 
     print(generic_merra_all, generic_era5_all)
-    print(seasonal_merra_all, seasonal_era5_all)
-    print(spacial_merra_all, spacial_era5_all)
+    print(monthly_merra_all, monthly_era5_all)
 
 
 main()
