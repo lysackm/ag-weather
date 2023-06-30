@@ -1,7 +1,7 @@
 import plotly.express as px
 import pandas as pd
 
-df = pd.read_csv("map_graph_data/SolarRad_output.csv")
+df = pd.read_csv("map_graph_data/AvgAir_T_output.csv")
 
 df = df[["Station", "time", "stn_long", "stn_lat", "stn_attr", "era5_err", "era5_sqr_err"]]
 print(df)

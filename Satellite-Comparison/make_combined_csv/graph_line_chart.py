@@ -223,4 +223,5 @@ def generate_all_graphs():
     graph_mean(False, True)
 
 
+generate_all_graphs()
 get_averaged_time()

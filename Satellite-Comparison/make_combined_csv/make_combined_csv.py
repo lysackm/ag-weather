@@ -7,6 +7,7 @@ import xarray as xr
 import pandas as pd
 import pytz
 from pytz.exceptions import NonExistentTimeError, AmbiguousTimeError
+import numpy as np
 
 pd.options.mode.chained_assignment = None  # default='warn'
 
@@ -14,30 +15,30 @@ pd.options.mode.chained_assignment = None  # default='warn'
 years = [2018, 2019, 2020, 2021, 2022]
 
 # column names for manitoba weather station data
-stn_attrs = ['AvgAir_T', 'AvgWS', 'Soil_TP5_TempC', ['Soil_TP5_TempC', 'Soil_TP20_TempC'], 'Soil_TP20_TempC',
-             'Soil_TP50_TempC', ['Soil_TP50_TempC', 'Soil_TP100_TempC'],
-             ['Soil_TP20_TempC', 'Soil_TP50_TempC', 'Soil_TP100_TempC'], 'SolarRad', ['TBRG_Rain', 'Pluvio_Rain'],
-             "Press_hPa", 'Soil_TP5_VMC', 'Soil_TP20_VMC', ['Soil_TP20_VMC', 'Soil_TP50_VMC', 'Soil_TP100_VMC'],
-             'Soil_TP100_VMC', 'RH']
-
-# attribute names for era5
-era5_attrs = ['t2m', ['v10m', 'u10m'], 'stl1', None, 'stl2',
-              None, None,
-              'stl3', 'ssrd', 'tp',
-              'sp', 'swvl1', 'swvl2', 'swvl3',
-              None, ['t2m', 'd2m'], 'd2m']
-# attribute names for merra2
-merra_attrs = ["T2M", ["V10M", "U10M"], None, "TSOIL1", "TSOIL2",
-              "TSOIL3", "TSOIL4",
-              None, "SWGDN", "PRECTOTLAND",
-              "PS", "SFMC", None, None,
-              "RZMC", ["T2M", "T2MDEW"], "T2MDEW"]
+# stn_attrs = ['AvgAir_T', 'AvgWS', 'Soil_TP5_TempC', ['Soil_TP5_TempC', 'Soil_TP20_TempC'], 'Soil_TP20_TempC',
+#              'Soil_TP50_TempC', ['Soil_TP50_TempC', 'Soil_TP100_TempC'],
+#              ['Soil_TP20_TempC', 'Soil_TP50_TempC', 'Soil_TP100_TempC'], 'SolarRad', ['TBRG_Rain', 'Pluvio_Rain'],
+#              "Press_hPa", 'Soil_TP5_VMC', 'Soil_TP20_VMC', ['Soil_TP20_VMC', 'Soil_TP50_VMC', 'Soil_TP100_VMC'],
+#              'Soil_TP100_VMC', 'RH']
+#
+# # attribute names for era5
+# era5_attrs = ['t2m', ['v10m', 'u10m'], 'stl1', None, 'stl2',
+#               None, None,
+#               'stl3', 'ssrd', 'tp',
+#               ['sp', 't2m'], 'swvl1', 'swvl2', 'swvl3',
+#               None, ['t2m', 'd2m'], 'd2m']
+# # attribute names for merra2
+# merra_attrs = ["T2M", ["V10M", "U10M"], None, "TSOIL1", "TSOIL2",
+#               "TSOIL3", "TSOIL4",
+#               None, "SWGDN", "PRECTOTLAND",
+#               ["PS", "T2M"], "SFMC", None, None,
+#               "RZMC", ["T2M", "T2MDEW"], "T2MDEW"]
 
 
 # For testing purposes
-# stn_attrs = ['RH']
-# era5_attrs = ['d2m']
-# merra_attrs = ["T2MDEW"]
+stn_attrs = ['SolarRad']
+era5_attrs = ['ssrd']
+merra_attrs = ["SWGDN"]
 
 # attribute names for merra broken down by database
 # _2 folders were there since they were added outside the
@@ -177,6 +178,11 @@ def decimal_to_percent(dec):
     return dec * 100
 
 
+# is actually kg/m^2*s which is equivalent to mm/s
+def mm_per_second_to_mm(mm_per_second):
+    return mm_per_second * 24 * 60 * 60
+
+
 # mapping of attribute names to correct conversion function
 # special cases (like wind, which reads two columns at a time)
 # are not included
@@ -198,7 +204,7 @@ conversions = {
     "TSOIL3": kelvin_to_celsius,
     "TSOIL4": kelvin_to_celsius,
     "SWGDN": watts_to_megajoules,
-    "PRECTOTLAND": meters_to_mm,
+    "PRECTOTLAND": mm_per_second_to_mm,
     "T2MDEW": kelvin_to_celsius,
     "PS": pa_to_hpa,
     "SFMC": decimal_to_percent,
@@ -267,9 +273,6 @@ def load_era5_data(era5_attr, year):
         era5_file = get_era_filename(year, era5_attr)
         # data array since 1 attribute per file
         era5_da = xr.open_dataarray(data_dir + era5_file)
-
-        if era5_attr == "ssrd":
-            era5_da = undo_cumulative_sum(era5_da)
 
         return era5_da
     else:
@@ -532,10 +535,25 @@ def clear_output():
         os.remove(file)
 
 
+def do_cumulative_sum(data_array):
+    return data_array.groupby('time.dayofyear').cumsum()
+
+
 # used to undo the cumulative sum done on the column of data that is era5 for solar radiation
-def undo_cumulative_sum(data_array):
-    # xarray function, not pandas
-    return data_array.diff("time")
+def adjust_solar_rad():
+    solar_df = pd.read_csv("output/pre_cleaning/SolarRad_output.csv")
+    solar_df["time"] = pd.to_datetime(solar_df["time"])
+    solar_df.set_index(solar_df["time"], inplace=True)
+    solar_df.set_index(solar_df.index.shift(-1, "H"), inplace=True)
+    non_modified = solar_df.copy()
+    solar_df["era5_SolarRad"] = solar_df.groupby([solar_df.index.day,
+                                                  solar_df.index.month,
+                                                  solar_df.index.year,
+                                                  solar_df["Station"]])["era5_SolarRad"].diff()
+
+    solar_df["era5_SolarRad"] = solar_df["era5_SolarRad"].fillna(non_modified["era5_SolarRad"])
+    solar_df.set_index(solar_df.index.shift(1, "H"), inplace=True)
+    solar_df.to_csv("output/pre_cleaning/SolarRad_output.csv", index=False)
 
 
 # global variables
@@ -609,6 +627,8 @@ def main():
                     append_csv(merged_df, col_name)
                 except TypeError as e:
                     print("main", e)
+
+    adjust_solar_rad()
 
 
 # bootstrap
