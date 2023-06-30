@@ -36,14 +36,14 @@ years = [2018, 2019, 2020, 2021, 2022]
 
 
 # For testing purposes
-stn_attrs = ['SolarRad']
-era5_attrs = ['ssrd']
-merra_attrs = ["SWGDN"]
+stn_attrs = ['Press_hPa']
+era5_attrs = [['sp', 't2m']]
+merra_attrs = [["PS", "T2M"]]
 
 # attribute names for merra broken down by database
 # _2 folders were there since they were added outside the
 # original data scope and had to be downloaded later
-M2T1NXSLV = ["T2M", ["V10M", "U10M"], "QV2M", "PS", "T2MDEW", ["T2M", "T2MDEW"]]
+M2T1NXSLV = ["T2M", ["V10M", "U10M"], "QV2M", ["PS", "T2M"], "T2MDEW", ["T2M", "T2MDEW"]]
 M2T1NXLND = ["TSOIL1", "TSOIL2", "TSOIL3", "TSOIL4", "PRECTOTLAND"]
 M2T1NXLND_2 = ["SFMC", "RZMC", "PRMC"]
 M2T1NXRAD = ["SWGDN"]
@@ -214,6 +214,27 @@ conversions = {
 }
 
 
+def calculate_era5_surface_pressure(sp, t2m, stn_data):
+    stn_data["time"] = stn_data["time"].dt.tz_localize(tz=None)
+
+    # return sp, discard t2m
+    attrs_df = t2m.copy()
+
+    stn_data_copy = stn_data.copy()
+    stn_data["time"] = stn_data["time"].dt.tz_localize(tz=None)
+
+    attrs_df = attrs_df.merge(stn_data_copy, on=["location", "time"], how="left")
+    attrs_df = attrs_df.set_index(t2m.index)
+
+    numerator = 0.0065 * attrs_df["elevation"]
+    denominator = attrs_df["t2m"] + 0.0065 * attrs_df["elevation"]
+
+    # equation source https://keisan.casio.com/exec/system/1224575267
+    sp["sp"] = sp["sp"] / 100 * (1 - numerator.div(denominator)) ** -5.257
+
+    return sp
+
+
 # using the equation
 # RH = 100 x [e^((17.625 * DP) / (243.04 + DP)) / e^((17.625 * T) / (243.04 + T))]
 # taken from the website https://www.omnicalculator.com/physics/relative-humidity
@@ -244,6 +265,16 @@ def stn_metadata_preprocessing(stn_meta):
         lambda x: x.lower().strip().replace('.', '').replace(' ', ''))
     stn_meta["location"] = stn_meta["location"] - 1
     return stn_meta
+
+
+def load_era5_pressure_data(era5_attr, year):
+    sp_file = get_era_filename(year, era5_attr[0])
+    t2m_file = get_era_filename(year, era5_attr[1])
+
+    sp_da = xr.open_dataarray(data_dir + sp_file)
+    t2m_da = xr.open_dataarray(data_dir + t2m_file)
+
+    return [sp_da, t2m_da]
 
 
 def load_era5_wind_data(era5_attr, year):
@@ -279,6 +310,8 @@ def load_era5_data(era5_attr, year):
         # handle special cases
         if era5_attr is None:
             return None
+        if era5_attr[0] == "sp":
+            return load_era5_pressure_data(era5_attr, year)
         if era5_attr[0] == "v10m":
             return load_era5_wind_data(era5_attr, year)
         if era5_attr[0] == "t2m":
@@ -354,6 +387,24 @@ def load_merra_wind_data(merra_attr, merra_data):
     return merra_df
 
 
+def load_merra_pressure_data(merra_attr, merra_data, stn_attr, stn_data):
+    merra_data = shift_merra_timescale(merra_data).copy()
+    temp = merra_data[merra_attr[1]].to_dataframe()
+    sp = merra_data[merra_attr[0]].to_dataframe()
+    stn_data["time"] = stn_data["time"].dt.tz_localize(tz=None)
+
+    attrs_df = temp.merge(stn_data, on=["location", "time"], how="left")
+    attrs_df = attrs_df.set_index(temp.index)
+
+    numerator = 0.0065 * attrs_df["elevation"]
+    denominator = attrs_df["T2M"] + 0.0065 * attrs_df["elevation"]
+
+    # equation source https://keisan.casio.com/exec/system/1224575267
+    sp[stn_attr] = sp["PS"] / 100 * (1 - numerator.div(denominator)) ** -5.257
+
+    return sp
+
+
 def load_merra_rh_data(merra_attr, merra_data, stn_attr):
     merra_data = shift_merra_timescale(merra_data)
     temp = merra_data[merra_attr[0]].to_dataframe()
@@ -376,7 +427,7 @@ def load_merra_rh_data(merra_attr, merra_data, stn_attr):
 
 # load and return a singular days worth of merra data of attribute
 # merra_attr
-def load_merra_data(merra_attr, day, stn_attr):
+def load_merra_data(merra_attr, day, stn_attr, stn_data):
     try:
         merra_file = get_merra_filename(day, merra_attr)
         # data set since multiple attributes per file
@@ -397,6 +448,9 @@ def load_merra_data(merra_attr, day, stn_attr):
                 merra_attr = stn_attr
             elif stn_attr == "RH":
                 merra_df = load_merra_rh_data(merra_attr, merra_data, stn_attr)
+                merra_attr = stn_attr
+            elif stn_attr == "Press_hPa":
+                merra_df = load_merra_pressure_data(merra_attr, merra_data, stn_attr, stn_data)
                 merra_attr = stn_attr
 
         else:  # missing data
@@ -446,7 +500,7 @@ def filter_stn_by_day(stn_df, day, stn_attr):
 
 # Given a years worth of data in era5_da get the current days worth of data from the era dataset
 # returns a dataframe with data for era5_attr for the hourly time in day
-def filter_era5_by_day(day, era5_da, era5_attr, stn_attr):
+def filter_era5_by_day(day, era5_da, era5_attr, stn_attr, stn_data):
     era5_times = era5_time_array(day)
 
     if isinstance(era5_attr, str) and era5_attr is not None:  # standard cases
@@ -472,6 +526,15 @@ def filter_era5_by_day(day, era5_da, era5_attr, stn_attr):
 
             era5_df = calculate_relative_humidity(t2m_data, d2m_data)
             era5_attr = "rh"
+        elif stn_attr == "Press_hPa":
+            sp_data = era5_da[0].sel(longitude=long, latitude=lat, time=era5_times, method="nearest")
+            t2m_data = era5_da[1].sel(longitude=long, latitude=lat, time=era5_times, method="nearest")
+
+            sp_data = sp_data.to_dataframe()
+            t2m_data = t2m_data.to_dataframe()
+            era5_df = calculate_era5_surface_pressure(sp_data, t2m_data, stn_data)
+            era5_attr = "sp"
+
         elif era5_attr is None:
             return None
 
@@ -613,9 +676,9 @@ def main():
 
                 # handling one chunk of data written to the csv
                 try:
-                    merra_df = load_merra_data(merra_attr, day, col_name)
-                    era5_df = filter_era5_by_day(day, era5_da, era5_attr, col_name)
                     stn_data = filter_stn_by_day(stn_df, day, col_name)
+                    merra_df = load_merra_data(merra_attr, day, col_name, stn_data)
+                    era5_df = filter_era5_by_day(day, era5_da, era5_attr, col_name, stn_data)
                 except AttributeError:
                     print("main", day)
                     continue

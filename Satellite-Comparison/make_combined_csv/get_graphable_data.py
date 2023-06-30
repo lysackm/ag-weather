@@ -240,4 +240,5 @@ def get_map_data():
 # call the function that you want to generate the new data
 
 # get_line_chart_data_daily()
-get_line_chart_data()
+# get_map_data()
+# get_line_chart_data()
