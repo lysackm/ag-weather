@@ -1,11 +1,17 @@
 import glob
+import json
 
 import pandas as pd
 import numpy as np
 import plotly.express as px
+from enum import Enum
 
 
-# load file once, generate all stats for that file
+class DataType(Enum):
+    raw = "raw"
+    lin_reg = "linear_regression"
+    mean_err = "mean_error"
+    rand_forest = "random_forest"
 
 
 # generic_performance
@@ -141,7 +147,69 @@ def correlation_coefficient(df, col1, col2):
     return correlation
 
 
-def main():
+# operation is not done in place
+def apply_corrections(df, attr, stn_col, merra_col, era5_col, dataType):
+    df = df.copy()
+    df["time"] = pd.to_datetime(df["time"])
+
+    if dataType == DataType.lin_reg:
+        with open("../error_correction/monthly_linear_regression.json", "r") as f:
+            linear_reg = json.load(f)
+
+    elif dataType == DataType.mean_err:
+        with open("../error_correction/monthly_mean_error.json", "r") as f:
+            mean_err = json.load(f)
+
+    if dataType == DataType.mean_err:
+        if "merra_err" in df.columns:
+            # merra correction
+            merra_dict = mean_err["merra"][attr]
+            merra_err_df = pd.DataFrame.from_dict(merra_dict, orient="index", columns=["merra_corr"])
+            merra_err_df = merra_err_df.set_index(pd.to_numeric(merra_err_df.index))
+
+            df = df.merge(merra_err_df, how="left", left_on=df["time"].dt.month, right_index=True)
+
+            df["merra_err"] = df[stn_col] - (df[merra_col] - df["merra_corr"])
+            df["merra_sqr_err"] = (df[stn_col] - (df[merra_col] - df["merra_corr"])) ** 2
+
+        if "era5_err" in df.columns:
+            # era5 correction
+            era5_dict = mean_err["era5"][attr]
+            era5_err_df = pd.DataFrame.from_dict(era5_dict, orient="index", columns=["era5_corr"])
+            era5_err_df = era5_err_df.set_index(pd.to_numeric(era5_err_df.index))
+
+            df = df.merge(era5_err_df, how="left", left_on=df["time"].dt.month, right_index=True)
+
+            df["era5_err"] = df[stn_col] - (df[era5_col] - df["era5_corr"])
+            df["era5_sqr_err"] = (df[stn_col] - (df[era5_col] - df["era5_corr"])) ** 2
+
+    elif dataType == DataType.lin_reg:
+        if "merra_err" in df.columns:
+            # merra correction
+            merra_dict = linear_reg["merra"][attr]
+            merra_err_df = pd.DataFrame.from_dict(merra_dict, orient="index", columns=["merra_slope", "merra_intercept"])
+            merra_err_df = merra_err_df.set_index(pd.to_numeric(merra_err_df.index))
+
+            df = df.merge(merra_err_df, how="left", left_on=df["time"].dt.month, right_index=True)
+
+            df["merra_err"] = df[stn_col] - (df["merra_slope"] * df[merra_col] + df["merra_intercept"])
+            df["merra_sqr_err"] = (df[stn_col] - (df["merra_slope"] * df[merra_col] + df["merra_intercept"])) ** 2
+
+        if "era5_err" in df.columns:
+            # era5 correction
+            era5_dict = linear_reg["era5"][attr]
+            era5_err_df = pd.DataFrame.from_dict(era5_dict, orient="index", columns=["era5_slope", "era5_intercept"])
+            era5_err_df = era5_err_df.set_index(pd.to_numeric(era5_err_df.index))
+
+            df = df.merge(era5_err_df, how="left", left_on=df["time"].dt.month, right_index=True)
+
+            df["era5_err"] = df[stn_col] - (df["era5_slope"] * df[era5_col] + df["era5_intercept"])
+            df["era5_sqr_err"] = (df[stn_col] - (df["era5_slope"] * df[era5_col] + df["era5_intercept"])) ** 2
+
+    return df
+
+
+def print_stats(dataType):
     files = glob.glob("output/*.csv")
     root_path = "D:\\data\\graphs\\interesting\\manitoba_map\\"
 
@@ -156,9 +224,13 @@ def main():
         df = pd.read_csv(file)
         print(file)
 
+        attr = get_column_name(file)
         stn_col = get_column_name(file, "stn_")
         merra_col = get_column_name(file, "merra_")
         era5_col = get_column_name(file, "era5_")
+
+        if dataType != DataType.raw:
+            df = apply_corrections(df, attr, stn_col, merra_col, era5_col, dataType)
 
         if "merra_sqr_err" in df.columns:
             generic_merra = generic_performance(df, "merra_sqr_err")
@@ -205,4 +277,5 @@ def main():
     format_seasonal_stats(monthly_era5_all)
 
 
-main()
+data_type = DataType.lin_reg
+print_stats(data_type)

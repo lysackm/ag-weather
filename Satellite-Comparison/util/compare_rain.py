@@ -23,13 +23,14 @@ def load_stn_data(year):
 output_df = pd.DataFrame()
 
 # print the both rain columns when the absolute difference is greater than 10mm
-for year in range(2018, 2022):
+for year in range(2018, 2023):
     stn_df = load_stn_data(year)
     stn_df["diff"] = abs(stn_df["Pluvio_Rain"] - stn_df["TBRG_Rain"])
-    stn_df = stn_df[stn_df["diff"] > 10]
-    print(stn_df[["time", "Pluvio_Rain", "TBRG_Rain"]])
-    print(len(stn_df))
+    stn_df["time"] = pd.to_datetime(stn_df["time"])
+    print(stn_df["time"].dt.month)
+    stn_df = stn_df[~((stn_df["time"].dt.month <= 3) & (stn_df["time"].dt.month >= 11) & (stn_df["Pluvio_Rain"] == 0)) &
+                    stn_df["diff"] > 10 | stn_df["diff"] > 20]
 
-    output_df = pd.concat([output_df, stn_df[["time", "Pluvio_Rain", "TBRG_Rain"]]])
+    output_df = pd.concat([output_df, stn_df[["time", "Pluvio_Rain", "TBRG_Rain", "Station", "StnID"]]])
 
 output_df.to_csv("rain_comparison.csv", index=False)
