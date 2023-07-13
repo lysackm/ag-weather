@@ -408,3 +408,43 @@ can be graphed. In particular, `get_line_chart_data`, averages the
 data over a month for one particular station. Calculating the 
 root-mean-square error. This data can then be charted to see the 
 rmse over time.
+
+## Random Forest Tuning
+Random forests are made in the get_corrections.py file.
+
+The random forest is made using the scikit learn python library 
+using the RandomForestRegression class. We are using a regression 
+random forest instead of a classification since our output is a 
+float. 
+
+Initially the random forest was given the input columns of 
+reanalysis lat, reanalysis long, elevation, reanalysis prediction, 
+month (integers ranging from 1 to 12), hour (integers ranging from 
+0 to 23?), and distance from the reanalysis station to our station.
+The model then predicted the actual value which is our station 
+recorded value. 50 trees were generated in the forest, with 20% (1 
+years worth) data used for testing while 80% of the data was used 
+for training. From preliminary testing this model showed to have 
+some prospect with a 0.6 degree improvement for the 
+root-mean-square error for Merra average air temperature.
+
+To improve performance the model was 
+[pickled](https://docs.python.org/3/library/pickle.html) to reduce 
+the time of regenerating the model everytime. A seed was used to 
+generate the test, train data to ensure the same data was 
+collected the saved model. However, the saved models are quite 
+large, being almost 18 GB. Any forests with more than 60 trees 
+cannot fit onto the 16 GB of RAM on the standard government laptop.
+Models can be created in RAM with 100 trees (the default option) 
+however only incremental gains are realized using 100 trees over 50.
+In total there would be roughly 250 GB of stored random forest 
+models.
+
+I suspected that some of the more nuanced variables were not being 
+represented well in this model as it is much harder for this model 
+to represented in this model due to the realities of a random 
+forest. Take hour for example. If consistently Merra 
+underestimated the temperature in the morning and overestimated 
+the temperature in the evening, then those small changes may be 
+not very well represented in the final output. It's harder to 
+capture the small changes to -40C. This yielded worse results.
