@@ -7,6 +7,8 @@ import plotly.express as px
 from enum import Enum
 
 
+# enum which represents the types of data which statistics can
+# be created for
 class DataType(Enum):
     raw = "raw"
     lin_reg = "linear_regression"
@@ -116,6 +118,8 @@ def spacial_correlation(df, col, show_graph=False, output_file="", title=""):
     return stn_data
 
 
+# Takes the output of monthly stats and formats the string for
+# LaTeX formatting.
 def format_seasonal_stats(monthly_stats):
     output = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
               "November", "December"]
@@ -131,13 +135,16 @@ def format_seasonal_stats(monthly_stats):
                 output[i] += " & " + str(months[i])
 
     for month in output:
-        print(month)
+        print(month + "\\")
 
 
+# change a filename to get the attribute or column name from it
 def get_column_name(file, prefix=""):
     return prefix + file.replace("output\\", "").replace("_output.csv", "")
 
 
+# given a df and 2 columns, calculate the correlation constant
+# between them via the pearson method.
 def correlation_coefficient(df, col1, col2):
     two_column_df = df[[col1, col2]]
     correlation = two_column_df.corr(method="pearson")
@@ -147,20 +154,25 @@ def correlation_coefficient(df, col1, col2):
     return correlation
 
 
-# operation is not done in place
-def apply_corrections(df, attr, stn_col, merra_col, era5_col, dataType):
+# apply_corrections
+#
+# Given a df apply the corrections to the df using the specified method
+# that is in dataType. The specified merra and era5 columns will be modified
+# to represent the new corrected data.
+# operation is not done in place, returns modified dataframe.
+def apply_corrections(df, attr, stn_col, merra_col, era5_col, data_type):
     df = df.copy()
     df["time"] = pd.to_datetime(df["time"])
 
-    if dataType == DataType.lin_reg:
+    if data_type == DataType.lin_reg:
         with open("../error_correction/monthly_linear_regression.json", "r") as f:
             linear_reg = json.load(f)
 
-    elif dataType == DataType.mean_err:
+    elif data_type == DataType.mean_err:
         with open("../error_correction/monthly_mean_error.json", "r") as f:
             mean_err = json.load(f)
 
-    if dataType == DataType.mean_err:
+    if data_type == DataType.mean_err:
         if "merra_err" in df.columns:
             # merra correction
             merra_dict = mean_err["merra"][attr]
@@ -183,7 +195,7 @@ def apply_corrections(df, attr, stn_col, merra_col, era5_col, dataType):
             df["era5_err"] = df[stn_col] - (df[era5_col] - df["era5_corr"])
             df["era5_sqr_err"] = (df[stn_col] - (df[era5_col] - df["era5_corr"])) ** 2
 
-    elif dataType == DataType.lin_reg:
+    elif data_type == DataType.lin_reg:
         if "merra_err" in df.columns:
             # merra correction
             merra_dict = linear_reg["merra"][attr]
@@ -209,7 +221,7 @@ def apply_corrections(df, attr, stn_col, merra_col, era5_col, dataType):
     return df
 
 
-def print_stats(dataType):
+def print_stats(data_type):
     files = glob.glob("output/*.csv")
     root_path = "D:\\data\\graphs\\interesting\\manitoba_map\\"
 
@@ -229,8 +241,8 @@ def print_stats(dataType):
         merra_col = get_column_name(file, "merra_")
         era5_col = get_column_name(file, "era5_")
 
-        if dataType != DataType.raw:
-            df = apply_corrections(df, attr, stn_col, merra_col, era5_col, dataType)
+        if data_type != DataType.raw:
+            df = apply_corrections(df, attr, stn_col, merra_col, era5_col, data_type)
 
         if "merra_sqr_err" in df.columns:
             generic_merra = generic_performance(df, "merra_sqr_err")
@@ -277,5 +289,5 @@ def print_stats(dataType):
     format_seasonal_stats(monthly_era5_all)
 
 
-data_type = DataType.lin_reg
-print_stats(data_type)
+data_type_run = DataType.raw
+print_stats(data_type_run)

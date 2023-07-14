@@ -21,6 +21,12 @@ from scipy.stats import spearmanr, pearsonr
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 
+# merge_files
+#
+# Combine all data in output files together to improve performance
+# for loading the csv files. Only has one copy of the metadata but
+# keeps the data for all the attributes. Output is written to a file
+# called random_forest_data.csv.
 def merge_files():
     files = glob.glob("../make_combined_csv/output/*.csv")
     df_output = pd.read_csv("../make_combined_csv/output/AvgAir_T_output.csv")
@@ -98,7 +104,7 @@ def train_random_forest(x_arr, y_arr, file_short_name, n_estimators, max_feature
 # Latitude, Longitude (model), Month, Distance from observed, attribute value
 # Elevation, Hour. Creates a model for both era5 and merra
 def make_merra_era5_random_forest(df, attr_col, n_estimators, max_features, min_samples_leaf, all_attrs=False):
-    # dont modify the dataframe
+    # don't modify the dataframe, creates copy
     df = df.copy()
 
     attr_stn_col = "stn_" + attr_col
@@ -108,37 +114,37 @@ def make_merra_era5_random_forest(df, attr_col, n_estimators, max_features, min_
     # convert time to datetime to apply operations
     df["time"] = pd.to_datetime(df["time"])
 
-    # # merra random forest
-    # # input cols: merra_lat, merra_lon, time(.dt.month), time(.dt.hour), merra_stn_col, elevation
-    # if all_attrs:
-    #     print("using all attrs")
-    #     merra_df = df[["merra_lat", "merra_lon", "elevation", "merra_AvgAir_T", "merra_AvgWS",
-    #                    "merra_Pluvio_Rain", "merra_Press_hPa", "merra_RH", "merra_SolarRad", attr_stn_col]]
-    # else:
-    #     merra_df = df[["merra_lat", "merra_lon", "elevation", merra_stn_col, attr_stn_col]]
-    # merra_df = merra_df.assign(month=df["time"].dt.month)
-    # merra_df = merra_df.assign(hour=df["time"].dt.hour)
-    # # calculate the difference between the station location and the merra location
-    # merra_df = merra_df.assign(dist=((df["stn_long"] - df["merra_lon"]) ** 2 +
-    #                                  (df["stn_lat"] - df["merra_lat"]) ** 2) ** 1 / 2)
-    #
-    # merra_df = merra_df.dropna(how="any")
-    # # merra_df["y"] = merra_df[attr_stn_col] - merra_df[merra_stn_col]
-    #
-    # if all_attrs:
-    #     x_merra_arr = merra_df[
-    #         ["merra_lat", "merra_lon", "elevation", "merra_AvgAir_T", "merra_AvgWS", "merra_Pluvio_Rain",
-    #          "merra_Press_hPa", "merra_RH", "merra_SolarRad", "month", "hour", "dist"]].to_numpy()
-    # else:
-    #     x_merra_arr = merra_df[
-    #         ["merra_lat", "merra_lon", "elevation", merra_stn_col, "month", "hour", "dist"]].to_numpy()
-    #
-    # # y_merra_arr = merra_df["y"].to_numpy()
+    # merra random forest
+    # get attributes wanted for random forest
+    # input cols: merra_lat, merra_lon, time(.dt.month), time(.dt.hour), merra_stn_col, elevation
+    if all_attrs:
+        print("using all attrs")
+        merra_df = df[["merra_lat", "merra_lon", "elevation", "merra_AvgAir_T", "merra_AvgWS",
+                       "merra_Pluvio_Rain", "merra_Press_hPa", "merra_RH", "merra_SolarRad", attr_stn_col]]
+    else:
+        merra_df = df[["merra_lat", "merra_lon", "elevation", merra_stn_col, attr_stn_col]]
+    merra_df = merra_df.assign(month=df["time"].dt.month)
+    merra_df = merra_df.assign(hour=df["time"].dt.hour)
+    # calculate the difference between the station location and the merra location
+    merra_df = merra_df.assign(dist=((df["stn_long"] - df["merra_lon"]) ** 2 +
+                                     (df["stn_lat"] - df["merra_lat"]) ** 2) ** 1 / 2)
+
+    merra_df = merra_df.dropna(how="any")
+    merra_df["y"] = merra_df[attr_stn_col] - merra_df[merra_stn_col]
+
+    if all_attrs:
+        x_merra_arr = merra_df[
+            ["merra_lat", "merra_lon", "elevation", "merra_AvgAir_T", "merra_AvgWS", "merra_Pluvio_Rain",
+             "merra_Press_hPa", "merra_RH", "merra_SolarRad", "month", "hour", "dist"]].to_numpy()
+    else:
+        x_merra_arr = merra_df[
+            ["merra_lat", "merra_lon", "elevation", merra_stn_col, "month", "hour", "dist"]].to_numpy()
+
+    y_merra_arr = merra_df["y"].to_numpy()
     # y_merra_arr = merra_df[attr_stn_col].to_numpy()
-    #
-    # print(y_merra_arr)
-    #
-    # train_random_forest(x_merra_arr, y_merra_arr, attr_col + "_merra", n_estimators, max_features, min_samples_leaf)
+
+    # pass data to function to train model
+    train_random_forest(x_merra_arr, y_merra_arr, attr_col + "_merra", n_estimators, max_features, min_samples_leaf)
 
     # train era5 model
     if all_attrs:
@@ -161,18 +167,24 @@ def make_merra_era5_random_forest(df, attr_col, n_estimators, max_features, min_
              "era5_RH", "era5_SolarRad", "month", "hour", "dist"]].to_numpy()
     else:
         x_era5_arr = era5_df[["era5_lat", "era5_long", "elevation", era5_stn_col, "month", "hour", "dist"]].to_numpy()
+
+    # y data is either the expected value or the error of the predicted and expected value
     # y_era5_arr = era5_df[attr_stn_col].to_numpy()
     y_era5_arr = (era5_df[attr_stn_col] - era5_df[era5_stn_col]).to_numpy()
 
+    # pass data to train data
     train_random_forest(x_era5_arr, y_era5_arr, attr_col + "_era5", n_estimators, max_features, min_samples_leaf)
 
 
+# iterate through several benchmarks to get stats on which
+# random forest takes the longest
+# This can take a long time
 def random_forest_benchmarks(df, attr_col):
-    for n_estimators in [50, 100, 150]:
-        for max_features in [0.3, None]:
-            for min_samples_leaf in [1, 10, 100]:
+    for n_estimators in [100]:
+        for max_features in [0.5]:
+            for min_samples_leaf in [1]:
                 print(n_estimators, max_features, min_samples_leaf)
-                make_merra_era5_random_forest(df, attr_col, n_estimators, max_features, min_samples_leaf)
+                make_merra_era5_random_forest(df, attr_col, n_estimators, max_features, min_samples_leaf, True)
 
 
 # linear_regression
@@ -255,9 +267,11 @@ def save_random_forest():
         exit(0)
 
 
+# create random forest using all attributes as input
 def save_random_forest_all_attr():
     df = pd.read_csv("random_forest_data.csv")
-    make_merra_era5_random_forest(df, "AvgAir_T", 100, 0.3, 1, True)
+    # make_merra_era5_random_forest(df, "AvgAir_T", 100, 0.3, 1, True)
+    random_forest_benchmarks(df, "AvgAir_T")
 
 
 def main():
