@@ -409,6 +409,170 @@ data over a month for one particular station. Calculating the
 root-mean-square error. This data can then be charted to see the 
 rmse over time.
 
+
+# A Very Detailed Look into the Data Correction Process
+
+## Raw Data
+Raw data is taken directly from our database, with a time change 
+to change the timezone to UTC. UTC is the same timezone which 
+Merra and Era5 operate on. Outliers were removed from the raw data.
+There have been outliers removed from the database if they pass 
+certain thresholds. (Mark: I cannot speak to the precise effects 
+of these as this was done before my time. Probably though it is what 
+is in `NewCleaner/apply_qa.py`) 
+
+Further outlier detection was done to remove outliers that were 
+inside seasonal norms. An analysis was done on the 4 closest 
+neighbors for every station, and if that stations value for its 
+attribute was over a certain threshold then the value was 
+considered an outlier. This removed some clearly rough stations 
+and outliers that can be seen in the original graphs generated, 
+before the data cleaning occurred. The thresholds for each 
+attribute can be found below. Certain attributes could not be 
+predicted if they were an outlier by the values of their neighbors,
+so it is possible that those attributes contain more outliers 
+than others. The file that does this cleaning is 
+`Satellite-Comparison/make_combined_csv/clean_csvs.py`. 
+
+| Attribute  | Threshold | Unit    |
+|------------|-----------|---------|
+| Air Temp   | 7         | Celsius |
+| Wind Speed | 10        | m/s     |
+| Pressure   | 15        | hPa     |
+| Humidity   | 20        | %       |
+| Solar Rad  | 1         | MJ/m^2  |
+
+Merra and Era 5 Land data were both converted to the units which 
+are measured by the Manitoba weather stations. Most values 
+were just a simple unit conversation. Notably some values 
+had to be calculated and used different attributes in the 
+calculated value. This may introduce more error into the final 
+result. Wind is vectorized in both Merra and Era 5 Land which 
+needed to be converted to a scalar value. Relative Humidity needed 
+to be calculated in both Merra and Era 5 using specific humidity. 
+This was done using this equation sourced 
+[here](https://www.omnicalculator.com/physics/relative-humidity).
+Merra and Era 5 both gave readings of surface pressure, when the 
+weather stations report their pressure readings as pressure at sea 
+level. Thus, a conversion using temperature was done on pressure 
+values for Merra and Era 5. The conversion used this
+[formula](https://keisan.casio.com/exec/system/1224575267).
+
+Data was then merged with metadata and a csv file was created for 
+every attribute. These files can be found in `/output`.
+
+## Initial Statistical Analysis
+
+The statistics are calculated on the files in 
+`Satellite-Comparison/make_combined_csv/output` using the program 
+in `Satellite-Comparison/make_combined_csv/get_stats.py`. 
+
+The first of the statistics calculated is a total Root 
+Mean-Square-Error which takes the square error for each hour, 
+means the square error, and takes the root. Every attribute is 
+returned its own RMSE value.
+This is calculated for 
+the raw data and any corrections attempted on the data. 
+
+The next statistic is the monthly Root Mean-Square-Error. This 
+takes the square error in one calendar month over the whole 5-year 
+period, takes the average, then takes the root. This process is 
+done 12 times for every month in the year. 12 values is returned 
+for every attribute analyzed.
+
+The last statistic is the Correlation Coefficients. This is 
+calculated using the pandas library `corr()` function call. We use 
+the Pearson method.
+[link](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.corr.html)
+
+## Monthly Mean Error Correction
+
+This correction takes the average of the error for each month over 
+all 5 years. Then subtracts the average error from every analysis 
+attribute value
+that is in that month. The new value is considered the corrected 
+value. The output of the mean correction is put into 
+`monthly_mean_error.json`
+
+## Linear Regression Error Correction
+
+This correction is also done to every month in the year, for 5 
+years. The data is grouped by month. Then the data is fed into the 
+sci kit learn linear regression algorithm. 
+(`linear_model.LinearRegression`) The X axis for the 
+linear regression is the attribute value given by the analysis 
+product. The Y axis, or output of the equation is the expected 
+value. It is trained on all the data. Once the data is fitted, the 
+coefficients are exported to `monthly_linear_regression.json`. After 
+the corrected value for each hour is given by putting the analysis 
+attribute value into the generated equation as the x value. 
+
+
+## Random Forests
+
+Random Forests are made using the Sci Kit Learn 
+`sklearn.ensemble.RandomForestRegressor` class. There are two 
+initial methods I used to make the random forest. 
+
+The first method is using the attribute and specific metadata for 
+input for the random forest. The attributes are as follows: 
+Analysis latitude, analysis longitude, analysis attribute value, 
+elevation, month, hour, distance between analysis location and 
+station location. The output is the station attribute value at 
+that time.
+
+The second method is using the same metadata as input but 
+including 6 reanalysis attributes, instead of the one that was 
+being predicted. The thought process behind this decision is that 
+when a weather model gives a prediction for weather we do not know 
+where error is being introduced. We expect for the model to have 
+some concept of the tight woven relationship between different 
+weather attributes. Then if say there was a large error in 
+humidity it may imply that there is a large error in temperature 
+as well. By including all attributes we get a better understanding 
+of what sort of inputs indicates how the model is over or 
+underestimating the attribute we are studying.
+
+An alternative to both of these models is to rather train it to 
+predict the error between the expected and given attribute value 
+rather than the actual correct value. This drastically changed 
+variables importance and slightly decreased the RSME.
+
+Month and hour are both integer values which are the day of the 
+month and hour of the day respectively. 
+
+Testing values are randomly sampled from the set, with 20% being 
+put aside for testing. This is the equivalent of 1 years worth of 
+data. The random values are seeded so that for all different 
+iterations of the random forest will have the same random split of 
+testing and training data. The other 80% is dedicated to training 
+the random forest. 
+
+Separate trees have to be trained for both Merra and Era 5, as 
+well as separate forests for every attribute being studied. This 
+means for the 6 attributes that are being studied 12 random 
+forests will have to be made. 
+
+Similarly to the other correction models the data used to train 
+the models is in `output`. A single joined file with only 
+the required data was made to speed up loading times. 
+
+Once every forest is generated, a series of test statistics is 
+automatically ran to evaluate the effectiveness of the model. 
+Those statistics are Root mean squared error, R-2 score, Spearman 
+correlation, Pearson correlation, and feature importance expressed 
+as a percentage. These stats are used as a type of benchmark. 
+Every forest has special hyperparameters that can used to adjust 
+the model. The parameters we focused on for tuning the model were 
+n_estimators, max_features, and min_samples_leaf. These were 
+chosen based on information from 
+[this website](https://www.analyticsvidhya.com/blog/2015/06/tuning-random-forest-model/)
+. When tuning hyperparameters options were iterated through each 
+of the 3 parameters until all combinations were tested. Notice 
+that these models were ran on a machine with an Intel(R) Xeon(R) 
+W-11855M CPU @ 3.20GHz processor and 16 GB of ram. The models that 
+were tested were pushing the boundaries of this machine.
+
 ## Random Forest Tuning
 Random forests are made in the get_corrections.py file.
 
@@ -417,16 +581,31 @@ using the RandomForestRegression class. We are using a regression
 random forest instead of a classification since our output is a 
 float. 
 
-Initially the random forest was given the input columns of 
-reanalysis lat, reanalysis long, elevation, reanalysis prediction, 
-month (integers ranging from 1 to 12), hour (integers ranging from 
-0 to 23?), and distance from the reanalysis station to our station.
-The model then predicted the actual value which is our station 
-recorded value. 50 trees were generated in the forest, with 20% (1 
-years worth) data used for testing while 80% of the data was used 
-for training. From preliminary testing this model showed to have 
-some prospect with a 0.6 degree improvement for the 
-root-mean-square error for Merra average air temperature.
+For the first method of creating the random forest, that is where 
+the only weather attribute fed into the model is the one we are 
+studying, the initial testing showed this preformed only marginally 
+better than the other 2 methods of correcting the data.
+Merra average air temperature testing showed to have a RMSE 
+of 2.09 when the output was the expected temperature, and 1.96 
+when the output was the error or correction. The best preforming 
+model was when the n_estimators=150, max_features=None, and
+min_samples_leaf=1. My hypothesis why it was most effective when 
+max_features=None (that is when all attributes are used in every 
+tree) is that it relied so heavily on temperature that when 
+temperature was not included in the trees the prediction ability 
+dropped drastically.
+
+The second method where 6 attributes are fed into the model had 
+better results. For Merra average air temperature has a RMSE of
+1.24 in the best result. The best preforming 
+model was when the n_estimators=100, max_features=0.5, and
+min_samples_leaf=1. This is when predicting the error and not the 
+expected temperature. These parameters were ran on Era5 as well 
+and produced a model with a RMSE of 1.08.
+
+It is very possible that the effectiveness of the model could be 
+improved by increasing the n_estimators, but I would need to run 
+these models on a better computer first.
 
 To improve performance the model was 
 [pickled](https://docs.python.org/3/library/pickle.html) to reduce 
@@ -439,12 +618,3 @@ Models can be created in RAM with 100 trees (the default option)
 however only incremental gains are realized using 100 trees over 50.
 In total there would be roughly 250 GB of stored random forest 
 models.
-
-I suspected that some of the more nuanced variables were not being 
-represented well in this model as it is much harder for this model 
-to represented in this model due to the realities of a random 
-forest. Take hour for example. If consistently Merra 
-underestimated the temperature in the morning and overestimated 
-the temperature in the evening, then those small changes may be 
-not very well represented in the final output. It's harder to 
-capture the small changes to -40C. This yielded worse results.
