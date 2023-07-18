@@ -15,30 +15,29 @@ pd.options.mode.chained_assignment = None  # default='warn'
 years = [2018, 2019, 2020, 2021, 2022]
 
 # column names for manitoba weather station data
-# stn_attrs = ['AvgAir_T', 'AvgWS', 'Soil_TP5_TempC', ['Soil_TP5_TempC', 'Soil_TP20_TempC'], 'Soil_TP20_TempC',
-#              'Soil_TP50_TempC', ['Soil_TP50_TempC', 'Soil_TP100_TempC'],
-#              ['Soil_TP20_TempC', 'Soil_TP50_TempC', 'Soil_TP100_TempC'], 'SolarRad', ['TBRG_Rain', 'Pluvio_Rain'],
-#              "Press_hPa", 'Soil_TP5_VMC', 'Soil_TP20_VMC', ['Soil_TP20_VMC', 'Soil_TP50_VMC', 'Soil_TP100_VMC'],
-#              'Soil_TP100_VMC', 'RH']
-#
-# # attribute names for era5
-# era5_attrs = ['t2m', ['v10m', 'u10m'], 'stl1', None, 'stl2',
-#               None, None,
-#               'stl3', 'ssrd', 'tp',
-#               ['sp', 't2m'], 'swvl1', 'swvl2', 'swvl3',
-#               None, ['t2m', 'd2m'], 'd2m']
-# # attribute names for merra2
-# merra_attrs = ["T2M", ["V10M", "U10M"], None, "TSOIL1", "TSOIL2",
-#               "TSOIL3", "TSOIL4",
-#               None, "SWGDN", "PRECTOTLAND",
-#               ["PS", "T2M"], "SFMC", None, None,
-#               "RZMC", ["T2M", "T2MDEW"], "T2MDEW"]
+stn_attrs = ['AvgAir_T', 'AvgWS', 'Soil_TP5_TempC', ['Soil_TP5_TempC', 'Soil_TP20_TempC'], 'Soil_TP20_TempC',
+             'Soil_TP50_TempC', ['Soil_TP50_TempC', 'Soil_TP100_TempC'],
+             ['Soil_TP20_TempC', 'Soil_TP50_TempC', 'Soil_TP100_TempC'], 'SolarRad', ['TBRG_Rain', 'Pluvio_Rain'],
+             "Press_hPa", 'Soil_TP5_VMC', 'Soil_TP20_VMC', ['Soil_TP20_VMC', 'Soil_TP50_VMC', 'Soil_TP100_VMC'],
+             'Soil_TP100_VMC', 'RH']
 
+# attribute names for era5
+era5_attrs = ['t2m', ['v10m', 'u10m'], 'stl1', None, 'stl2',
+              None, None,
+              'stl3', 'ssrd', 'tp',
+              ['sp', 't2m'], 'swvl1', 'swvl2', 'swvl3',
+              None, ['t2m', 'd2m'], 'd2m']
+# attribute names for merra2
+merra_attrs = ["T2M", ["V10M", "U10M"], None, "TSOIL1", "TSOIL2",
+               "TSOIL3", "TSOIL4",
+               None, "SWGDN", "PRECTOTLAND",
+               ["PS", "T2M"], "SFMC", None, None,
+               "RZMC", ["T2M", "T2MDEW"], "T2MDEW"]
 
 # For testing purposes
-stn_attrs = ['Press_hPa']
-era5_attrs = [['sp', 't2m']]
-merra_attrs = [["PS", "T2M"]]
+# stn_attrs = ['SolarRad']
+# era5_attrs = ["ssrd"]
+# merra_attrs = ["SWGDN"]
 
 # attribute names for merra broken down by database
 # _2 folders were there since they were added outside the
@@ -180,7 +179,7 @@ def decimal_to_percent(dec):
 
 # is actually kg/m^2*s which is equivalent to mm/s
 def mm_per_second_to_mm(mm_per_second):
-    return mm_per_second * 24 * 60 * 60
+    return mm_per_second * 60 * 60
 
 
 # mapping of attribute names to correct conversion function
@@ -615,8 +614,29 @@ def adjust_solar_rad():
                                                   solar_df["Station"]])["era5_SolarRad"].diff()
 
     solar_df["era5_SolarRad"] = solar_df["era5_SolarRad"].fillna(non_modified["era5_SolarRad"])
+    solar_df["era5_err"] = solar_df["stn_SolarRad"] - solar_df["era5_SolarRad"]
+    solar_df["era5_sqr_err"] = solar_df["era5_err"] ** 2
     solar_df.set_index(solar_df.index.shift(1, "H"), inplace=True)
     solar_df.to_csv("output/pre_cleaning/SolarRad_output.csv", index=False)
+
+
+# used to undo the cumulative sum done on the column of data that is era5 for precipitation
+def adjust_precipitation():
+    precip_df = pd.read_csv("output/pre_cleaning/Pluvio_Rain_output.csv")
+    precip_df["time"] = pd.to_datetime(precip_df["time"])
+    precip_df.set_index(precip_df["time"], inplace=True)
+    precip_df.set_index(precip_df.index.shift(-1, "H"), inplace=True)
+    non_modified = precip_df.copy()
+    precip_df["era5_Pluvio_Rain"] = precip_df.groupby([precip_df.index.day,
+                                                       precip_df.index.month,
+                                                       precip_df.index.year,
+                                                       precip_df["Station"]])["era5_Pluvio_Rain"].diff()
+
+    precip_df["era5_Pluvio_Rain"] = precip_df["era5_Pluvio_Rain"].fillna(non_modified["era5_Pluvio_Rain"])
+    precip_df["era5_err"] = precip_df["stn_Pluvio_Rain"] - precip_df["era5_Pluvio_Rain"]
+    precip_df["era5_sqr_err"] = precip_df["era5_err"] ** 2
+    precip_df.set_index(precip_df.index.shift(1, "H"), inplace=True)
+    precip_df.to_csv("output/pre_cleaning/Pluvio_Rain_output.csv", index=False)
 
 
 # global variables
@@ -691,8 +711,10 @@ def main():
                 except TypeError as e:
                     print("main", e)
 
-    adjust_solar_rad()
-
+    if "SolarRad" in stn_attrs:
+        adjust_solar_rad()
+    if ['TBRG_Rain', 'Pluvio_Rain'] in stn_attrs:
+        adjust_precipitation()
 
 # bootstrap
 main()

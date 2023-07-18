@@ -13,6 +13,7 @@ from sklearn.ensemble import RandomForestRegressor
 import warnings
 import pickle
 import numpy as np
+import statistics as stats
 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score, mean_squared_error
@@ -44,6 +45,30 @@ def merge_files():
 
     df_output = df_output.dropna(how="any")
     df_output.to_csv("random_forest_data.csv")
+
+
+def print_monthly_stats(random_forest, x_test, y_test):
+    merged = np.c_[x_test, y_test]
+    df = pd.DataFrame(merged)
+
+    rmse_arr = []
+
+    for month in range(1, 13):
+        print("month: ", month)
+        df_month = df[df[9] == month]
+        y_month = df_month[12].to_numpy()
+        x_month = df_month[range(12)].to_numpy()
+
+        predicted_test = random_forest.predict(x_month)
+
+        rmse = np.sqrt(mean_squared_error(y_month, predicted_test))
+        rmse_arr.append(rmse)
+        pearson = pearsonr(y_month, predicted_test)
+
+        # print(f'Root mean squared error: {rmse:.6}')
+        # print(f'Test data Pearson correlation: {pearson[0]:.6}')
+
+    print(rmse_arr)
 
 
 # given a 2D numpy array for the input and output of the random forest
@@ -86,6 +111,7 @@ def train_random_forest(x_arr, y_arr, file_short_name, n_estimators, max_feature
     spearman = spearmanr(y_test, predicted_test)
     pearson = pearsonr(y_test, predicted_test)
 
+    print("Comprehensive Statistics")
     print(f'Root mean squared error: {rmse:.3}')
     print(f'Test data R-2 score: {test_score:>5.3}')
     print(f'Test data Spearman correlation: {spearman[0]:.3}')
@@ -94,6 +120,8 @@ def train_random_forest(x_arr, y_arr, file_short_name, n_estimators, max_feature
     print(model.feature_importances_)
 
     # print(model.predict(np.asarray([[-98.75, 49.5, 371.0, -28.830664062499977, 1, 6, 0.53]])))
+
+    print_monthly_stats(model, x_test, y_test)
 
     print("finished")
 
@@ -270,8 +298,14 @@ def save_random_forest():
 # create random forest using all attributes as input
 def save_random_forest_all_attr():
     df = pd.read_csv("random_forest_data.csv")
-    # make_merra_era5_random_forest(df, "AvgAir_T", 100, 0.3, 1, True)
-    random_forest_benchmarks(df, "AvgAir_T")
+    # make_merra_era5_random_forest(df, "AvgAir_T", 100, 0.5, 1, True)
+    # random_forest_benchmarks(df, "AvgAir_T")
+
+    # attrs = ["AvgAir_T", "AvgWS", "Pluvio_Rain", "Press_hPa", "RH", "SolarRad"]
+    attrs = ["AvgAir_T", "AvgWS", "Pluvio_Rain", "Press_hPa", "RH", "SolarRad"]
+
+    for attr in attrs:
+        make_merra_era5_random_forest(df, attr, 100, 0.5, 1, True)
 
 
 def main():
@@ -316,3 +350,4 @@ def main():
 
 
 save_random_forest_all_attr()
+# main()

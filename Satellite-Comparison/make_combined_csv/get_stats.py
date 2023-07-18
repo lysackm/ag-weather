@@ -57,8 +57,8 @@ def seasonal_breakdown(df, col):
 # for each of the months over all the years.
 def monthly_breakdown(df, col):
     df["time"] = pd.to_datetime(df["time"])
-    df.set_index(df["time"], inplace=True)
-    all_years = np.sqrt(df.groupby([df.index.month])[col].mean())
+    # df.set_index(df["time"], inplace=True)
+    all_years = np.sqrt(df.groupby([df["time"].dt.month])[col].mean())
 
     return all_years.to_list()
 
@@ -135,7 +135,7 @@ def format_seasonal_stats(monthly_stats):
                 output[i] += " & " + str(months[i])
 
     for month in output:
-        print(month + "\\")
+        print(month + "\\\\")
 
 
 # change a filename to get the attribute or column name from it
@@ -236,6 +236,9 @@ def print_stats(data_type):
         df = pd.read_csv(file)
         print(file)
 
+        if "Pluvio_Rain" in file:
+            print(df["merra_sqr_err"].mean())
+
         attr = get_column_name(file)
         stn_col = get_column_name(file, "stn_")
         merra_col = get_column_name(file, "merra_")
@@ -289,5 +292,5 @@ def print_stats(data_type):
     format_seasonal_stats(monthly_era5_all)
 
 
-data_type_run = DataType.raw
+data_type_run = DataType.lin_reg
 print_stats(data_type_run)
