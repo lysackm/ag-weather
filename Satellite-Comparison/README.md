@@ -6,6 +6,8 @@
 2. [Era-5 Land](#era-5-land)
 3. [CaSPAr](#caspar)
 4. [Station Data](#station-data)
+5. [A Very Detailed Look into the Data Correction Process](#data-correction)
+6. [Random Forest](#random-forest)
 
 ## <a name="merra-2"></a>
 ## Merra-2
@@ -409,7 +411,7 @@ data over a month for one particular station. Calculating the
 root-mean-square error. This data can then be charted to see the 
 rmse over time.
 
-
+## <a name="data-correction"></a>
 # A Very Detailed Look into the Data Correction Process
 
 ## Raw Data
@@ -508,6 +510,7 @@ the corrected value for each hour is given by putting the analysis
 attribute value into the generated equation as the x value. 
 
 
+## <a name="random-forest"></a>
 ## Random Forests
 
 Random Forests are made using the Sci Kit Learn 
