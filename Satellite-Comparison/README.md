@@ -618,3 +618,114 @@ Models can be created in RAM with 100 trees (the default option)
 however only incremental gains are realized using 100 trees over 50.
 In total there would be roughly 250 GB of stored random forest 
 models.
+
+# Code Overview
+
+## make_combined_csv
+This directory holds the program that takes the raw Merra and Era 
+data as well as the station data and then merges it all into a 
+series of csv files, found in `output/precleaning`. There are then 
+programs that clean this data and moves it to `output`. Then 
+programs can extract and modify data from `ouput`.
+
+### make_combined_csv.py
+Program that fetches and combines the data from Merra, Era and 
+our station data. Calling the main function will run all the 
+functions necessary to extract the data and combine it. Some data 
+processing is done by default, such as unit conversions, changing 
+cumulative data to hourly, and other operations. The data being 
+fetched relative path needs to be added in `data_dir` variable. 
+The data directory shape is described below
+
+data
+ |-> station-csv
+    |-> MBAg-60min-2018.csv
+    |-> MBAg-60min-2019.csv
+    |-> ...
+ |-> conpernicus
+    |-> ERA5-Land
+        |-> v10m2022
+            |-> data.nc
+        |-> v10m2021
+            |-> data.nc
+        |-> ...
+        |-> d2m2018
+            |-> data.nc
+ |-> merra
+    |-> M2T1NXSLV
+        |-> MERRA2_400.tavg1_2d_slv_Nx.20180101.SUB.nc
+        |-> ...
+    |-> M2T1NXLND
+        |-> MERRA2_400.tavg1_2d_lnd_Nx.20180101.SUB.nc
+        |-> ...
+    |-> M2T1NXLND_2
+        |-> MERRA2_400.tavg1_2d_lnd_Nx.20180101.SUB.nc
+        |-> ...
+    |-> M2T1NXRAD
+        |-> MERRA2_400.tavg1_2d_rad_Nx.20180101.SUB.nc
+        |-> ..
+
+`station-csv` holds the data for our observed stations data. It 
+needs to keep the file naming scheme shown above where only the 
+year changes. `conpernicus` holds all the data from Era5. This is 
+the format of the unzipped data when downloading the data from the 
+conpernicus data portal. The `merra` directory holds the merra 
+data. Each of the subdirectories represents a database. Inside 
+each file is a nc file for every for the timeframe which was 
+downloaded. There are sometimes when the files downloaded have a 
+different file name, such as having 401 instead of 400. The 
+program in `merra\util\rename_files.py` can replace the filenames 
+to make it uniform. You just need to set the directory where you 
+want the program running should run to.
+
+Alternatively the naming schemes can be changed by changing the 
+functions `get_merra_filename`, `get_era_filename`, and 
+`get_stn_filename`.
+
+To only compile files for certain attributes the lists stn_attrs, 
+era5_attrs, merra_attrs can be modified. Only the attributes in 
+those lists will be fetched and processed.
+
+Once the program is complete `/output/pre_cleaning` with have 1 
+file per attribute. The csv structure is described below.
+
+| Column Description      | Air Temp Column Name | Column Name Regex |
+|-------------------------|----------------------|-------------------|
+| UTC time                | time                 | time              |
+| Station ID              | StnID                | StnID             |
+| Station Name            | Station              | Station           |
+| Attribute value         | stn_AvgAir_T         | stn_attr_name     |
+| Station longitude value | stn_long             | stn_long          |
+| Station latitude value  | stn_lat              | stn_lat           |
+| Location Id             | location             | location          |
+| Elevation at station    | elevation            | elevation         |
+| Era5 longitude          | era5_long            | era5_long         |
+| Era5 latitude           | era5_lat             | era5_lat          |
+| Era5 attribute value    | era5_AvgAir_T        | era5_attr_name    |
+| Merra longitude         | merra_lon            | merra_lon         |
+| Merra latitude          | merra_lat            | merra_lat         |
+| Merra attribute value   | merra_AvgAir_T       | merra_attr_name   |
+| Merra Error             | merra_err            | merra_err         |
+| Merra Square Error      | merra_sqr_err        | merra_sqr_err     |
+| Era5 Error              | era5_err             | era5_err          |
+| Era5 Square Error       | era5_sqr_err         | era5_sqr_err      |
+
+## clean_csvs.py
+Once the data is in pre_cleaning then running `clean_csvs.py` can 
+clean a portion of the csvs. Note that it does not move all the 
+files over from pre_cleaning, and you need to copy some 
+files over that are not cleaned. If you copy all the files over 
+and skip the ones that already exist then that works. Cleaning is 
+based off of neighbors values and thresholds.
+
+## get_graphable_data.py
+This takes the data from output and processes it in ways that 
+makes it ready to be graphed. Different functions will process 
+graphs for different reasons. The three 
+functions that can be run are get_line_chart_data_daily, 
+get_map_data, get_line_chart_data.
+
+## get_stats.py
+This does analysis on the data and returns stats such as RMSE, 
+correlation, ect. Change the type of stats that are retrieved by 
+changing the enum's value which is passed to print_stats.
