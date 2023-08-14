@@ -1,9 +1,72 @@
+from datetime import datetime
 import glob
 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from numpy import NaN
+
+
+# graph_mean_comparison
+def graph_mean_comparison():
+    attrs = ["AvgAir_T", "AvgWS", "Pluvio_Rain", "Press_hPa", "RH", "SolarRad"]
+    titles = ['Average Air Temperature ($^\circ$C)', "Average Wind Speed (m/s)", "Precipitation (mm)",
+              "Pressure (hPa)", "Relative Humidity (%)", "Solar Radiation (mJ/m$^2$)"]
+
+    plt.style.use("ggplot")
+
+    for attr, title in zip(attrs, titles):
+        print(attr)
+
+        x = []
+        # graph era5
+        file = "daily/err/merra_" + attr + "_output.csv"
+        df = pd.read_csv(file, parse_dates={"date": ["time", "time.1", "time.2"]})
+        df["date"] = pd.to_datetime(df["date"])
+        df = df.set_index("date")
+
+        dates = df.index
+        x_axis = pd.date_range(start="2018-01-01", periods=365*5 + 1, freq="d")
+
+        for date in x_axis:
+            try:
+                daily_df = df[df.index == date]
+
+                x.append(daily_df.iloc[0].mean(axis=0, skipna=True))
+                # print(no_nan_df.mean(axis=0, skipna=True))
+            except (KeyError, IndexError):
+                x.append(np.NaN)
+
+        plt.scatter(x_axis, x, linewidths=0, s=10, c=["orange"], label="MERRA")
+
+        x = []
+        file = "daily/err/era5_" + attr + "_output.csv"
+        df = pd.read_csv(file, parse_dates={"date": ["time", "time.1", "time.2"]})
+
+        dates = df["date"]
+
+        for date in df.index:
+
+            # drop index column
+            try:
+                df_no_index = df.drop(columns="date")
+            except KeyError:
+                df_no_index = df
+
+            daily_df = df_no_index.loc[date]
+            no_nan_df = daily_df.dropna()
+
+            # append mean of all values if values exist
+            if no_nan_df.size == 1:
+                x.append(NaN)
+            else:
+                x.append(no_nan_df.mean(axis=0, skipna=True))
+
+        plt.scatter(dates, x, linewidths=0, s=10, c=["blue"], label="ERA5-Land", alpha=0.5)
+        plt.title(title)
+        plt.xlim([datetime(2017, 10, 1), datetime(2023, 4, 1)])
+        plt.legend()
+        plt.show()
 
 
 # graph_mean
@@ -78,10 +141,10 @@ def graph_mean(is_sqr=False, is_daily=False):
 
         if is_daily:
             if is_sqr:
-                filename = root_path + file.replace("_output.csv", ".png").replace("./sqr-err", "")\
+                filename = root_path + file.replace("_output.csv", ".png").replace("./sqr-err", "") \
                     .replace("daily", "daily\\mean")
             else:
-                filename = root_path + file.replace("_output.csv", ".png").replace("./err", "")\
+                filename = root_path + file.replace("_output.csv", ".png").replace("./err", "") \
                     .replace("daily", "daily\\mean")
         else:
             if is_sqr:
@@ -223,5 +286,6 @@ def generate_all_graphs():
     graph_mean(False, True)
 
 
-generate_all_graphs()
-get_averaged_time()
+# generate_all_graphs()
+# get_averaged_time()
+graph_mean_comparison()
