@@ -7,7 +7,9 @@ import matplotlib.pyplot as plt
 from numpy import NaN
 
 
-# graph_mean_comparison
+# graph the mean bias for all the attributes. One graph will have both
+# data from MERRA and ERA5-Land. The data spans all 5 years and one point in
+#  the scatter plot represents the average of the mean bias for tha single day
 def graph_mean_comparison():
     attrs = ["AvgAir_T", "AvgWS", "Pluvio_Rain", "Press_hPa", "RH", "SolarRad"]
     titles = ['Average Air Temperature ($^\circ$C)', "Average Wind Speed (m/s)", "Precipitation (mm)",
