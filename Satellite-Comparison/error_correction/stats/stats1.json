@@ -1,5 +1,5 @@
 {
-  "Air Temperature": {
+  "Average Air Temperature ($^\\circ$C)": {
     "merra": {
       "raw": [
         3.134,
@@ -117,7 +117,7 @@
       ]
     }
   },
-  "Wind Speed": {
+  "Average Wind Speed (m/s)": {
     "merra": {
       "raw": [
         1.898,
@@ -235,7 +235,7 @@
       ]
     }
   },
-  "Precipitation": {
+  "Precipitation (mm)": {
     "merra": {
       "raw": [
         0.079,
@@ -353,7 +353,7 @@
       ]
     }
   },
-  "Pressure": {
+  "Pressure (hPa)": {
     "merra": {
       "raw": [
         8.252,
@@ -471,7 +471,7 @@
       ]
     }
   },
-  "Humidity": {
+  "Relative Humidity (%)": {
     "merra": {
       "raw": [
         16.79,
@@ -589,7 +589,7 @@
       ]
     }
   },
-  "Solar Radiation": {
+  "Solar Radiation (mJ/m$^2$)": {
     "merra": {
       "raw": [
         0.283,
