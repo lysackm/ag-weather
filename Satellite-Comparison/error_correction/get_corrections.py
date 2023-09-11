@@ -4,6 +4,7 @@ import time
 
 import joblib
 import pandas as pd
+import xarray as xr
 import glob
 
 from sklearn import datasets, linear_model
@@ -22,6 +23,74 @@ from scipy.stats import spearmanr, pearsonr
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
 
+# raw data to stored np array
+def process_data(attr_stn_col, attr_model_col, model):
+    df = pd.read_csv("random_forest_data.csv")
+
+    df["time"] = pd.to_datetime(df["time"])
+
+    model_df = df[["Station", model + "_lat", model + "_lon", "elevation", model + "_AvgAir_T", model + "_AvgWS",
+                   model + "_Pluvio_Rain", model + "_Press_hPa", model + "_RH", model + "_SolarRad", attr_stn_col]]
+    model_df = model_df.assign(month=df["time"].dt.month)
+    model_df = model_df.assign(hour=df["time"].dt.hour)
+    # calculate the difference between the station location and the merra location
+    model_df = model_df.assign(dist=((df["stn_long"] - df[model + "_lon"]) ** 2 +
+                                     (df["stn_lat"] - df[model + "_lat"]) ** 2) ** 1 / 2)
+
+    model_df[attr_stn_col] = model_df[attr_stn_col] - model_df[attr_model_col]
+
+    model_df = model_df.dropna()
+
+    return model_df
+
+
+def time_fading(df):
+    num_previous = 3
+    model = "merra"
+    df_past = df[[model + "_AvgAir_T", model + "_AvgWS", model + "_Pluvio_Rain",
+                  model + "_Press_hPa", model + "_RH", model + "_SolarRad"]]
+
+    for i in range(num_previous):
+        str_num = str(i) + model
+        new_col_names = [str_num + "_AvgAir_T", str_num + "_AvgWS", str_num + "_Pluvio_Rain",
+                         str_num + "_Press_hPa", str_num + "_RH", str_num + "_SolarRad"]
+
+        df[new_col_names] = (df_past
+                             .groupby(df["Station"], group_keys=False)
+                             .apply(lambda s: s.bfill().shift(-1)))
+        df_past = df[new_col_names]
+
+    return df
+
+
+def load_data(attr, is_time_faded=False):
+    model = "merra"
+    attr_stn_col = "stn_" + attr
+    attr_model_col = model + "_" + attr
+    model_df = process_data(attr_stn_col, attr_model_col, model)
+
+    if is_time_faded:
+        model_df = time_fading(model_df)
+        model_df = model_df.dropna()
+
+        x_df = model_df.loc[:, model_df.columns != "Station"]
+        x_df = x_df.loc[:, x_df.columns != attr_stn_col]
+        x_arr = x_df.to_numpy()
+        y_arr = model_df[attr_stn_col].to_numpy()
+
+    else:
+        x_arr = model_df.loc[:, model_df.columns != "Station"].to_numpy()
+        y_arr = model_df[attr_stn_col].to_numpy()
+
+    return x_arr, y_arr
+
+
+def time_series_random_forest():
+    x_arr, y_arr = load_data("AvgAir_T", True)
+
+    train_random_forest(x_arr, y_arr, "merra_all_attrs", 100, 0.5, 1)
+
+
 # merge_files
 #
 # Combine all data in output files together to improve performance
@@ -33,18 +102,56 @@ def merge_files():
     df_output = pd.read_csv("../make_combined_csv/output/AvgAir_T_output.csv")
 
     df_output = df_output[["merra_lat", "merra_lon", "stn_long", "stn_lat", "era5_lat", "era5_long", "elevation",
-                           "merra_AvgAir_T", "stn_AvgAir_T", "era5_AvgAir_T", "time", "location"]]
+                           "merra_AvgAir_T", "stn_AvgAir_T", "era5_AvgAir_T", "time", "Station"]]
+
+    print("start", len(df_output.index))
 
     for file in files:
         if "AvgAir_T" not in file:
             df = pd.read_csv(file)
             attr_name = file.replace("../make_combined_csv/output\\", "").replace("_output.csv", "")
 
-            df = df[["stn_" + attr_name, "era5_" + attr_name, "merra_" + attr_name, "time", "location"]]
-            df_output = df_output.merge(df, on=["location", "time"], how="inner")
+            df = df[["stn_" + attr_name, "era5_" + attr_name, "merra_" + attr_name, "time", "Station"]]
+            df_output = df_output.merge(df, on=["Station", "time"], how="inner")
+            print(file, len(df_output.index))
 
     df_output = df_output.dropna(how="any")
-    df_output.to_csv("random_forest_data.csv")
+    df_output.drop_duplicates(subset=['Station', 'time'], inplace=True)
+    df_output.to_csv("random_forest_data.csv", index=False)
+
+
+# def make_netcdf():
+#     df = pd.read_csv("random_forest_data.csv")
+#     df.drop_duplicates(subset=['Station', 'time'], inplace=True)
+#     df = df.set_index(["Station", "time"])
+#     print(df)
+#
+#     ds = xr.Dataset.from_dataframe(df)
+#     print(ds)
+#     ds.to_netcdf("data.netcdf")
+
+
+def print_hourly_stats(random_forest, x_test, y_test):
+    merged = np.c_[x_test, y_test]
+    df = pd.DataFrame(merged)
+
+    rmse_arr = []
+
+    for hour in range(24):
+        df_hour = df[df[10] == hour]
+        y_hour = df_hour[12].to_numpy()
+        x_hour = df_hour[range(12)].to_numpy()
+
+        predicted_test = random_forest.predict(x_hour)
+
+        rmse = np.sqrt(mean_squared_error(y_hour, predicted_test))
+        rmse_arr.append(rmse)
+        pearson = pearsonr(y_hour, predicted_test)
+
+        # print(f'Root mean squared error: {rmse:.6}')
+        # print(f'Test data Pearson correlation: {pearson[0]:.6}')
+
+    print(rmse_arr)
 
 
 def print_monthly_stats(random_forest, x_test, y_test):
@@ -54,7 +161,6 @@ def print_monthly_stats(random_forest, x_test, y_test):
     rmse_arr = []
 
     for month in range(1, 13):
-        print("month: ", month)
         df_month = df[df[9] == month]
         y_month = df_month[12].to_numpy()
         x_month = df_month[range(12)].to_numpy()
@@ -121,7 +227,10 @@ def train_random_forest(x_arr, y_arr, file_short_name, n_estimators, max_feature
 
     # print(model.predict(np.asarray([[-98.75, 49.5, 371.0, -28.830664062499977, 1, 6, 0.53]])))
 
+    print("monthly stats")
     print_monthly_stats(model, x_test, y_test)
+    print("hourly stats")
+    print_hourly_stats(model, x_test, y_test)
 
     print("finished")
 
@@ -297,11 +406,11 @@ def save_random_forest():
 
 # create random forest using all attributes as input
 def save_random_forest_all_attr():
+    merge_files()
     df = pd.read_csv("random_forest_data.csv")
     # make_merra_era5_random_forest(df, "AvgAir_T", 100, 0.5, 1, True)
     # random_forest_benchmarks(df, "AvgAir_T")
 
-    # attrs = ["AvgAir_T", "AvgWS", "Pluvio_Rain", "Press_hPa", "RH", "SolarRad"]
     attrs = ["AvgAir_T", "AvgWS", "Pluvio_Rain", "Press_hPa", "RH", "SolarRad"]
 
     for attr in attrs:
@@ -349,5 +458,7 @@ def main():
         json.dump({"merra": mean_err_merra, "era5": mean_err_era5}, f, ensure_ascii=False, indent=4)
 
 
-save_random_forest_all_attr()
+# save_random_forest_all_attr()
 # main()
+# merge_files()
+time_series_random_forest()
