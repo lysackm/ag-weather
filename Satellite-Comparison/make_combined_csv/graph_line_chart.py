@@ -224,11 +224,15 @@ def graph_all_stns(is_sqr=False, is_daily=False):
 # or hourly average (single point). If you want to change the time then some slight
 # modifications of the function will have to be made
 def get_averaged_time():
-    dates = pd.date_range(start="2018-01-01", periods=744, freq="H")
-    files = glob.glob("D:/data/processed-data/*.csv")
-    root_path = "D:\\data\\graphs\\interesting\\month_hourly_avg\\"
+    titles = {"AvgAir_T": 'Average Air Temperature ($^\circ$C)', "AvgWS": "Average Wind Speed (m/s)", "Pluvio_Rain": "Precipitation (mm)",
+              "Press_hPa": "Pressure (hPa)", "RH": "Relative Humidity (%)", "SolarRad": "Solar Radiation (mJ/m$^2$)"}
 
-    data_fetched = ["era5_err", "merra_err"]
+    x_axis = range(24)
+    files = glob.glob("output/*.csv")
+    root_path = "D:\\data\\graphs\\interesting\\hourly_avg\\"
+
+    data_fetched = ["merra_err", "era5_err"]
+    plt.style.use("ggplot")
 
     for file in files:
         attr_df = pd.read_csv(file)
@@ -254,26 +258,28 @@ def get_averaged_time():
         date_index = filtered.set_index(attr_df["time"])
 
         # change this line to change where the average is happening
-        result = date_index.groupby([date_index.index.day, date_index.index.hour])[mean_cols].mean()
+        result = date_index.groupby([date_index.index.hour])[mean_cols].mean()
         print(file)
 
-        for attr in data_fetched:
-            if attr in columns:
-                # plot both err and sqr-err
-                filename = root_path + "err\\" + file.replace("_output.csv", ".png").replace(
-                    "D:/data/processed-data\\", attr)
-                plt.plot(dates, result[attr], linewidth=0.5)
-                plt.title(file.replace("D:/data/processed-data\\", "").replace("_output.csv", "") + " " + attr)
-                plt.savefig(filename)
-                plt.clf()
 
-                filename = root_path + "sqr-err\\" + file.replace("_output.csv", ".png").replace(
-                    "D:/data/processed-data\\", attr)
-                plt.plot(dates, np.sqrt(result[attr.replace("_err", "_sqr_err")]), linewidth=0.5)
-                plt.title(file.replace("D:/data/processed-data\\", "").replace("_output.csv", "") + " " + attr.replace(
-                    "_err", "_sqr_err"))
-                plt.savefig(filename)
-                plt.clf()
+        # plot both err and sqr-err
+        filename = root_path + "err\\hourly_" + file.replace("_output.csv", ".png").replace(
+            "D:/data/processed-data\\", "").replace("output\\", "")
+        plt.plot(x_axis, result[data_fetched[0]], c="orange")
+        plt.plot(x_axis, result[data_fetched[1]], c="blue")
+        plt.title(titles[file.replace("D:/data/processed-data\\", "").replace("_output.csv", "").replace("output\\", "")])
+        plt.xlabel("Hour of Day (UTC)")
+        plt.legend(["MERRA", "ERA5-Land"])
+        plt.savefig(filename)
+
+        filename = root_path + "sqr-err\\hourly_" + file.replace("_output.csv", ".png").replace(
+            "D:/data/processed-data\\", "").replace("output\\", "")
+        plt.plot(x_axis, np.sqrt(result[data_fetched[0].replace("_err", "_sqr_err")]), c="orange")
+        plt.plot(x_axis, np.sqrt(result[data_fetched[1].replace("_err", "_sqr_err")]), c="blue")
+        plt.title(titles[file.replace("D:/data/processed-data\\", "").replace("_output.csv", "").replace("output\\", "")])
+        plt.legend(["MERRA", "ERA5-Land"])
+        plt.savefig(filename)
+        plt.clf()
 
 
 def generate_all_graphs():
@@ -289,5 +295,5 @@ def generate_all_graphs():
 
 
 # generate_all_graphs()
-# get_averaged_time()
-graph_mean_comparison()
+get_averaged_time()
+# graph_mean_comparison()
