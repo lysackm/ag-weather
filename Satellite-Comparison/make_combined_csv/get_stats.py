@@ -108,8 +108,7 @@ def spacial_correlation(df, col, show_graph=False, output_file="", title=""):
                                 color_continuous_scale=color_scale,
                                 size=np.abs(stats_df["value"]),
                                 size_max=25,
-                                opacity=0.60,
-                                title=title)
+                                opacity=0.60)
 
         fig.update_layout(mapbox_style="open-street-map")
         fig.update_layout(margin={"r": 0, "t": 80, "l": 0, "b": 0})
@@ -269,13 +268,13 @@ def print_stats(data_type):
             output_file = root_path + file.replace("_output.csv", ".html").replace("output\\", "merra_")
             title = "merra " + file.replace("_output.csv", "").replace("output\\", "")
 
-            spacial_merra = spacial_correlation(df, "merra_err", False, output_file, title)
+            spacial_merra = spacial_correlation(df, "merra_err", True, output_file, title)
             spacial_merra_all[file] = spacial_merra
         if "era5_sqr_err" in df.columns:
             output_file = root_path + file.replace("_output.csv", ".html").replace("output\\", "era5_")
             title = "era5 " + file.replace("_output.csv", "").replace("output\\", "")
 
-            spacial_era5 = spacial_correlation(df, "era5_err", False, output_file, title)
+            spacial_era5 = spacial_correlation(df, "era5_err", True, output_file, title)
             spacial_era5_all[file] = spacial_era5
 
         if merra_col in df.columns:
@@ -292,5 +291,5 @@ def print_stats(data_type):
     format_seasonal_stats(monthly_era5_all)
 
 
-data_type_run = DataType.lin_reg
+data_type_run = DataType.raw
 print_stats(data_type_run)
