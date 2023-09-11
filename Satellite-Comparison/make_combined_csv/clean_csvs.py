@@ -126,11 +126,6 @@ def clean_all_csvs_closest_neighbors():
                     "Soil_50_100_avg_TempC": soil_thresh, "Soil_TP5_TempC": soil_thresh, "Soil_TP20_TempC": soil_thresh,
                     "Soil_TP50_TempC": soil_thresh}
 
-    # attr_offsets = {"SolarRad": solar_thresh, "Soil_5_20_avg_TempC": soil_thresh,
-    #                 "Soil_20_50_100_avg_TempC": soil_thresh,
-    #                 "Soil_50_100_avg_TempC": soil_thresh, "Soil_TP5_TempC": soil_thresh, "Soil_TP20_TempC": soil_thresh,
-    #                 "Soil_TP50_TempC": soil_thresh}
-
     files = glob.glob("output/pre_cleaning/*.csv")
 
     for file in files:
