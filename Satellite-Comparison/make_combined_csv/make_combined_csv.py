@@ -220,7 +220,6 @@ def calculate_era5_surface_pressure(sp, t2m, stn_data):
     attrs_df = t2m.copy()
 
     stn_data_copy = stn_data.copy()
-    stn_data["time"] = stn_data["time"].dt.tz_localize(tz=None)
 
     attrs_df = attrs_df.merge(stn_data_copy, on=["location", "time"], how="left")
     attrs_df = attrs_df.set_index(t2m.index)
@@ -717,4 +716,4 @@ def main():
         adjust_precipitation()
 
 # bootstrap
-main()
+# main()
