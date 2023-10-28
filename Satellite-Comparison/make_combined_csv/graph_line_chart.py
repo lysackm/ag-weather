@@ -272,6 +272,9 @@ def get_averaged_time():
         plt.legend(["MERRA", "ERA5-Land"])
         plt.savefig(filename)
 
+        print("Merra", max(result[data_fetched[0]]) - min(result[data_fetched[0]]))
+        print("Era5", max(result[data_fetched[1]]) - min(result[data_fetched[1]]))
+
         filename = root_path + "sqr-err\\hourly_" + file.replace("_output.csv", ".png").replace(
             "D:/data/processed-data\\", "").replace("output\\", "")
         plt.plot(x_axis, np.sqrt(result[data_fetched[0].replace("_err", "_sqr_err")]), c="orange")
