@@ -16,6 +16,11 @@ class DataType(Enum):
     rand_forest = "random_forest"
 
 
+attr_names = {"output\\AvgAir_T_output.csv": "Air Temperature", "output\\AvgWS_output.csv": "Wind Speed",
+              "output\\Pluvio_Rain_output.csv": "Precipitation", "output\\Press_hPa_output.csv": "Pressure",
+              "output\\RH_output.csv": "Relative Humidity"}
+
+
 # generic_performance
 #
 # Find the root-mean-square of the entire attribute, over all stations
@@ -23,6 +28,17 @@ class DataType(Enum):
 # returns a single number
 def generic_performance(df, col):
     return np.sqrt(df[col].mean())
+
+
+# generic_performance_mbe
+#
+# Find the mean-bias-error of the entire attributes, over all stations
+# over all time
+# returns a single number
+def generic_performance_mbe(df, col):
+    mbe = df[col].mean()
+    return mbe
+
 
 
 # seasonal_breakdown
@@ -59,6 +75,18 @@ def monthly_breakdown(df, col):
     df["time"] = pd.to_datetime(df["time"])
     # df.set_index(df["time"], inplace=True)
     all_years = np.sqrt(df.groupby([df["time"].dt.month])[col].mean())
+
+    return all_years.to_list()
+
+
+# monthly_mbe_breakdown
+#
+# Break down data for each month. Then find the mean bias error
+# for each of the months over all the years.
+def monthly_mbe_breakdown(df, col):
+    df["time"] = pd.to_datetime(df["time"])
+    # df.set_index(df["time"], inplace=True)
+    all_years = df.groupby([df["time"].dt.month])[col].mean()
 
     return all_years.to_list()
 
@@ -137,6 +165,105 @@ def format_seasonal_stats(monthly_stats):
         print(month + "\\\\")
 
 
+# formatting the data for table one
+# RMSE, MBE, PCC (pierson correlation constant) generic means
+# over all hours, one value per
+def format_table_one(merra_rmse, era5_rmse, merra_mbe, era5_mbe, merra_pcc, era5_pcc):
+    for i in merra_rmse.keys():
+        attr_name = attr_names[i]
+        row = attr_name + " & " + str(merra_rmse[i]) + " & " + str(merra_mbe[i]) + " & " + str(merra_pcc[i]) + " & " +\
+              str(era5_rmse[i]) + " & " + str(era5_mbe[i]) + " & " + str(era5_pcc[i]) + "\\\\"
+        print(row)
+
+
+# formatting the data for table 2
+# For each mean bias correction, linear regression, and random forest,
+# show the RMSE and MBE, for Merra and Era5
+def format_table_two(merra_mean_rmse, era5_mean_rmse, merra_mean_mbe, era5_mean_mbe, merra_lin_rmse, era5_lin_rmse,
+                     merra_lin_mbe, era5_lin_mbe, merra_for_rmse, era5_for_rmse, merra_for_mbe, era5_for_mbe):
+    for i in merra_mean_rmse.keys():
+        attr_name = attr_names[i]
+
+        row = attr_name + " & " + str(merra_mean_rmse[i]) + " & " + str(merra_mean_mbe[i]) + " & " + str(merra_lin_rmse[i]) + " & " +\
+              str(merra_lin_mbe[i]) + " & " + str(merra_for_rmse[i]) + " & " + str(merra_for_mbe[i])
+
+        row += "\n" + attr_name + " & " + str(era5_mean_rmse[i]) + " & " + str(era5_mean_mbe[i]) + " & " + str(era5_lin_rmse[i]) + " & " +\
+              str(era5_lin_mbe[i]) + " & " + str(era5_for_rmse[i]) + " & " + str(era5_for_mbe[i])
+        print(row)
+
+
+def print_table_two():
+    mean_data = print_stats(DataType.mean_err)
+    lin_data = print_stats(DataType.lin_reg)
+    for_data = print_stats(DataType.rand_forest)
+
+    format_table_two(mean_data["merra_rmse"], mean_data["era5_rmse"], mean_data["merra_mbe"], mean_data["era5_mbe"],
+                     lin_data["merra_rmse"], lin_data["era5_rmse"], lin_data["merra_mbe"], lin_data["era5_mbe"],
+                     for_data["merra_rmse"], for_data["era5_rmse"], for_data["merra_mbe"], for_data["era5_mbe"])
+
+
+def print_table_three():
+    uncorrected = print_stats(DataType.raw)
+    mean = print_stats(DataType.mean_err)
+    lin = print_stats(DataType.lin_reg)
+    rand = print_stats(DataType.rand_forest)
+
+    format_table_three(uncorrected["monthly_merra_rmse"],
+                       mean["monthly_merra_rmse"],
+                       lin["monthly_merra_rmse"],
+                       rand["monthly_merra_rmse"],)
+
+
+def print_table_four():
+    uncorrected = print_stats(DataType.raw)
+    mean = print_stats(DataType.mean_err)
+    lin = print_stats(DataType.lin_reg)
+    rand = print_stats(DataType.rand_forest)
+
+    format_table_three(uncorrected["monthly_era5_rmse"],
+                       mean["monthly_era5_rmse"],
+                       lin["monthly_era5_rmse"],
+                       rand["monthly_era5_rmse"],)
+
+
+def format_table_three(uncorrected, mean, lin, randFor):
+    output = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
+              "November", "December"]
+    files = glob.glob("output/*.csv")
+
+    for file in files:
+        if file in ["output\AvgAir_T_output.csv", "output\AvgWS_output.csv", "output\Pluvio_Rain_output.csv"]:
+            uncorrected_months = uncorrected[file]
+            mean_months = mean[file]
+            lin_months = lin[file]
+            randFor_months = randFor[file]
+
+            for i in range(12):
+                output[i] += " & " + str(uncorrected_months[i]) + " & " + str(mean_months[i]) + " & " + str(lin_months[i]) + " & " + str(randFor_months[i])
+
+    for month in output:
+        print(month + "\\\\")
+
+    print("\n")
+    output = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
+              "November", "December"]
+
+    for file in files:
+        if file in ["output\Press_hPa_output.csv", "output\RH_output.csv"]:
+            uncorrected_months = uncorrected[file]
+            mean_months = mean[file]
+            lin_months = lin[file]
+            randFor_months = randFor[file]
+
+            for i in range(12):
+                output[i] += " & " + str(uncorrected_months[i]) + " & " + str(mean_months[i]) + " & " + str(lin_months[i]) + " & " + str(randFor_months[i])
+
+    for month in output:
+        print(month + "\\\\")
+
+
+
+
 # change a filename to get the attribute or column name from it
 def get_column_name(file, prefix=""):
     return prefix + file.replace("output\\", "").replace("_output.csv", "")
@@ -147,10 +274,9 @@ def get_column_name(file, prefix=""):
 def correlation_coefficient(df, col1, col2):
     two_column_df = df[[col1, col2]]
     correlation = two_column_df.corr(method="pearson")
-    print("\n\n", col1, col2, "\n")
     print(correlation)
     print("\n\n")
-    return correlation
+    return correlation[col1][col2]
 
 
 # apply_corrections
@@ -198,7 +324,8 @@ def apply_corrections(df, attr, stn_col, merra_col, era5_col, data_type):
         if "merra_err" in df.columns:
             # merra correction
             merra_dict = linear_reg["merra"][attr]
-            merra_err_df = pd.DataFrame.from_dict(merra_dict, orient="index", columns=["merra_slope", "merra_intercept"])
+            merra_err_df = pd.DataFrame.from_dict(merra_dict, orient="index",
+                                                  columns=["merra_slope", "merra_intercept"])
             merra_err_df = merra_err_df.set_index(pd.to_numeric(merra_err_df.index))
 
             df = df.merge(merra_err_df, how="left", left_on=df["time"].dt.month, right_index=True)
@@ -225,11 +352,18 @@ def print_stats(data_type):
     root_path = "D:\\data\\graphs\\interesting\\manitoba_map\\"
 
     generic_merra_all = {}
+    generic_mbe_merra_all = {}
     generic_era5_all = {}
+    generic_mbe_era5_all = {}
     monthly_merra_all = {}
+    monthly_mbe_merra_all = {}
     monthly_era5_all = {}
+    monthly_mbe_era5_all = {}
     spacial_merra_all = {}
     spacial_era5_all = {}
+
+    merra_pcc = {}
+    era5_pcc = {}
 
     for file in files:
         df = pd.read_csv(file)
@@ -253,6 +387,13 @@ def print_stats(data_type):
             generic_era5 = generic_performance(df, "era5_sqr_err")
             generic_era5_all[file] = generic_era5
 
+        if "merra_err" in df.columns:
+            generic_mbe_merra = generic_performance_mbe(df, "merra_err")
+            generic_mbe_merra_all[file] = generic_mbe_merra
+        if "era5_err" in df.columns:
+            generic_mbe_era5 = generic_performance_mbe(df, "era5_err")
+            generic_mbe_era5_all[file] = generic_mbe_era5
+
         # print(file, generic_merra, generic_era5)
 
         if "merra_sqr_err" in df.columns:
@@ -261,6 +402,13 @@ def print_stats(data_type):
         if "era5_sqr_err" in df.columns:
             monthly_era5 = monthly_breakdown(df, "era5_sqr_err")
             monthly_era5_all[file] = monthly_era5
+
+        if "merra_err" in df.columns:
+            monthly_mbe_merra = monthly_mbe_breakdown(df, "merra_err")
+            monthly_mbe_merra_all[file] = monthly_mbe_merra
+        if "era5_err" in df.columns:
+            monthly_mbe_era5 = monthly_mbe_breakdown(df, "era5_err")
+            monthly_mbe_era5_all[file] = monthly_mbe_era5
 
         # print(seasonal_merra, seasonal_era5)
 
@@ -278,18 +426,34 @@ def print_stats(data_type):
             spacial_era5_all[file] = spacial_era5
 
         if merra_col in df.columns:
-            correlation_coefficient(df, stn_col, merra_col)
+            merra_pcc[file] = correlation_coefficient(df, stn_col, merra_col)
         if era5_col in df.columns:
-            correlation_coefficient(df, stn_col, era5_col)
+            era5_pcc[file] = correlation_coefficient(df, stn_col, era5_col)
 
-    print(generic_merra_all, generic_era5_all)
-    print(monthly_merra_all, monthly_era5_all)
+    format_table_one(generic_merra_all, generic_era5_all, generic_mbe_merra_all, generic_mbe_era5_all, merra_pcc,
+                     era5_pcc)
 
-    print("merra")
-    format_seasonal_stats(monthly_merra_all)
-    print("\nEra5")
-    format_seasonal_stats(monthly_era5_all)
+    # print(generic_merra_all, generic_era5_all)
+    # print(monthly_merra_all, monthly_era5_all)
+    #
+    # print("\nmerra rmse")
+    # format_seasonal_stats(monthly_merra_all)
+    # print("\nmerra mbe")
+    # format_seasonal_stats(monthly_mbe_merra_all)
+    # print("\nEra5 rmse")
+    # format_seasonal_stats(monthly_era5_all)
+    # print("\nEra5 rmse")
+    # format_seasonal_stats(monthly_era5_all)
+
+    return {"merra_rmse": generic_merra_all, "era5_rmse": generic_era5_all,
+            "merra_mbe": generic_mbe_merra_all, "era5_mbe": generic_mbe_era5_all,
+            "monthly_merra_rmse": monthly_merra_all, "monthly_merra_mbe": monthly_mbe_merra_all,
+            "monthly_era5_rmse": monthly_era5_all, "monthly_era5_mbe": monthly_mbe_era5_all,
+            "spacial_merra_all": spacial_merra_all, "spacial_era5_all": spacial_era5_all}
 
 
 data_type_run = DataType.raw
-print_stats(data_type_run)
+# print_stats(data_type_run)
+
+print_table_four()
+

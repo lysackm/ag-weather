@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import glob
 import pytz
+from sklearn import linear_model
 
 
 def capitalize_names():
@@ -98,8 +99,12 @@ def netcdf_to_climate_normal(ds):
     return df_climate_normal
 
 
+# def netcdf_to_yearly_data(ds):
+
+
+
 def filter_climate_normal(df):
-    stn_metadata = pd.read_csv("StationList.csv")
+    stn_metadata = pd.read_csv("NormalStationList.csv")
     latitudes = stn_metadata["LatDD"].values.round(1)
     longitudes = stn_metadata["LongDD"].values.round(1)
 
@@ -166,15 +171,15 @@ def corrected_climate_normal_to_average(era5=False):
     else:
         print("Using corrected ERA5 data")
 
-    start_year = 1980
-    end_year = 2000
+    start_year = 1990
+    end_year = 2020
 
     if era5:
         files = glob.glob('../../../data/climate_normal_era5/*.csv')
         cummulative_df = pd.read_csv('../../../data/climate_normal_era5/' + str(end_year) + '.csv')
     else:
-        files = glob.glob('../../../data/climate_normal/*.csv')
-        cummulative_df = pd.read_csv('../../../data/climate_normal/' + str(end_year) + '.csv')
+        files = glob.glob('../../../data/climate_normal_2/*.csv')
+        cummulative_df = pd.read_csv('../../../data/climate_normal_2/' + str(end_year) + '.csv')
 
     cummulative_df["counter"] = [1] * len(cummulative_df["Tmax"])
 
@@ -182,7 +187,7 @@ def corrected_climate_normal_to_average(era5=False):
         if era5:
             year = int(file.replace('../../../data/climate_normal_era5\\', "").replace(".csv", ""))
         else:
-            year = int(file.replace('../../../data/climate_normal\\', "").replace(".csv", ""))
+            year = int(file.replace('../../../data/climate_normal_2\\', "").replace(".csv", ""))
 
         if end_year > year >= start_year:
             year_df = pd.read_csv(file)
@@ -220,7 +225,7 @@ def corrected_climate_normal_to_average(era5=False):
     if era5:
         cummulative_df.to_csv("../../../data/climate_normal_avg/" + str(end_year) + "_era5.csv")
     else:
-        cummulative_df.to_csv("../../../data/climate_normal_avg/" + str(end_year) + ".csv")
+        cummulative_df.to_csv("../../../data/climate_normal_avg/" + str(end_year) + "_2.csv")
 
 
 def corrected_files_to_climate_normal():
@@ -228,7 +233,7 @@ def corrected_files_to_climate_normal():
     for file in files:
         ds = xr.open_dataset(file)
         print(file)
-        output_file = file.replace("/historical_era5/corrected_netcdf", "/climate_normal").replace(".nc", ".csv")
+        output_file = file.replace("/historical_era5/corrected_netcdf", "/climate_normal_2").replace(".nc", ".csv")
         df = netcdf_to_climate_normal(ds)
         df = filter_climate_normal(df)
 
@@ -258,7 +263,25 @@ def era5_files_to_climate_normal():
         df.to_csv(output_file)
 
 
+def merge_normals():
+    df_old_normals = pd.read_csv('../../../data/2000-normal.csv')
+    df_new_normals = pd.read_csv('../../../data/climate_normal_avg/2020_2.csv')
+
+    df_new_normals = df_new_normals.drop(columns=["PPT"])
+
+    df_precip = df_old_normals[["Location", "NormMM", "NormDD", "PPT"]]
+
+    merged = df_new_normals.merge(df_precip, how='inner', on=["Location", "NormMM", "NormDD"])
+
+    merged = merged[["StnID", "Location", "NormYY", "NormMM", "NormDD", "DateDT", "JD", "Tmax", "Tmin", "Tavg", "PPT", "CHU", "GDD", "PDay", "NormLocation"]]
+
+    print(merged.columns)
+
+    merged.to_csv("../../../data/climate_normal_avg/2020.csv")
+
+
 # corrected_files_to_climate_normal()
-era5_files_to_climate_normal()
+# era5_files_to_climate_normal()
 # capitalize_names()
-corrected_climate_normal_to_average(True)
+# corrected_climate_normal_to_average(False)
+merge_normals()

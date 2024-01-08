@@ -4,7 +4,10 @@ from datetime import datetime
 
 import pandas as pd
 from dateutil import relativedelta
-from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt, cycler
+import numpy as np
+from scipy.stats import pearsonr
+from sklearn import linear_model
 
 
 # get_line_chart_data
@@ -237,8 +240,122 @@ def get_map_data():
         print("./map_graph_data/" + file.replace("output\\", ""))
 
 
-# call the function that you want to generate the new data
+# generate graphable data and statistics
+def get_rain_data():
+    file = "output/Pluvio_Rain_output.csv"
 
-get_line_chart_data_daily()
-get_map_data()
-get_line_chart_data()
+    df = pd.read_csv(file)
+
+    thresholds = [0.5, 1, 5, 10, 15]
+
+    era5_err = []
+    era5_rmse = []
+    era5_lin_err = []
+    era5_lin_rmse = []
+    merra_err = []
+    merra_rmse = []
+
+    plt.style.use("ggplot")
+
+    plt.rc("axes", prop_cycle=(cycler('linestyle', ['-', '--'])))
+
+    df["Pluvio_Rain_corrected"] = 0.213 * df["era5_Pluvio_Rain"] + 3.103
+
+    for threshold in thresholds:
+        df = df[df["stn_Pluvio_Rain"] > threshold]
+        print("size of dataframe", len(df))
+
+        # print("era5 mean", df["era5_err"].mean())
+        era5_err.append(df["era5_err"].mean())
+        # print("era5 RMSE", math.sqrt(df["era5_sqr_err"].mean()))
+        era5_rmse.append(math.sqrt(df["era5_sqr_err"].mean()))
+
+        # print("merra mean", df["merra_err"].mean())
+        merra_err.append(df["merra_err"].mean())
+        # print("merra RMSE", math.sqrt(df["merra_err"].mean()))
+        merra_rmse.append(math.sqrt(df["merra_sqr_err"].mean()))
+
+        era5_lin_err.append((df["stn_Pluvio_Rain"] - df["Pluvio_Rain_corrected"]).mean())
+        era5_lin_rmse.append(math.sqrt(((df["stn_Pluvio_Rain"] - df["Pluvio_Rain_corrected"]) ** 2).mean()))
+
+    # df = df[np.logical_and(df["stn_Pluvio_Rain"] > 1, df["stn_Pluvio_Rain"] < 10)]
+
+    plt.plot(thresholds, era5_err, c="orange")
+    plt.plot(thresholds, era5_rmse, c="orange")
+    plt.plot(thresholds, merra_err, c="blue")
+    plt.plot(thresholds, merra_rmse, c="blue")
+    plt.plot(thresholds, era5_lin_err, c="green")
+    plt.plot(thresholds, era5_lin_rmse, c="green")
+    plt.title("Precipitation comparison")
+    plt.xlabel("threshold cut off")
+    plt.legend(["ERA5-Land Error", "ERA5-Land RMSE", "MERRA Error", "MERRA RMSE"])
+    plt.show()
+
+    plt.scatter(df["stn_Pluvio_Rain"], df["era5_Pluvio_Rain"])
+    plt.show()
+
+    plt.scatter(df["stn_Pluvio_Rain"], df["era5_err"])
+    plt.show()
+
+    plt.scatter(df["stn_Pluvio_Rain"], df["merra_Pluvio_Rain"])
+    plt.show()
+
+    plt.scatter(df["stn_Pluvio_Rain"], df["merra_err"])
+    plt.show()
+
+    plt.scatter(df["merra_Pluvio_Rain"],  df["merra_err"])
+    plt.show()
+
+    plt.scatter(df["era5_Pluvio_Rain"], df["era5_err"])
+    plt.show()
+
+    index = range(len(df["stn_Pluvio_Rain"]))
+
+    plt.scatter(index, df["stn_Pluvio_Rain"], c="black")
+    plt.scatter(index, df["merra_Pluvio_Rain"], c="orange")
+    plt.scatter(index, df["era5_Pluvio_Rain"], c="blue")
+    plt.show()
+
+
+def get_rain_daily_data():
+    file = "output/Pluvio_Rain_output.csv"
+
+    df = pd.read_csv(file)
+    df["time"] = pd.to_datetime(df["time"])
+
+    # df["date"] = df['time'].dt.date
+    # grouped_df = df.groupby(['time', 'Station'])[["stn_Pluvio_Rain", "era5_Pluvio_Rain"]].sum().reset_index()
+
+    grouped_df = df.dropna(how="any")
+
+    plt.scatter(grouped_df["era5_Pluvio_Rain"], grouped_df["stn_Pluvio_Rain"], c="black", alpha=1/500)
+
+    ax = plt.gca()
+    ax.set_xlim([0, 10])
+    ax.set_ylim([0, 10])
+
+    regression = linear_model.LinearRegression()
+    y = grouped_df["stn_Pluvio_Rain"].values
+    x = grouped_df["era5_Pluvio_Rain"].values
+
+    # x = x.reshape(len(x), 1)
+    # y = y.reshape(len(y), 1)
+    # regression.fit(x, y)
+    # slope = regression.coef_[0][0]
+    # intercept = regression.intercept_[0]
+    #
+    # plt.plot([0, 80], [0, 80], c="blue")
+    # plt.plot([0, 80], [intercept, 80 * slope + intercept], c="red")
+
+    plt.show()
+
+    corr, pval = pearsonr(grouped_df["era5_Pluvio_Rain"].values, grouped_df["stn_Pluvio_Rain"].values, alternative='two-sided')
+    print(corr, pval)
+
+
+# call the function that you want to generate the new data
+# get_rain_data()
+# get_rain_daily_data()
+# get_line_chart_data_daily()
+# get_map_data()
+# get_line_chart_data()

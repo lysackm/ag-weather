@@ -11,13 +11,18 @@ from numpy import NaN
 # data from MERRA and ERA5-Land. The data spans all 5 years and one point in
 #  the scatter plot represents the average of the mean bias for tha single day
 def graph_mean_comparison():
+    root_path = "D:\\data\\graphs\\scatter_plots\\"
     attrs = ["AvgAir_T", "AvgWS", "Pluvio_Rain", "Press_hPa", "RH", "SolarRad"]
-    titles = ['Average Air Temperature ($^\circ$C)', "Average Wind Speed (m/s)", "Precipitation (mm)",
+    titles = ['Air Temperature ($^\circ$C)', "Wind Speed (m/s)", "Precipitation (mm)",
               "Pressure (hPa)", "Relative Humidity (%)", "Solar Radiation (mJ/m$^2$)"]
+    y_titles = ["$^\circ$C", "m/s", "mm", "hPa", "%", "(mJ/m$^2$)"]
 
     plt.style.use("ggplot")
+    plt.rcParams['axes.facecolor'] = 'w'
+    plt.rcParams['axes.edgecolor'] = 'dimgrey'
+    plt.rcParams['grid.color'] = 'lightgrey'
 
-    for attr, title in zip(attrs, titles):
+    for attr, title, y_title in zip(attrs, titles, y_titles):
         print(attr)
 
         x = []
@@ -39,7 +44,7 @@ def graph_mean_comparison():
             except (KeyError, IndexError):
                 x.append(np.NaN)
 
-        plt.scatter(x_axis, x, linewidths=0, s=10, c=["orange"], label="MERRA")
+        plt.scatter(x_axis, x, linewidths=0, s=10, c=["orange"], label="MERRA-2")
 
         x = []
         file = "daily/err/era5_" + attr + "_output.csv"
@@ -67,8 +72,10 @@ def graph_mean_comparison():
         plt.scatter(dates, x, linewidths=0, s=10, c=["blue"], label="ERA5-Land", alpha=0.5)
         plt.title(title)
         plt.xlim([datetime(2017, 10, 1), datetime(2023, 4, 1)])
+        plt.ylabel(y_title)
         plt.legend()
-        plt.show()
+        plt.savefig(root_path + attr + ".png")
+        plt.clf()
 
 
 # graph_mean
@@ -224,8 +231,10 @@ def graph_all_stns(is_sqr=False, is_daily=False):
 # or hourly average (single point). If you want to change the time then some slight
 # modifications of the function will have to be made
 def get_averaged_time():
-    titles = {"AvgAir_T": 'Average Air Temperature ($^\circ$C)', "AvgWS": "Average Wind Speed (m/s)", "Pluvio_Rain": "Precipitation (mm)",
+    titles = {"AvgAir_T": 'Air Temperature ($^\circ$C)', "AvgWS": "Wind Speed (m/s)", "Pluvio_Rain": "Precipitation (mm)",
               "Press_hPa": "Pressure (hPa)", "RH": "Relative Humidity (%)", "SolarRad": "Solar Radiation (mJ/m$^2$)"}
+    y_titles = {"AvgAir_T": '$^\circ$C', "AvgWS": "m/s", "Pluvio_Rain": "mm",
+              "Press_hPa": "hPa", "RH": "%", "SolarRad": "mJ/m$^2$"}
 
     x_axis = range(24)
     files = glob.glob("output/*.csv")
@@ -233,6 +242,9 @@ def get_averaged_time():
 
     data_fetched = ["merra_err", "era5_err"]
     plt.style.use("ggplot")
+    plt.rcParams['axes.facecolor'] = 'w'
+    plt.rcParams['axes.edgecolor'] = 'dimgrey'
+    plt.rcParams['grid.color'] = 'lightgrey'
 
     for file in files:
         attr_df = pd.read_csv(file)
@@ -261,15 +273,20 @@ def get_averaged_time():
         result = date_index.groupby([date_index.index.hour])[mean_cols].mean()
         print(file)
 
+        orange = result[data_fetched[0]].tolist()
+        orange = orange[-6:] + orange[:-6]
+        blue = result[data_fetched[1]].tolist()
+        blue = blue[-6:] + blue[:-6]
 
         # plot both err and sqr-err
         filename = root_path + "err\\hourly_" + file.replace("_output.csv", ".png").replace(
             "D:/data/processed-data\\", "").replace("output\\", "")
-        plt.plot(x_axis, result[data_fetched[0]], c="orange")
-        plt.plot(x_axis, result[data_fetched[1]], c="blue")
+        plt.plot(x_axis, orange, c="orange")
+        plt.plot(x_axis, blue, c="blue")
         plt.title(titles[file.replace("D:/data/processed-data\\", "").replace("_output.csv", "").replace("output\\", "")])
-        plt.xlabel("Hour of Day (UTC)")
-        plt.legend(["MERRA", "ERA5-Land"])
+        plt.xlabel("Hour of Day (CST)")
+        plt.ylabel(y_titles[file.replace("D:/data/processed-data\\", "").replace("_output.csv", "").replace("output\\", "")])
+        plt.legend(["MERRA-2", "ERA5-Land"])
         plt.savefig(filename)
 
         print("Merra", max(result[data_fetched[0]]) - min(result[data_fetched[0]]))
@@ -280,7 +297,7 @@ def get_averaged_time():
         plt.plot(x_axis, np.sqrt(result[data_fetched[0].replace("_err", "_sqr_err")]), c="orange")
         plt.plot(x_axis, np.sqrt(result[data_fetched[1].replace("_err", "_sqr_err")]), c="blue")
         plt.title(titles[file.replace("D:/data/processed-data\\", "").replace("_output.csv", "").replace("output\\", "")])
-        plt.legend(["MERRA", "ERA5-Land"])
+        plt.legend(["MERRA-2", "ERA5-Land"])
         plt.savefig(filename)
         plt.clf()
 
@@ -297,6 +314,6 @@ def generate_all_graphs():
     graph_mean(False, True)
 
 
-# generate_all_graphs()
+generate_all_graphs()
 get_averaged_time()
-# graph_mean_comparison()
+graph_mean_comparison()

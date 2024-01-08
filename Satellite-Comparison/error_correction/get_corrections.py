@@ -417,6 +417,33 @@ def save_random_forest_all_attr():
         make_merra_era5_random_forest(df, attr, 100, 0.5, 1, True)
 
 
+def rain_threshold_linear_regression():
+    df = pd.read_csv("../make_combined_csv/output/Pluvio_Rain_output.csv")
+
+    df = df[df["stn_Pluvio_Rain"] > 5]
+
+    print(df[["era5_Pluvio_Rain", "stn_Pluvio_Rain"]])
+    print((df["era5_Pluvio_Rain"] - df["stn_Pluvio_Rain"]).mean())
+
+    df = df.dropna()
+    length = len(df.index)
+
+    x = df["era5_Pluvio_Rain"].values
+    y = df["stn_Pluvio_Rain"].values
+
+    x = x.reshape(length, 1)
+    y = y.reshape(length, 1)
+
+    regression = linear_model.LinearRegression()
+    regression.fit(x, y)
+
+    slope = regression.coef_[0][0]
+    intercept = regression.intercept_[0]
+    print(slope, intercept)
+
+    # for a threshold of 1mm of observed rain, slope = 0.213, intercept = 3.103
+
+
 def main():
     files = glob.glob("../make_combined_csv/output/*.csv")
 
@@ -461,4 +488,5 @@ def main():
 # save_random_forest_all_attr()
 # main()
 # merge_files()
-time_series_random_forest()
+# time_series_random_forest()
+rain_threshold_linear_regression()
