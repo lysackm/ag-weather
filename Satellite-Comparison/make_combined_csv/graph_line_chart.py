@@ -275,8 +275,10 @@ def get_averaged_time():
 
         orange = result[data_fetched[0]].tolist()
         orange = orange[-6:] + orange[:-6]
+        print("Merrra", orange)
         blue = result[data_fetched[1]].tolist()
         blue = blue[-6:] + blue[:-6]
+        print("era5", blue)
 
         # plot both err and sqr-err
         filename = root_path + "err\\hourly_" + file.replace("_output.csv", ".png").replace(
@@ -314,6 +316,8 @@ def generate_all_graphs():
     graph_mean(False, True)
 
 
-generate_all_graphs()
+# generate_all_graphs()
+# get_averaged_time()
+# graph_mean_comparison()
 get_averaged_time()
-graph_mean_comparison()
+

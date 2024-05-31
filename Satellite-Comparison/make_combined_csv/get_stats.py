@@ -262,8 +262,6 @@ def format_table_three(uncorrected, mean, lin, randFor):
         print(month + "\\\\")
 
 
-
-
 # change a filename to get the attribute or column name from it
 def get_column_name(file, prefix=""):
     return prefix + file.replace("output\\", "").replace("_output.csv", "")

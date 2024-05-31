@@ -159,6 +159,7 @@ def print_monthly_stats(random_forest, x_test, y_test):
     df = pd.DataFrame(merged)
 
     rmse_arr = []
+    mbe_arr = []
 
     for month in range(1, 13):
         df_month = df[df[9] == month]
@@ -166,15 +167,19 @@ def print_monthly_stats(random_forest, x_test, y_test):
         x_month = df_month[range(12)].to_numpy()
 
         predicted_test = random_forest.predict(x_month)
-
         rmse = np.sqrt(mean_squared_error(y_month, predicted_test))
         rmse_arr.append(rmse)
         pearson = pearsonr(y_month, predicted_test)
 
+        mbe = np.mean(predicted_test - y_month)
+        mbe_arr.append(mbe)
+
         # print(f'Root mean squared error: {rmse:.6}')
         # print(f'Test data Pearson correlation: {pearson[0]:.6}')
 
-    print(rmse_arr)
+    print("rmse:", rmse_arr)
+    print("mbe:", mbe_arr)
+    print("pearson:", pearson)
 
 
 # given a 2D numpy array for the input and output of the random forest
@@ -485,8 +490,8 @@ def main():
         json.dump({"merra": mean_err_merra, "era5": mean_err_era5}, f, ensure_ascii=False, indent=4)
 
 
-# save_random_forest_all_attr()
+save_random_forest_all_attr()
 # main()
 # merge_files()
 # time_series_random_forest()
-rain_threshold_linear_regression()
+# rain_threshold_linear_regression()

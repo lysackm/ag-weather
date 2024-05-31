@@ -102,7 +102,6 @@ def netcdf_to_climate_normal(ds):
 # def netcdf_to_yearly_data(ds):
 
 
-
 def filter_climate_normal(df):
     stn_metadata = pd.read_csv("NormalStationList.csv")
     latitudes = stn_metadata["LatDD"].values.round(1)
