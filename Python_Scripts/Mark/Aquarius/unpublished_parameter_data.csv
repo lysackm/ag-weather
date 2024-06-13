@@ -1,0 +1,25 @@
+parameter_long,parameter,label_new,label_telemetry,label_working,label_derived,threshold_low,threshold_high,published,unit
+Air Temp,TA,Max60,MaxTelemetry60,MaxWorking60,MaxDerived24,-50,50,yes,degC
+Air Temp,TA,Min60,MinTelemetry60,MinWorking60,MinDerived24,-50,50,yes,degC
+Air Temp,TA,15,Telemetry15,Working15,AvgDerived24,-50,50,yes,degC
+Atmos Pres,PA,15,Telemetry15,Working15,,900,1100,yes,hPa
+Avg Wind Vel,18520,15,Telemetry15,Working15,AvgDerived24,0,50,yes,m/s
+Evapotrans,EM,60,Telemetry60,Working60,,-0.5,3,yes,mm
+Peak Wind Vel,UP,15,Telemetry15,Working15,MaxDerived24,0,50,yes,m/s
+Precip Incem,PP,Rain15,TBRGTelemetry15,TBRGWorking15,,0,100,no,mm
+Precip Incem,PP,Precip15,WGTelemetry15,WGWorking15,,0,100,yes,mm
+Rel Humidity,XR,15,Telemetry,Working15,AvgDerived24,10,100,yes,%
+Rel Humidity,XR,15,,,MaxDerived24,10,100,yes,%
+Rel Humidity,XR,15,,,MinDerived24,10,100,yes,%
+Soil Moisture 5 cm,MW,60,TP5Telemetry60,TP5Working60,,3,65,yes,%
+Soil Moisture 20 cm,MW20,60,Telemetry60,Working60,,3,65,yes,%
+Soil Moisture 50 cm,MW50,60,Telemetry60,Working60,,3,65,yes,%
+Soil Moisture 100 cm,MW100,60,Telemetry60,Working60,,3,65,yes,%
+Soil Temp 5 cm,TS,60,109LTelemetry60,109LWorking60,,-30,35,yes,degC
+Soil Temp 5 cm,TS,TP560,TP5Telemetry60,TP5Working60,,-30,35,no,degC
+Soil Temp 20 cm,TS20,60,Telemetry60,Working60,,-30,35,yes,degC
+Soil Temp 50 cm,TS50,60,Telemetry60,Working60,,-10,20,yes,degC
+Soil Temp 100 cm,TS100,60,Telemetry60,Working60,,-10,20,yes,degC
+Solar Rad,RW,MJm2-60,MJm2-Telemetry60,MJm2-Working60,,0,5,yes,MJ/m^2
+Wind Dir,UD,15,Telemetry15,Working15,,0,360,yes,deg
+Voltage,,,,MinWorking60,,,,,
