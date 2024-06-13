@@ -3,6 +3,7 @@
 # set to None. To be used after the base and bounds checks of the other qa check is done
 import time
 import pandas
+import pandas as pd
 
 
 # dependents are values that are derived or only have meaning with the attribute
@@ -151,11 +152,33 @@ def qa_consecutive_24(df_24):
     return df_24
 
 
-dff = pandas.read_csv("mock-station-data.csv")
+# define the attrs, offsets, and whatnot
+# made, so I didnt have to edit the other functions, while this is
+# not meant to be permanently stored.
+def general_qa():
+    df_path = "../../Python_Scripts/Mark/frost_maps/data/station_temp_data.csv"
+    df = pd.read_csv(df_path)
+    date_col = "time"
+    attributes = ["AvgAir_T"]
+    attr_offsets = {"AvgAir_T": 10}
+    dependents = []
 
-print("Starting qa_relative_24")
+    df = replace_outliers(df, date_col, attributes, attr_offsets, dependents)
+    print(df, df.shape, sep="\n")
+    df.to_csv(df_path)
 
-qa_relative_24(dff)
-# qa_consecutive_24(dff)
 
-print("End of program (yay)")
+def main():
+    general_qa()
+
+    # dff = pandas.read_csv("mock-station-data.csv")
+    #
+    # print("Starting qa_relative_24")
+    #
+    # qa_relative_24(dff)
+    # # qa_consecutive_24(dff)
+
+
+if __name__ == "__main__":
+    main()
+    print("End of program (yay)")

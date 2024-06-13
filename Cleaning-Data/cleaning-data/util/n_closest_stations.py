@@ -69,10 +69,16 @@ def n_closest_stations(n=3):
         neighbors.remove(station)
 
         station_coord = (station[lat_index], station[long_index])
+        if station_coord == ('LatDD', 'LongDD'):
+            continue
 
         # inefficient algorithm but it works in a few seconds right now, so it's ok, O(n^2)
         for neighbor in neighbors:
             neighbor_coord = (neighbor[lat_index], neighbor[long_index])
+
+            if neighbor_coord == ('LatDD', 'LongDD'):
+                continue
+
             dist = geopy.distance.geodesic(station_coord, neighbor_coord)
             if len(closest_stations) < n:
                 closest_stations.append([dist, neighbor])
