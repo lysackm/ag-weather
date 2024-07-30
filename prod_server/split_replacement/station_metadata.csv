@@ -1,0 +1,121 @@
+SN,StnID,StationName,LatDD,LongDD,DatFilename,URL,stringFriendlyStnName
+89,544,Alexander,49.8134,-100.3721,alexander,http://www.gov.mb.ca/agriculture/weather/alexander-cc.html,Alexander
+42,253,Alonsa,50.698,-99.068,alonsa,http://www.gov.mb.ca/agriculture/weather/alonsa-cc.html,Alonsa
+37,244,Altona,49.095,-97.528,altona,http://www.gov.mb.ca/agriculture/weather/altona-cc.html,Altona
+119,574,Amaranth,50.6424,-98.6686,amaranth,http://www.gov.mb.ca/agriculture/weather/amaranth-cc.html,Amaranth
+6,206,Arborg,50.904,-97.273,arborg,http://www.gov.mb.ca/agriculture/weather/arborg-cc.html,Arborg
+49,505,Argue,49.436,-100.308,argue,http://www.gov.mb.ca/agriculture/weather/argue-cc.html,Argue
+120,575,Ashville,51.1623,-100.297,ashville,http://www.gov.mb.ca/agriculture/weather/ashville-cc.html,Austin
+78,533,Austin,49.9607,-98.9054,austin,http://www.gov.mb.ca/agriculture/weather/austin-cc.html,Ashville
+79,534,Bagot,49.9601,-98.6367,bagot,http://www.gov.mb.ca/agriculture/weather/bagot-cc.html,Bagot
+47,503,Baldur,49.356,-99.248,baldur,http://www.gov.mb.ca/agriculture/weather/baldur-cc.html,Baldur
+40,251,Beausejour,50.116,-96.434,beausejour,http://www.gov.mb.ca/agriculture/weather/beausejour-cc.html,Beausejour
+75,740,Bede,49.402,-100.93,bede2_,http://www.gov.mb.ca/agriculture/weather/bede-cc.html,Bede
+108,563,Birch River,52.3472,-101.1099,birchriver,http://www.gov.mb.ca/agriculture/weather/birch-river-cc.html,BirchRiver
+16,216,Birtle,50.411,-100.893,birtle2_,http://www.gov.mb.ca/agriculture/weather/birtle-cc.html,Birtle
+9,209,Boissevain,49.24,-100.055,boissevain,http://www.gov.mb.ca/agriculture/weather/boissevain-cc.html,Boissevain
+111,566,BrandonNH,49.876,-99.909,brandonMBFI,http://www.gov.mb.ca/agriculture/weather/brandon-cc.html,Brandon
+76,530,Brunkild ,49.591,-97.518,brunkild,http://www.gov.mb.ca/agriculture/weather/brunkild-cc.html,Brunkild
+44,314,Carberry,49.905,-99.354,Carberry,http://www.gov.mb.ca/agriculture/weather/carberry-cc.html,Carberry
+12,212,Carman,49.498,-98.03,carman,http://www.gov.mb.ca/agriculture/weather/carman-cc.html,Carman
+46,502,Cartwright,49.088,-99.325,cartwright,http://www.gov.mb.ca/agriculture/weather/cartwright-cc.html,Cartwright
+114,569,Clarkleigh,50.5947,-98.0035,clarkleigh,http://www.gov.mb.ca/agriculture/weather/clarkleigh-cc.html,Clarkleigh
+45,501,Clearwater,49.118,-99.054,clearwater,http://www.gov.mb.ca/agriculture/weather/clearwater-cc.html,Dand
+87,542,Dand,49.3776,-100.5387,dand,http://www.gov.mb.ca/agriculture/weather/dand-cc.html,Deloraine
+34,241,Deloraine,49.148,-100.491,deloraine,http://www.gov.mb.ca/agriculture/weather/deloraine-cc.html,DominionCity
+80,535,Dominion City,49.1631,-97.1454,dominioncity,http://www.gov.mb.ca/agriculture/weather/dominion-city-cc.html,DriftingRiver
+56,512,Drifting River,51.358,-100.361,driftingriver,http://www.gov.mb.ca/agriculture/weather/driftingriver-cc.html,DriftingRiver
+17,217,Dugald,49.826,-96.776,dugald2_,http://www.gov.mb.ca/agriculture/weather/dugald-cc.html,Dugald
+90,545,Eden,50.4324,-99.4392,eden,http://www.gov.mb.ca/agriculture/weather/eden-cc.html,Eden
+81,536,Elie,49.96,-97.7463,elie,http://www.gov.mb.ca/agriculture/weather/elie-cc.html,Elie
+31,237,Elm Creek,49.68,-97.984,elmcreek,http://www.gov.mb.ca/agriculture/weather/elmcreek-cc.html,ElmCreek
+66,522,Elma,49.875,-95.92,elma,http://www.gov.mb.ca/agriculture/weather/elma-cc.html,Elma
+117,572,Erickson,50.5057,-99.9013,erickson,http://www.gov.mb.ca/agriculture/weather/erickson-cc.html,Erickson
+18,218,Eriksdale,50.829,-98.111,eriksdale2_,http://www.gov.mb.ca/agriculture/weather/eriksdale-cc.html,Ericksdale
+13,213,Ethelbert,51.572,-100.488,ethelbert,http://www.gov.mb.ca/agriculture/weather/ethelbert-cc.html,Ethelbert
+48,504,Findlay,49.547,-100.782,findlay,http://www.gov.mb.ca/agriculture/weather/findlay-cc.html,Findlay
+61,517,Fisherton,51.185,-97.769,fisherton,http://www.gov.mb.ca/agriculture/weather/fisherton-cc.html,Fisherton
+55,511,Fork River,51.538,-100.006,Forkriver,http://www.gov.mb.ca/agriculture/weather/forkriver-cc.html,ForkRiver
+29,233,Forrest,50.054,-99.926,forrest,http://www.gov.mb.ca/agriculture/weather/forrest-cc.html,Forrest
+62,518,Gardenton,49.088,-96.64,gardenton,http://www.gov.mb.ca/agriculture/weather/gardenton-cc.html,Gardenton
+4,204,Gladstone,50.142,-98.95,gladstone,http://www.gov.mb.ca/agriculture/weather/gladstone-cc.html,Gladstone
+32,239,Glenboro,49.547,-99.326,glenboro,http://www.gov.mb.ca/agriculture/weather/glenboro-cc.html,Glenboro
+19,219,Grandview,51.185,-100.715,Grandview2_,http://www.gov.mb.ca/agriculture/weather/grandview-cc.html,Grandview
+14,214,Hamiota,50.185,-100.603,hamiota2_,http://www.gov.mb.ca/agriculture/weather/hamiota-cc.html,Hamiota
+104,559,Holland,49.591,-98.984,holland,http://www.gov.mb.ca/agriculture/weather/holland-cc.html,Holland
+116,571,Ingelow,49.9674,-99.5919,ingelow,http://www.gov.mb.ca/agriculture/weather/ingelow-cc.html,Ingelow
+69,525,Inglis,50.948,-101.259,inglis,http://www.gov.mb.ca/agriculture/weather/inglis-cc.html,Inglis
+60,516,Inwood,50.507,-97.622,inwood,http://www.gov.mb.ca/agriculture/weather/inwood-cc.html,Inwood
+118,573,Jordan,49.3663,-98.0219,jordan,http://www.gov.mb.ca/agriculture/weather/jordan-cc.html,Jordan
+68,524,Kane,49.355,-97.704,kane,http://www.gov.mb.ca/agriculture/weather/kane-cc.html,Kane
+77,532,Keld,50.993,-100.227,keld,http://www.gov.mb.ca/agriculture/weather/keld-cc.html,Keld
+93,548,Kenton,50.0187,-100.5926,kenton,http://www.gov.mb.ca/agriculture/weather/kenton-cc.html,Kenton
+20,220,Killarney,49.148,-99.685,killarney2_,http://www.gov.mb.ca/agriculture/weather/killarney-cc.html,Killarney
+74,531,Kola,49.857,-101.37,kola,http://www.gov.mb.ca/agriculture/weather/kola-cc.html,Kola
+102,557,Lac du Bonnet,50.2796,-96.0507,lacdubonnet,http://www.gov.mb.ca/agriculture/weather/lac-du-bonnet-cc.html,LacduBonnet
+94,549,Lake Audy,50.6803,-100.2593,lakeaudy,http://www.gov.mb.ca/agriculture/weather/lake-audy-cc.html,LakeAudy
+101,556,Lake Francis,50.3583,-97.8755,lakefrancis,http://www.gov.mb.ca/agriculture/weather/lake-francis-cc.html,LakeFrancis
+84,539,Lakeland,50.2548,-98.6376,lakeland,http://www.gov.mb.ca/agriculture/weather/lakeland-cc.html,Lakeland
+98,553,Laurier,50.8753,-99.6024,laurier,http://www.gov.mb.ca/agriculture/weather/laurier-cc.html,Laurier
+35,242,Manitou,49.245,-98.545,manitou,http://www.gov.mb.ca/agriculture/weather/manitou-cc.html,Manitou
+82,537,Marchand,49.4294,-96.4428,Marchand,http://www.gov.mb.ca/agriculture/weather/marchand-cc.html,Marchand
+91,546,McAuley,50.182,-101.4239,mcauley,http://www.gov.mb.ca/agriculture/weather/mcauley-cc.html,McAuley
+43,255,Menisino,49.097,-96.137,menisino,http://www.gov.mb.ca/agriculture/weather/menisino-cc.html,Menisino
+92,547,Miniota,50.137,-100.9434,miniota,http://www.gov.mb.ca/agriculture/weather/miniota-cc.html,Miniota
+54,510,Minitonas,52.144,-100.882,minitonas,http://www.gov.mb.ca/agriculture/weather/minitonas-cc.html,Minitonas
+21,221,Minnedosa,50.272,-99.762,minnedosa2_,http://www.gov.mb.ca/agriculture/weather/minnedosa-cc.html,Minnedosa
+50,506,Minto,49.428,-99.924,minto,http://www.gov.mb.ca/agriculture/weather/minto-cc.html,Minto
+5,205,Moosehorn,51.333,-98.598,moosehorn2_,http://www.gov.mb.ca/agriculture/weather/moosehorn2-cc.html,Moosehorn
+22,222,Morris,49.361,-97.322,morris2_,http://www.gov.mb.ca/agriculture/weather/morris-cc.html,Morris
+52,508,Mountainside,49.13,-100.298,Mountainside,http://www.gov.mb.ca/agriculture/weather/mountainside-cc.html,Mountainside
+41,252,Narcisse,50.702,-97.53,narcisse,http://www.gov.mb.ca/agriculture/weather/narcisse-cc.html,Narcisse
+96,551,Neepawa,50.1889,-99.432,neepawa,http://www.gov.mb.ca/agriculture/weather/neepawa-cc.html,Neepawa
+86,541,Newdale,50.3389,-100.1616,newdale,http://www.gov.mb.ca/agriculture/weather/newdale-cc.html,Newdale
+53,509,Ninette,49.326,-99.699,ninette,http://www.gov.mb.ca/agriculture/weather/ninette-cc.html,Ninette
+67,523,Oakburn,50.595,-100.672,oakburn,http://www.gov.mb.ca/agriculture/weather/oakburn-cc.html,Oakburn
+113,568,Petersfield,50.2994,-97.0406,petersfield,http://www.gov.mb.ca/agriculture/weather/petersfield-cc.html,Petersfield
+28,232,Pierson,49.215,-101.21,pierson2_,http://www.gov.mb.ca/agriculture/weather/pierson-cc.html,Pierson
+70,526,Pipe Lake,51.316,-100.693,pipelake,http://www.gov.mb.ca/agriculture/weather/pipelake-cc.html,PipeLake
+85,540,Plumas,50.4029,-99.007,Plumas,http://www.gov.mb.ca/agriculture/weather/plumas-cc.html,Plumas
+107,562,Poplarfield,50.8858,-97.603,poplarfield,http://www.gov.mb.ca/agriculture/weather/poplarfield-cc.html,PoplarField
+30,235,Portage East,49.97,-98.254,portage2_,http://www.gov.mb.ca/agriculture/weather/portage-cc.html,Portage
+105,560,Prawda,49.6477,-95.7241,prawda,http://www.gov.mb.ca/agriculture/weather/prawda-cc.html,Prawda
+97,552,Reedy Creek,50.9461,-98.9286,reedycreek,http://www.gov.mb.ca/agriculture/weather/reedy-creek-cc.html,ReedyCreek
+38,245,Reston,49.576,-101.033,reston2_,http://www.gov.mb.ca/agriculture/weather/reston-cc.html,Reston
+112,567,Richer,49.6089,-96.5256,richer,http://www.gov.mb.ca/agriculture/weather/richer-cc.html,Richer
+95,550,Rivers,50.0514,-100.2341,rivers,http://www.gov.mb.ca/agriculture/weather/rivers-cc.html,Rivers
+109,564,Riverton,51.0203,-97.0625,Riverton,http://www.gov.mb.ca/agriculture/weather/riverton-cc.html,Riverton
+72,528,Rorketon,51.333,-99.493,rorketon,http://www.gov.mb.ca/agriculture/weather/rorketon-cc.html,Rorkenton
+83,538,Rosa,49.2415,-96.8135,Rosa,http://www.gov.mb.ca/agriculture/weather/rosa-cc.html,Rosa
+15,215,Russell,50.769,-101.297,russell,http://www.gov.mb.ca/agriculture/weather/russell-cc.html,Russell
+64,520,Ruthenia,50.827,-100.903,ruthenia,http://www.gov.mb.ca/agriculture/weather/ruthenia-cc.html,Ruthenia
+115,570,Saint Labre,49.3116,-95.9831,saintlabre,http://www.gov.mb.ca/agriculture/weather/saintlabre-cc.html,SaintLabre
+71,527,San Clara,51.421,-101.398,sanclara,http://www.gov.mb.ca/agriculture/weather/sanclara-cc.html,SanClara
+10,210,Selkirk,50.177,-96.794,selkirk,http://www.gov.mb.ca/agriculture/weather/selkirk-cc.html,Selkirk
+103,558,Shilo,49.8277,-99.6988,shilo,http://www.gov.mb.ca/agriculture/weather/shilo-cc.html,Shilo
+88,543,Sinclair,49.4919,-101.3028,sinclair,http://www.gov.mb.ca/agriculture/weather/sinclair-cc.html,Sinclair
+58,514,Snowflake,49.016,-98.673,Snowflake,http://www.gov.mb.ca/agriculture/weather/snowflake-cc.html,Snowflake
+39,246,Somerset,49.414,-98.704,somerset2_,http://www.gov.mb.ca/agriculture/weather/somerset-cc.html,Somerset
+8,208,Souris,49.63,-100.198,souris,http://www.gov.mb.ca/agriculture/weather/souris-cc.html,Souris
+106,561,Sprague Lake,49.3325,-95.4056,spraguelakebog,http://www.gov.mb.ca/agriculture/weather/sprague-lake-cc.html,SpragueLake
+36,243,St Adolphe,49.696,-97.118,stadolphe,http://www.gov.mb.ca/agriculture/weather/stadolphe-cc.html,StAdolphe
+11,211,St Rose,51.082,-99.524,SteRose2_,http://www.gov.mb.ca/agriculture/weather/sterose-cc.html,SteRose
+99,554,St. Claude,49.6649,-98.3329,stclaude,http://www.gov.mb.ca/agriculture/weather/stclaude-cc.html,StClaude
+73,529,St. Lazare,50.447,-101.231,stlazare,http://www.gov.mb.ca/agriculture/weather/stlazare-cc.html,StLazare
+3,203,St. Pierre,49.449,-96.963,stpierre2_,http://www.gov.mb.ca/agriculture/weather/stpierre-cc.html,StPierre
+2,202,Starbuck,49.768,-97.664,starbuck,http://www.gov.mb.ca/agriculture/weather/starbuck-cc.html,Starbuck
+110,565,Stead,50.4138,-96.4111,Stead,http://www.gov.mb.ca/agriculture/weather/stead-cc.html,Stead
+23,223,Steinbach,49.55,-96.681,steinbach,http://www.gov.mb.ca/agriculture/weather/steinbach-cc.html,Steinbach
+100,555,Stonewall,50.1227,-97.3033,stonewall,http://www.gov.mb.ca/agriculture/weather/stonewall-cc.html,Stonewall
+27,231,Swan Valley,52.057,-101.49,swanvalley2_,http://www.gov.mb.ca/agriculture/weather/swanvalley-cc.html,SwanValley
+59,515,Taylor's Point,50.862,-98.448,taylorspoint,http://www.gov.mb.ca/agriculture/weather/taylorspoint-cc.html,TaylorsPoint
+7,207,Teulon,50.381,-97.236,teulon2_,http://www.gov.mb.ca/agriculture/weather/teulon-cc.html,Teulon
+1,201,Treherne,49.635,-98.676,treherne,http://www.gov.mb.ca/agriculture/weather/treherne-cc.html,Treherne
+24,224,Virden,49.878,-100.918,virden2_,http://www.gov.mb.ca/agriculture/weather/virden-cc.html,Virden
+65,521,Vivian,49.885,-96.411,vivian,http://www.gov.mb.ca/agriculture/weather/vivian-cc.html,Vivian
+51,507,Waskada,49.088,-100.93,waskada,http://www.gov.mb.ca/agriculture/weather/waskada-cc.html,Waskada
+33,240,Wawanesa,49.636,-99.662,wawanesa,http://www.gov.mb.ca/agriculture/weather/wawanesa-cc.html,Wawanesa
+57,513,Windygates,49.008,-98.38,windygates,http://www.gov.mb.ca/agriculture/weather/windygates-cc.html,Windygates
+26,230,Winkler,49.122,-97.932,winkler2_,http://www.gov.mb.ca/agriculture/weather/winkler-cc.html,Winkler
+25,225,Woodlands,50.161,-97.712,woodlands2_,http://www.gov.mb.ca/agriculture/weather/woodlands-cc.html,Woodlands
+63,519,Zhoda,49.252,-96.511,zhoda,http://www.gov.mb.ca/agriculture/weather/zhoda-cc.html,Zhoda
