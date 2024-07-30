@@ -1,0 +1,2 @@
+    DateTime           StnID    Temp     RH      Rain   AvgWS   MaxWS   AvgWD   SolRad         Soil_T  Soil_T
+                                (°C)     (%)     (mm)   (km/h)  (km/h)   (°)    (MJ/m2)        (5cm)   (20cm)
