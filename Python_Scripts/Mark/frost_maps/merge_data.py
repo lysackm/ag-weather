@@ -65,23 +65,32 @@ def merge_nrcan_station_data():
     df_station_metadata = pd.read_csv("../../../Cleaning-Data/cleaning-data/util/station-metadata.csv")
 
     df_nrcan = pd.read_csv("./data/nrcan_temp_data.csv")
-    df_nrcan = df_nrcan[["time", "StnID", "nrcan_mint"]]
+    df_nrcan = df_nrcan[["time", "StnID", "nrcan_mint", "nrcan_maxt"]]
+    df_nrcan["date"] = pd.to_datetime(df_nrcan["time"], utc=True).dt.date
+    # df_nrcan["date"] = df_nrcan["date"].dt.date
 
     df_station = pd.read_csv("./data/station_temp_data.csv")
-    df_station["time_utc"] = pd.to_datetime(df_station["time"], utc="true")
-    df_station = df_station.groupby([df_station["time_utc"].dt.date,
-                                     df_station["StnID"]]).min()
-    df_station = df_station.drop(columns=["time_utc"])
+    df_station["time_utc"] = pd.to_datetime(df_station["time"], utc=True)
+    df_station_min = df_station.groupby([df_station["time_utc"].dt.date, df_station["StnID"]]).min()
+    df_station_max = df_station.groupby([df_station["time_utc"].dt.date, df_station["StnID"]]).max()
+
+    df_station = df_station_min.merge(df_station_max, how="outer", right_index=True, left_index=True)
+
+    df_station = df_station.drop(columns=["time_utc_x", "time_utc_y", "time_x", "time_y"])
+    df_station = df_station.rename(columns={"AvgAir_T_x": "min_temp", "AvgAir_T_y": "max_temp"})
     df_station = df_station.reset_index()
     df_station["StnID"] = df_station["StnID"].astype(int)
+    df_station["date"] = pd.to_datetime(df_station["time_utc"], utc=True).dt.date
 
-    df_merged = df_nrcan.merge(df_station, how="outer", on=["time", "StnID"])
+    df_merged = df_nrcan.merge(df_station, how="outer", on=["date", "StnID"])
 
     stations = list(set(df_station_metadata["StnID"].unique()) & set(df_station["StnID"].unique()))
     df_merged = df_merged[df_merged["StnID"].isin(stations)]
 
-    df_merged["is_nrcan"] = pd.isna(df_merged["AvgAir_T"])
-    df_merged["air_temp_merged"] = df_merged["nrcan_mint"].where(df_merged["is_nrcan"], df_merged["AvgAir_T"])
+    df_merged["is_nrcan"] = pd.isna(df_merged["min_temp"])
+    df_merged["air_temp_merged"] = df_merged["nrcan_mint"].where(df_merged["is_nrcan"], df_merged["min_temp"])
+    df_merged["min_temp_merged"] = df_merged["air_temp_merged"]
+    df_merged["max_temp_merged"] = df_merged["nrcan_maxt"].where(df_merged["is_nrcan"], df_merged["max_temp"])
 
     df_merged = df_merged.drop(columns=["time_utc"])
     df_merged = df_merged[df_merged["air_temp_merged"].notna()]
