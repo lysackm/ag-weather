@@ -173,13 +173,13 @@ def graph_frost_dates_on_map(df, title="Interpolated Frost Dates", scale="low-hi
     stations_y = df["LatDD"]
     station_values = df[col]
     # Create a grid for interpolation
-    grid_x, grid_y = np.meshgrid(np.linspace(-102, -94, 80), np.linspace(48, 53, 50))
+    grid_x, grid_y = np.meshgrid(np.linspace(-102, -94, 80), np.linspace(48, 54.5, 50))
 
     # Interpolate station values to the grid
     grid_values = griddata((stations_x, stations_y), station_values, (grid_x, grid_y), method='linear')
 
     m = Basemap(projection='lcc',
-                resolution='f', lat_0=50., lon_0=-98., llcrnrlon=-102, llcrnrlat=48.8, urcrnrlon=-95, urcrnrlat=52.4)
+                resolution='f', lat_0=50., lon_0=-98., llcrnrlon=-102, llcrnrlat=48.8, urcrnrlon=-95, urcrnrlat=54.5)
     # draw coastlines, colour oceans, continents and lakes
     m.drawrivers()
     m.drawcountries()
@@ -204,6 +204,7 @@ def graph_frost_dates_on_map(df, title="Interpolated Frost Dates", scale="low-hi
     # plt.show()
     plt.savefig("../../../../frost_maps/graphs/nrcan/" + title.replace(" ", "_") + ".png")
     plt.clf()
+
 
 def map_year(year):
     if year % 4 == 0:
@@ -324,7 +325,7 @@ def map_seasons(date):
 def reformat_frost_dataframe(df, col="day_of_year"):
     df = df.reset_index()
 
-    station_metadata_df = pd.read_csv("../../../Cleaning-Data/cleaning-data/util/station-metadata.csv",
+    station_metadata_df = pd.read_csv("./data/station-metadata.csv",
                                       dtype={"StnID": str})
     df = df.merge(station_metadata_df, how="left", on="StnID")
 

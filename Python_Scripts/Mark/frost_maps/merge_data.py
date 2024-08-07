@@ -24,7 +24,7 @@ def merge_merra_station_data():
 def merge_station_ec_data():
     df_station = pd.read_csv("./data/station_temp_data.csv", parse_dates=["time"])
     df_ec = pd.read_csv("./data/environment_canada_temp_data.csv", parse_dates=["time"], dtype={"StnID": str})
-    df_station_metadata = pd.read_csv("../../../Cleaning-Data/cleaning-data/util/station-metadata.csv")
+    df_station_metadata = pd.read_csv("./data/station-metadata.csv")
 
     df_ec = df_ec[df_ec["StnID"] != "5032951"]
 
@@ -62,7 +62,7 @@ def merge_era5_station_data():
 def merge_nrcan_station_data():
     # mint for the whole year, since we only care if there was a frost on a day
     # converts hourly data to daily minimum data
-    df_station_metadata = pd.read_csv("../../../Cleaning-Data/cleaning-data/util/station-metadata.csv")
+    df_station_metadata = pd.read_csv("./data/station-metadata.csv")
 
     df_nrcan = pd.read_csv("./data/nrcan_temp_data.csv")
     df_nrcan = df_nrcan[["time", "StnID", "nrcan_mint", "nrcan_maxt"]]
@@ -85,6 +85,7 @@ def merge_nrcan_station_data():
     df_merged = df_nrcan.merge(df_station, how="outer", on=["date", "StnID"])
 
     stations = list(set(df_station_metadata["StnID"].unique()) & set(df_station["StnID"].unique()))
+    stations.append(700)
     df_merged = df_merged[df_merged["StnID"].isin(stations)]
 
     df_merged["is_nrcan"] = pd.isna(df_merged["min_temp"])

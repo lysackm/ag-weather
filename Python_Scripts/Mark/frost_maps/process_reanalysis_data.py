@@ -50,7 +50,7 @@ def kelvin_to_celsius(kelvin):
 
 # An array which holds metadata that is not recorded in the hourly table.
 # Includes name, id (station number), longitude, and latitude
-stn_metadata = pd.read_csv("../../../Cleaning-Data/cleaning-data/util/station-metadata.csv")
+stn_metadata = pd.read_csv("./data/station-metadata.csv")
 stn_metadata = stn_metadata_preprocessing(stn_metadata)
 
 # lat and long are pairs of the stations latitude and longitude
@@ -111,7 +111,7 @@ def merge_merra():
 
 
 def add_station_column(reanalysis_product="era5"):
-    stn_df = pd.read_csv("../../../Cleaning-Data/cleaning-data/util/station-metadata.csv")
+    stn_df = pd.read_csv("./data/station-metadata.csv")
 
     if reanalysis_product == "merra":
         df = pd.read_csv("./data/merra_temp_data.csv")

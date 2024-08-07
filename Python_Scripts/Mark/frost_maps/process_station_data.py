@@ -7,8 +7,6 @@ data_dir = "../../../../data/station-csv/"
 
 
 def process_station_data():
-    # stn_df = pd.read_csv("../../../Cleaning-Data/cleaning-data/util/station-metadata.csv")
-
     station_data_dir = data_dir + "*.csv"
     station_files = glob.glob(station_data_dir)
     print(station_files, station_data_dir)
