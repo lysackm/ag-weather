@@ -1,23 +1,24 @@
+import multiprocessing
 import sys
 import glob
 import time
 import json
 import tracemalloc
 import shutil
-import dat_logging
 import pandas as pd
 
 from datetime import datetime
 from pandas.api.types import is_numeric_dtype
 from pandas.api.types import is_number
-from cProfile import Profile
-from pstats import SortKey, Stats
+from dat_logging import Logger
 
 # directory of the .dat files where the incoming data is coming
 dat_dir = "D:\\data\\remote_server_mock\\.dats\\"
 dest_dir = "D:\\data\\remote_server_mock\\.saved_data\\"
 # dat_dir = "C:/Campbellsci/Dats/"
 # dest_dir = "C:/WWW/mbagweather.ca/www/Partners/StagingTest/"
+
+logger = Logger()
 
 
 # get_date_since
@@ -48,7 +49,7 @@ def get_date_since_to_date(get_date_since):
     try:
         date_since = datetime.strptime(date_str, "%Y%m%d")
     except ValueError:
-        dat_logging.log_non_fatal_error("Invalid get_data_since date, reading " + date_str + ". Using current date.")
+        logger.log_non_fatal_error("Invalid get_data_since date, reading " + date_str + ". Using current date.")
         date_str = str(datetime.now().year) + str(datetime.now().month) + str(datetime.now().day)
         date_since = datetime.strptime(date_str, "%Y%m%d")
 
@@ -63,9 +64,9 @@ def apply_lower_thresholds(df, lower_thresholds, substitution=""):
         try:
             df[column] = df[column].mask(df[column] < lower_threshold, other=substitution)
         except KeyError as e:
-            dat_logging.log_warning("Key was not found in the dataframe and a lower threshold of "
-                                    "lower_threshold was not applied to column " + column + ". KeyError: " + str(e))
-        except TypeError as e:
+            logger.log_warning("Key was not found in the dataframe and a lower threshold of "
+                               "lower_threshold was not applied to column " + column + ". KeyError: " + str(e))
+        except TypeError:
             is_num_col = df[column].apply(is_number)
             df.loc[is_num_col, column] = df.loc[is_num_col, column].mask(df.loc[is_num_col, column] < lower_threshold,
                                                                          other=substitution)
@@ -83,9 +84,9 @@ def apply_upper_thresholds(df, upper_thresholds, substitution=""):
         try:
             df[column] = df[column].mask(df[column] > upper_threshold, other=substitution)
         except KeyError as e:
-            dat_logging.log_warning("Key column was not found in the dataframe and a lower threshold of lower_threshold"
-                                    " was not applied to column " + column + ". KeyError: " + str(e))
-        except TypeError as e:
+            logger.log_warning("Key column was not found in the dataframe and a lower threshold of lower_threshold"
+                               " was not applied to column " + column + ". KeyError: " + str(e))
+        except TypeError:
             is_num_col = df[column].apply(is_number)
             df.loc[is_num_col, column] = df.loc[is_num_col, column].mask(df.loc[is_num_col, column] > upper_threshold,
                                                                          other=substitution)
@@ -107,13 +108,13 @@ def apply_transformations(df, transformations):
                 if is_numeric_dtype(df[column]):
                     df[column] = df[column] * transformation
                 else:
-                    dat_logging.log_warning("Found non numerical values when trying to apply a numerical transformation"
-                                            "in column " + column + " applying transformation to all numerical data.")
+                    logger.log_warning("Found non numerical values when trying to apply a numerical transformation"
+                                       "in column " + column + " applying transformation to all numerical data.")
                     is_num_col = df[column].apply(is_number)
                     df.loc[is_num_col, column] = df.loc[is_num_col, column] * transformation
         except KeyError as e:
-            dat_logging.log_non_fatal_error("Trying to apply transformation " + str(transformation) +
-                                            " when column " + column + " doesnt exist. KeyError: " + str(e))
+            logger.log_non_fatal_error("Trying to apply transformation " + str(transformation) +
+                                       " when column " + column + " doesnt exist. KeyError: " + str(e))
     return df
 
 
@@ -135,8 +136,8 @@ def format_time_column(df, timestamp, df_metadata, column, format_key):
             elif column == "DATE":
                 df.loc[:, column] = timestamp.dt.date
     except ValueError as e:
-        dat_logging.log_non_fatal_error("For file " + df_metadata["destination_file"] + " an improper date format was "
-                                        "given, ValueError: " + str(e))
+        logger.log_non_fatal_error("For file " + df_metadata["destination_file"] + " an improper date format was "
+                                                                                   "given, ValueError: " + str(e))
 
 
 # Formats all date columns in df based on df_metadata, as well as handling getting the
@@ -226,10 +227,9 @@ def column_formatting(df, metadata):
             try:
                 df[column] = df[column].apply(formatting.format)
             except ValueError as e:
-                dat_logging.log_non_fatal_error("Error in the value of the string format ValueError: " + str(e))
+                logger.log_non_fatal_error("Error in the value of the string format ValueError: " + str(e))
             except IndexError as e:
-                dat_logging.log_non_fatal_error("Column does not exist when trying to apply string formatting: " +
-                                                str(e))
+                logger.log_non_fatal_error("Column does not exist when trying to apply string formatting: " + str(e))
     return df
 
 
@@ -266,7 +266,7 @@ def add_header(metadata, partner, dest_file):
     try:
         shutil.copy(src_file, dest_file)
     except FileNotFoundError as e:
-        dat_logging.log_non_fatal_error("No header file found, default header used FileNotFoundError: " + str(e))
+        logger.log_non_fatal_error("No header file found, default header used FileNotFoundError: " + str(e))
         return False
     return True
 
@@ -295,7 +295,7 @@ def save_df(df, metadata, base_directory, destination_file):
         df.to_csv(destination_file, index=False, sep=delimiter, header=header, mode=mode)
         print("Saving df to ", destination_file)
     except OSError as e:
-        dat_logging.log_fatal_error("OSError when saving to file " + destination_file + " OSError: " + str(e))
+        logger.log_fatal_error("OSError when saving to file " + destination_file + " OSError: " + str(e))
 
 
 # go through metadata related to concatenated data
@@ -308,28 +308,33 @@ def iterate_concat_data(df_concat, version_metadata, base_directory):
         df = process_concat_data(df_concat.copy(), version_metadata)
         save_df(df, version_metadata, base_directory, version_metadata["destination_file"])
     else:
-        dat_logging.log_non_fatal_error("Unknown data when parsing the version meta data for " +
-                                        base_directory + ". Skipping copying this data")
+        logger.log_non_fatal_error("Unknown data when parsing the version meta data for " +
+                                   base_directory + ". Skipping copying this data")
 
 
 # take the concatenated data and process it based on partner specification
 def copy_concat_stn_data(df_concat_15, df_concat_60, df_concat_24, partner_json):
-    for partner in partner_json:
-        base_dir = None
-        try:
+    # Prod has 4 virtual threads, but since there is a large amount of IO operations which would
+    # be halting, 6 workers may still be beneficial
+    num_processes = 6
+    tasks = []
+    with multiprocessing.Pool(num_processes) as pool:
+        # tasks = [(iterate_concat_data, (df_concat_15, concat_data["15"], base_dir, )) for dat_file in dat_files]
+        for partner in partner_json:
             if "copy_concatenated_stn_data" in partner_json[partner]:
                 base_dir = partner_json[partner]["base_directory"]
                 concat_data = partner_json[partner]["copy_concatenated_stn_data"]
 
                 if "15" in concat_data:
-                    iterate_concat_data(df_concat_15, concat_data["15"], base_dir)
+                    tasks.append((iterate_concat_data, (df_concat_15, concat_data["15"], base_dir)))
                 if "60" in concat_data:
-                    iterate_concat_data(df_concat_60, concat_data["60"], base_dir)
+                    tasks.append((iterate_concat_data, (df_concat_60, concat_data["60"], base_dir)))
                 if "24" in concat_data:
-                    iterate_concat_data(df_concat_24, concat_data["24"], base_dir)
-        except Exception as e:
-            dat_logging.log_fatal_error("Unknown error caught when processing concatenated dat file for  " + base_dir +
-                                        " Exception: " + str(e))
+                    tasks.append((iterate_concat_data, (df_concat_24, concat_data["24"], base_dir)))
+
+        results = [pool.apply_async(pool_calculation, task) for task in tasks]
+        for result in results:
+            result.get(timeout=15)
 
 
 # load a dat file, only read 2nd of 2 headers
@@ -358,7 +363,7 @@ def process_column_mapping(df, metadata, dat_file=None):
                 df = df.rename(columns=column_mapping)
         except KeyError as e:
             if column_mapping is None:
-                dat_logging.log_non_fatal_error("Error when mapping columns KeyError " + str(e))
+                logger.log_non_fatal_error("Error when mapping columns KeyError " + str(e))
             else:
                 columns = []
                 for column, column_mapped in column_mapping.items():
@@ -366,75 +371,102 @@ def process_column_mapping(df, metadata, dat_file=None):
                         df = df.rename(columns={column: column_mapped})
                         columns.append(column_mapped)
                     else:
-                        dat_logging.log_non_fatal_error("Column " + column + " does not exist in the .dat file's "
-                                                        "columns or metadata columns. Mapping to partners column "
-                                                        + column_mapped + " was not completed, and will not be included"
-                                                        " in the final file.")
+                        logger.log_non_fatal_error("Column " + column + " does not exist in the .dat file's "
+                                                   "columns or metadata columns. Mapping to partners column "
+                                                   + column_mapped + " was not completed, and will not be included"
+                                                   " in the final file.")
                 df = df[columns]
     else:
-        dat_logging.log_warning("No column mapping provided for destination file " + dest_dir)
+        logger.log_warning("No column mapping provided for destination file " + dest_dir)
 
     return df
 
 
+# returning None indicates that the loop should continue
+def process_single_dat(partner_json, station_metadata, dat_file):
+    try:
+        df_stn = None
+        dat_file_complete = dat_file
+        print(dat_file_complete)
+
+        # from the .dat file name find the matching station id
+        # isolate the name of the station
+        station_name = dat_file.split("\\")[-1][:-6]
+        time_version = dat_file.split("\\")[-1][-6:-4]
+
+        # ignoring files that are not in the format name24.dat, name60.dat, or name15.dat
+        if time_version not in ["24", "60", "15"]:
+            return None
+
+        # find the station id from the name
+        stn_id = station_metadata[station_metadata["DatFilename"] == station_name]["StnID"].values
+
+        if len(stn_id) <= 0:
+            stn_id = -1
+        else:
+            assert (len(stn_id) == 1)
+            stn_id = stn_id[0]
+
+        # iterate through the partner data and see if the current file is used anywhere
+        for partner in partner_json:
+            # check if we need to copy the files over to a specific partner
+            if "copy_individual_stn_data" in partner_json[partner]:
+                # collect the time_version, stn_id?, collect the df_stn
+                # merge all the 15s, 60s, and 24s (replaces the if elif statements below)
+                df_stn = copy_individual_stn_data(partner_json[partner], dat_file_complete, df_stn, time_version)
+
+        # all data gets added to the contacted file, given that we have a valid stnID
+        if stn_id != -1:
+            if df_stn is None:
+                df_stn = load_dat(dat_file_complete)
+
+            return df_stn, time_version
+
+    except Exception as e:
+        logger.log_fatal_error("Unknown error caught when processing dat file " + dat_file + " Exception: "
+                               + str(e))
+        return None
+
+
+def pool_calculation(func, args):
+    return func(*args)
+
+
 def process_all_dats():
-    dat_logging.log_info("Starting .dat file transfer to partner")
-    partner_json_file = open("./partner_data.json")
-    partner_json = json.load(partner_json_file)
-    dat_files = glob.glob(dat_dir + "*.dat")
-    station_metadata = pd.read_csv("station_metadata.csv")
+    list_concat_15 = []
+    list_concat_60 = []
+    list_concat_24 = []
 
-    df_concat_15 = pd.DataFrame()
-    df_concat_24 = pd.DataFrame()
-    df_concat_60 = pd.DataFrame()
+    # Prod has 4 virtual threads, but since there is a large amount of IO operations which would
+    # be halting, 6 workers may still be beneficial.
+    num_processes = 4
+    with multiprocessing.Pool(num_processes) as pool:
+        logger.log_info("Starting .dat file transfer to partner")
+        partner_json_file = open("./partner_data.json")
+        partner_json = json.load(partner_json_file)
+        dat_files = glob.glob(dat_dir + "*.dat")
+        station_metadata = pd.read_csv("station_metadata.csv")
 
-    # iterate through .dat files
-    for dat_file in dat_files:
-        try:
-            df_stn = None
-            dat_file_complete = dat_file
-            print(dat_file_complete)
+        # iterate through .dat files
+        # for dat_file in dat_files:
+        tasks = [(process_single_dat, (partner_json, station_metadata, dat_file)) for dat_file in dat_files]
+        results = [pool.apply_async(pool_calculation, task) for task in tasks]
 
-            # from the .dat file name find the matching station id
-            # isolate the name of the station
-            station_name = dat_file.split("\\")[-1][:-6]
-            time_version = dat_file.split("\\")[-1][-6:-4]
-
-            # ignoring files that are not in the format name24.dat, name60.dat, or name15.dat
-            if time_version not in ["24", "60", "15"]:
-                continue
-
-            # find the station id from the name
-            stn_id = station_metadata[station_metadata["DatFilename"] == station_name]["StnID"].values
-
-            if len(stn_id) <= 0:
-                stn_id = -1
-            else:
-                assert (len(stn_id) == 1)
-                stn_id = stn_id[0]
-
-            # iterate through the partner data and see if the current file is used anywhere
-            for partner in partner_json:
-                # check if we need to copy the files over to a specific partner
-                if "copy_individual_stn_data" in partner_json[partner]:
-                    df_stn = copy_individual_stn_data(partner_json[partner], dat_file_complete, df_stn, time_version)
-
-            # all data gets added to the contacted file, given that we have a valid stnID
-            if stn_id != -1:
-                if df_stn is None:
-                    df_stn = load_dat(dat_file_complete)
-
+        for result in results:
+            result = result.get(timeout=10)
+            if result is not None:
+                df_stn = result[0]
+                time_version = result[1]
                 if time_version == "15":
-                    df_concat_15 = station_to_concat_file(df_concat_15, df_stn)
+                    list_concat_15.append(df_stn)
                 elif time_version == "60":
-                    df_concat_60 = station_to_concat_file(df_concat_60, df_stn)
+                    list_concat_60.append(df_stn)
                 elif time_version == "24":
-                    df_concat_24 = station_to_concat_file(df_concat_24, df_stn)
+                    list_concat_24.append(df_stn)
 
-        except Exception as e:
-            dat_logging.log_fatal_error("Unknown error caught when processing dat file " + dat_file + " Exception: "
-                                        + str(e))
-            continue
+    df_concat_15 = pd.concat(list_concat_15)
+    df_concat_60 = pd.concat(list_concat_60)
+    df_concat_24 = pd.concat(list_concat_24)
 
     # merge in canadian metadata
     df_concat_15 = post_processing_concat_file(df_concat_15, station_metadata)
@@ -443,21 +475,13 @@ def process_all_dats():
 
     # check if partners need the concatenated file, move over data if necessary
     copy_concat_stn_data(df_concat_15, df_concat_60, df_concat_24, partner_json)
-    dat_logging.log_info("Finished .dat file transfer to partner")
+    logger.log_info("Finished .dat file transfer to partner")
 
 
 def main():
     start_time = time.time()
     tracemalloc.start()
-    dat_logging.initialize_logger()
-    with Profile() as profile:
-        process_all_dats()
-        (
-            Stats(profile)
-            .strip_dirs()
-            .sort_stats("cumtime")
-            .print_stats()
-        )
+    process_all_dats()
     print("Successfully completed running program in", time.time() - start_time, "seconds, memory usage:",
           tracemalloc.get_traced_memory()[1] / (sys.getsizeof([]) * 1000000.0), "MB")
     tracemalloc.stop()
