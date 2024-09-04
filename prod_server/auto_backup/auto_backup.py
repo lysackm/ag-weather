@@ -1,3 +1,22 @@
+# auto_backup.py
+#
+# Created by: Mark.Lysack@gov.mb.ca
+# Date: 2024-09-04
+#
+# The purpose of this program is to be able to run a semi automated backup of the dat files on the prod server. There
+# are several ways that a backup can be made using this program. This means that it will copy the data over from the
+# dat directory as well as modifying the dats in the dat directory, to make the files smaller. The features are as
+# follows:
+#   - Save data as the last n lines
+#   - Save data from a specific date
+#   - Use a regex to select the files operated on, this regex is applied to the directory of the dats specified
+#   - Use a file with names of the dats which should be operated on. These files will be appended to the dats directory
+#     specified
+#   - Choose to keep May 1st in the dat file
+#   - Automatically creates a backup of the data
+#   - A simple text based UI to select these configurations
+
+
 import datetime
 import glob
 import os
@@ -10,11 +29,14 @@ def get_current_date_string():
 
 
 class CreateBackup:
-    def __init__(self, file_regex, files, dats_dir):
+    def __init__(self, file_regex, files, dats_dir, kp_splt_st_dt):
         self.file_regex = file_regex
         self.files = files
         self.dats_dir = dats_dir.replace("\\", "/")
         self.backup_dir = "./dat_backups_" + get_current_date_string()
+        self.keep_split_start_date = kp_splt_st_dt
+        # May 1st. Change if the start date for the split files is different
+        self.split_start_date_regex = r"[0-9]{4}-05-01 [0-9]{2}:[0-9]{2}:[0-9]{2}"
 
     def create_backup_dir(self):
         if not os.path.isdir(self.backup_dir):
@@ -69,19 +91,39 @@ class CreateBackup:
         for dat_file in self.get_dat_files():
             print(dat_file)
 
+    def save_start_date(self, line):
+        if re.search(self.split_start_date_regex, line[0:22]):
+            return True
+        else:
+            return False
+
 
 class CreateBackupSavePreviousRows(CreateBackup):
     # saved_days: variable which indicates how
-    def __init__(self, file_regex, files, dats_dir, previous_rows):
-        super().__init__(file_regex, files, dats_dir)
+    def __init__(self, file_regex, files, dats_dir, kp_splt_st_dt, previous_rows):
+        super().__init__(file_regex, files, dats_dir, kp_splt_st_dt)
         self.previous_rows = previous_rows
 
     def clear_dat_data(self, dat_file):
         with open(dat_file, 'r') as file:
             file_data = file.readlines()
             header = file_data[0:2]
-            data = file_data[len(file_data) - self.previous_rows: len(file_data)]
-            file_content = header + data
+
+            if self.previous_rows > len(file_data) - 2:
+                data = file_data[2:]
+            else:
+                data = file_data[len(file_data) - self.previous_rows: len(file_data)]
+
+            if self.keep_split_start_date:
+                index = 2
+                start_date = []
+                for line in file_data[2:]:
+                    if self.save_start_date(line) and len(file_data) - index > self.previous_rows:
+                        start_date.append(line)
+                    index += 1
+                file_content = header + start_date + data
+            else:
+                file_content = header + data
             file_content = "".join(file_content)
 
         with open(dat_file, "w") as file:
@@ -94,8 +136,8 @@ class CreateBackupSavePreviousRows(CreateBackup):
 
 
 class CreateBackupSaveFromDate(CreateBackup):
-    def __init__(self, file_regex, files, dats_dir, start_datetime):
-        super().__init__(file_regex, files, dats_dir)
+    def __init__(self, file_regex, files, dats_dir, kp_splt_st_dt, start_datetime):
+        super().__init__(file_regex, files, dats_dir, kp_splt_st_dt)
         if type(start_datetime) is datetime.datetime:
             self.start_datetime = start_datetime
         elif type(start_datetime) is str:
@@ -116,6 +158,8 @@ class CreateBackupSaveFromDate(CreateBackup):
                 if re.search('[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:00', line[0:22]):
                     line_datetime = datetime.datetime.strptime(line[1:20], '%Y-%m-%d %H:%M:%S')
                     if line_datetime >= self.start_datetime:
+                        data.append(line)
+                    elif re.search(self.split_start_date_regex, line[0:22]):
                         data.append(line)
 
             file_content = header + data
@@ -152,14 +196,16 @@ def user_interface_bootstrap():
     dat_file = input("If there is a file which has a list of dat files which you want to backup, type the name of "
                      "the file or press enter to skip: ")
 
+    keep_split_file_date = input("Would you like to keep May 1st in the split file? Type 1 for yes, 2 for no: ") == "1"
+
     if backup_type == "1":
         num_saved = input("Please enter in the number of lines at the end of the file you would like to save: ")
-        create_backup = CreateBackupSavePreviousRows(dat_regex, dat_file, dats_dir, num_saved)
+        create_backup = CreateBackupSavePreviousRows(dat_regex, dat_file, dats_dir, keep_split_file_date, int(num_saved))
     elif backup_type == "2":
         print("In the format of YYYY-MM-DD HH:mm:ss please type in the date which all data on or after will be saved. "
               "All data before this date will not be saved.")
         date = input("Enter date: ")
-        create_backup = CreateBackupSaveFromDate(dat_regex, dat_file, dats_dir, date)
+        create_backup = CreateBackupSaveFromDate(dat_regex, dat_file, dats_dir, keep_split_file_date, date)
 
     print_effected_dats = input("Would you like to see a list of the dat files which will be changed in this "
                                 "operation? 1 for yes, 2 for no: ")
@@ -181,14 +227,15 @@ def user_interface_bootstrap():
 def main():
     dats_dir = "D:/data/remote_server_mock/.dats/"
     mb_regex = r"\\MB\\(.+).dat"
-    # create_backup = CreateBackupSavePreviousRows(mb_regex, "", dats_dir, 500)
-    # create_backup = CreateBackupSaveFromDate(mb_regex, "", dats_dir, "2024-06-21 00:00:00")
-    # create_backup = CreateBackupSaveFromDate("", "non_potato_dats.csv", dats_dir, "2024-06-21 00:00:00")
+    # create_backup = CreateBackupSavePreviousRows("", "non_potato_dats.csv", dats_dir, True, 6)
+    # create_backup = CreateBackupSaveFromDate(mb_regex, "", dats_dir, True, "2024-06-21 00:00:00")
+    # create_backup = CreateBackupSaveFromDate("", "non_potato_dats.csv", dats_dir, True, "2024-06-21 00:00:00")
 
-    # comment/uncomment these to stop the prompts from appearing
+    # comment/uncomment these for non prompted execution
     # create_backup.backup_dats()
     # create_backup.clear_dats_data()
 
+    # comment/uncomment to run with user prompts
     user_interface_bootstrap()
 
 
