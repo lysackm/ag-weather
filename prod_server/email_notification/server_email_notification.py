@@ -47,7 +47,7 @@ def main():
     live_page_date = get_curr_date()
     date = datetime.datetime.now()
 
-    date_delta = live_page_date - date
+    date_delta = date - live_page_date
     two_hours = datetime.timedelta(hours=2)
 
     if date_delta >= two_hours:
