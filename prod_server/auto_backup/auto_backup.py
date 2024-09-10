@@ -14,7 +14,7 @@
 #     specified
 #   - Choose to keep May 1st in the dat file
 #   - Automatically creates a backup of the data
-#   - A simple text based UI to select these configurations
+#   - A simple text based UI to select these configurations1
 
 
 import datetime
@@ -75,7 +75,7 @@ class CreateBackup:
             if not os.path.isdir(dest_dir + "/" + dir_extension):
                 os.mkdir(dest_dir + "/" + dir_extension)
             dest_dir = dest_dir + "/" + dir_extension
-                
+
         return self.backup_dir + "/" + dat_file_suffix
 
     def copy_dats(self):
@@ -88,8 +88,14 @@ class CreateBackup:
         self.copy_dats()
 
     def print_effected_dirs(self):
+        if self.get_dat_files() is []:
+            print("No chosen files.")
+
         for dat_file in self.get_dat_files():
-            print(dat_file)
+            if not os.path.isfile(dat_file):
+                print(dat_file + " is not a valid file")
+            else:
+                print(dat_file)
 
     def save_start_date(self, line):
         if re.search(self.split_start_date_regex, line[0:22]):
@@ -174,17 +180,118 @@ class CreateBackupSaveFromDate(CreateBackup):
             self.clear_dat_data(dat_file)
 
 
+def get_user_backup_type():
+    backup_type = False
+    while backup_type != "1" and backup_type != "2":
+        backup_type = input("For each file would you like to (1) save data after a date, or "
+                            "(2) save the last n lines of the file? Enter 1 or 2 to continue: ")
+
+        if backup_type != "1" and backup_type != "2":
+            print("Unexpected input, please try again")
+    return backup_type
+
+
+def is_dats_dir_valid(dats_dir):
+    valid_dir = True
+    if dats_dir == "":
+        return True
+
+    if dats_dir[-1] != "/":
+        print("Make sure your directory ends with a /")
+        valid_dir = False
+
+    if not os.path.isdir(dats_dir):
+        print("This directory cannot be found.")
+        valid_dir = False
+
+    return valid_dir
+
+
+def get_user_dats_dir():
+    valid_dir = False
+    dats_dir = ""
+    while not valid_dir:
+        dats_dir = input("Please type the absolute file directory to the dat files (default is C:/Campbellsci/Dats/)."
+                         " Type your answer or press enter for default: ")
+        valid_dir = is_dats_dir_valid(dats_dir)
+
+        if dats_dir == "":
+            if os.path.isdir("C:/Campbellsci/Dats/"):
+                dats_dir = "C:/Campbellsci/Dats/"
+                valid_dir = True
+            else:
+                print("C:/Campbellsci/Dats/ is an invalid path on this computer, try entering a valid directory")
+                valid_dir = False
+
+    return dats_dir
+
+
+def get_user_dat_file():
+    valid_file = False
+    dat_file = ""
+    while not valid_file:
+        dat_file = input("If there is a file which has a list of dat files which you want to backup, type the name of "
+                         "the file or press enter to skip: ")
+
+        if dat_file == "":
+            return ""
+
+        if not os.path.isfile(dat_file):
+            print("The file specified does not exist, try entering the complete file directory.")
+        else:
+            valid_file = True
+
+    return dat_file
+
+
+def get_user_keep_may():
+    valid_input = False
+    keep_may = False
+    while not valid_input:
+        keep_may = input("Would you like to keep May 1st in the split file? Type 1 for yes, 2 for no: ")
+        if keep_may != "1" and keep_may != "2":
+            print("Invalid input.")
+        else:
+            keep_may = keep_may == "1"
+            valid_input = True
+    return keep_may
+
+
+def get_user_num_lines():
+    valid_input = False
+    num_lines = False
+    while not valid_input:
+        num_lines = input("Please enter in the number of lines at the end of the file you would like to save: ")
+        try:
+            num_lines = int(num_lines)
+            valid_input = True
+        except ValueError:
+            print("Not a valid number.")
+    return num_lines
+
+
+def get_user_date():
+    valid_date = False
+    date = ""
+    print("In the format of YYYY-MM-DD HH:mm:ss please type in the date which all data on or after will be saved. "
+          "All data before this date will not be saved.")
+
+    while not valid_date:
+        date = input("Enter a date: ")
+
+        try:
+            date = datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
+            valid_date = True
+        except ValueError:
+            print("Invalid date format, make sure to follow the format YYYY-MM-DD HH:mm:ss (Ex. 2024-09-10 00:00:00): ")
+    return date
+
+
 def user_interface_bootstrap():
     create_backup = None
     print("This is a program to automatically preform backups on the dat files.")
-    backup_type = input("For each file would you like to (1) save the last n lines of the file, or "
-                        "(2) save data after a date? Enter 1 or 2 to continue: ")
-
-    dats_dir = input("Please type the absolute file directory to the dat files (default is C:/Campbellsci/Dats/)."
-                     " Type your answer or press enter for default: ")
-
-    if dats_dir == "":
-        dats_dir = "C:/Campbellsci/Dats/"
+    backup_type = get_user_backup_type()
+    dats_dir = get_user_dats_dir()
 
     dat_regex = input("Please enter in a regular expression to select the specific files which you want to select. "
                       "Some common regex expressions have been listed: \n"
@@ -193,18 +300,14 @@ def user_interface_bootstrap():
                       "*WG15.dat : selects all WG 15 minute dat files\n"
                       "Type in regular expression or enter to skip: ")
 
-    dat_file = input("If there is a file which has a list of dat files which you want to backup, type the name of "
-                     "the file or press enter to skip: ")
+    dat_file = get_user_dat_file()
+    keep_split_file_date = get_user_keep_may()
 
-    keep_split_file_date = input("Would you like to keep May 1st in the split file? Type 1 for yes, 2 for no: ") == "1"
-
-    if backup_type == "1":
-        num_saved = input("Please enter in the number of lines at the end of the file you would like to save: ")
-        create_backup = CreateBackupSavePreviousRows(dat_regex, dat_file, dats_dir, keep_split_file_date, int(num_saved))
-    elif backup_type == "2":
-        print("In the format of YYYY-MM-DD HH:mm:ss please type in the date which all data on or after will be saved. "
-              "All data before this date will not be saved.")
-        date = input("Enter date: ")
+    if backup_type == "2":
+        num_saved = get_user_num_lines()
+        create_backup = CreateBackupSavePreviousRows(dat_regex, dat_file, dats_dir, keep_split_file_date, num_saved)
+    elif backup_type == "1":
+        date = get_user_date()
         create_backup = CreateBackupSaveFromDate(dat_regex, dat_file, dats_dir, keep_split_file_date, date)
 
     print_effected_dats = input("Would you like to see a list of the dat files which will be changed in this "
@@ -212,7 +315,8 @@ def user_interface_bootstrap():
     if print_effected_dats == "1":
         create_backup.print_effected_dirs()
 
-    continue_program = input("Would you like to continue with the operation? 1 for yes, 2 for exiting the program: ")
+    continue_program = input("Would you like to continue with the operation? 1 for yes, anything else for "
+                             "exiting the program: ")
     if continue_program != "1":
         print("Exiting the program")
         exit(1)
