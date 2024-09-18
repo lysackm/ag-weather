@@ -4,6 +4,8 @@ import smtplib
 from email.mime.text import MIMEText
 import requests
 import hashlib
+import cv2
+import numpy as np
 
 email_sender = "mbagWeather@outlook.com"
 email_recipient = ["Mark.Lysack@gov.mb.ca", "lysackm@myumanitoba.ca", "a_sass3@hotmail.com", "alison.sass@gov.mb.ca"]
@@ -23,10 +25,18 @@ def has_sent_mail(metadata):
 
 
 def get_curr_image_hash():
-    r = requests.get("https://mbagweather.ca/partners/rtmc/Carman212.png")
+    r = requests.get("https://mbagweather.ca/partners/rtmc/Inwood516.png")
     new_image = r.content
 
-    image_hash = hashlib.sha256(new_image).hexdigest()
+    arr = np.asarray(bytearray(new_image), dtype=np.uint8)
+    img = cv2.imdecode(arr, -1)
+    # crop the image so only the header appears. Only should change if the time changes on the chart
+    crop_img = img[0:60, :]
+    cv2.imshow("img", crop_img)
+    cv2.waitKey(0)
+    exit()
+
+    image_hash = hashlib.sha256(crop_img).hexdigest()
 
     return image_hash
 
