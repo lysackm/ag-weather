@@ -33,7 +33,7 @@ class CreateBackup:
         self.file_regex = file_regex
         self.files = files
         self.dats_dir = dats_dir.replace("\\", "/")
-        self.backup_dir = "./dat_backups_" + get_current_date_string()
+        self.backup_dir = "./auto_backup/dat_backups_" + get_current_date_string()
         self.keep_split_start_date = kp_splt_st_dt
         # May 1st. Change if the start date for the split files is different
         self.split_start_date_regex = r"[0-9]{4}-05-01 [0-9]{2}:[0-9]{2}:[0-9]{2}"
@@ -88,6 +88,7 @@ class CreateBackup:
         self.copy_dats()
 
     def print_effected_dirs(self):
+        print("printing dirs")
         if self.get_dat_files() is []:
             print("No chosen files.")
 
@@ -111,7 +112,7 @@ class CreateBackupSavePreviousRows(CreateBackup):
         self.previous_rows = previous_rows
 
     def clear_dat_data(self, dat_file):
-        with open(dat_file, 'r') as file:
+        with open(dat_file, "r") as file:
             file_data = file.readlines()
             header = file_data[0:2]
 
@@ -147,7 +148,7 @@ class CreateBackupSaveFromDate(CreateBackup):
         if type(start_datetime) is datetime.datetime:
             self.start_datetime = start_datetime
         elif type(start_datetime) is str:
-            self.start_datetime = datetime.datetime.strptime(start_datetime, '%Y-%m-%d %H:%M:%S')
+            self.start_datetime = datetime.datetime.strptime(start_datetime, "%Y-%m-%d %H:%M:%S")
         else:
             # undefined behaviour
             print("Date in unexpected format, please enter in format YYYY-MM-DD HH:mm:ss. Exiting the program.")
@@ -165,7 +166,7 @@ class CreateBackupSaveFromDate(CreateBackup):
                     line_datetime = datetime.datetime.strptime(line[1:20], '%Y-%m-%d %H:%M:%S')
                     if line_datetime >= self.start_datetime:
                         data.append(line)
-                    elif re.search(self.split_start_date_regex, line[0:22]):
+                    elif self.keep_split_start_date and re.search(self.split_start_date_regex, line[0:22]):
                         data.append(line)
 
             file_content = header + data
@@ -287,19 +288,34 @@ def get_user_date():
     return date
 
 
+def get_user_regex():
+    valid_regex = False
+    dat_regex = ""
+
+    while not valid_regex:
+        dat_regex = input("Please enter in a regular expression to select the specific files which you want to select. "
+                          "Some common regex expressions have been listed: \n"
+                          "\\\\MB\\\\(.+)\\.dat : selects all dat files in the MB directory\n"
+                          ".*24\\.dat : selects all 24 hour dat files\n"
+                          ".*WG15\\.dat : selects all WG 15 minute dat files\n"
+                          "Type in regular expression or enter to skip: ")
+        try:
+            re.compile(dat_regex)
+            valid_regex = True
+        except re.error:
+            valid_regex = False
+
+    print("\n\ndat_regex", dat_regex, "\n\n")
+    return dat_regex
+
+
 def user_interface_bootstrap():
     create_backup = None
     print("This is a program to automatically preform backups on the dat files.")
     backup_type = get_user_backup_type()
     dats_dir = get_user_dats_dir()
 
-    dat_regex = input("Please enter in a regular expression to select the specific files which you want to select. "
-                      "Some common regex expressions have been listed: \n"
-                      "\\\\MB\\\\(.+).dat : selects all dat files in the MB directory\n"
-                      "*24.dat : selects all 24 hour dat files\n"
-                      "*WG15.dat : selects all WG 15 minute dat files\n"
-                      "Type in regular expression or enter to skip: ")
-
+    dat_regex = get_user_regex()
     dat_file = get_user_dat_file()
     keep_split_file_date = get_user_keep_may()
 
