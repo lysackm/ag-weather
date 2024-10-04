@@ -1,4 +1,7 @@
+import datetime
 import multiprocessing
+import os
+import re
 import sys
 import glob
 import time
@@ -7,64 +10,30 @@ import tracemalloc
 import shutil
 import pandas as pd
 
-from datetime import datetime
 from pandas.api.types import is_numeric_dtype
 from pandas.api.types import is_number
 from dat_logging import Logger
 
 # directory of the .dat files where the incoming data is coming
+# local testing
 dat_dir = "D:\\data\\remote_server_mock\\.dats\\"
 dest_dir = "D:\\data\\remote_server_mock\\.saved_data\\"
+# prod file directories
 # dat_dir = "C:/Campbellsci/Dats/"
 # dest_dir = "C:/WWW/mbagweather.ca/www/Partners/StagingTest/"
 
 logger = Logger()
 
 
-# get_date_since
-# Take a string which is a dat and return a datetime object which represents
-# the date which the date which to fetch data since
-#
-# get_date_since can either be a day, day and month, or full date
-# If there is missing data then the current date is used to fill the date
-def get_date_since_to_date(get_date_since):
-    date_pieces = get_date_since.split("/")
-
-    year = datetime.now().year
-    month = datetime.now().month
-    day = datetime.now().day
-
-    if len(date_pieces) == 3:
-        year = date_pieces[0]
-        month = date_pieces[1]
-        day = date_pieces[2]
-    elif len(date_pieces) == 2:
-        month = date_pieces[0]
-        day = date_pieces[1]
-    elif len(date_pieces) == 1:
-        day = date_pieces[0]
-
-    date_str = str(year) + str(month) + str(day)
-
-    try:
-        date_since = datetime.strptime(date_str, "%Y%m%d")
-    except ValueError:
-        logger.log_non_fatal_error("Invalid get_data_since date, reading " + date_str + ". Using current date.")
-        date_str = str(datetime.now().year) + str(datetime.now().month) + str(datetime.now().day)
-        date_since = datetime.strptime(date_str, "%Y%m%d")
-
-    return date_since
-
-
 # given a df and a dictionary of column to threshold mappings, apply the threshold to
 # each column. If value is lower than the lower_threshold, then the substitution replaces
 # the value
-def apply_lower_thresholds(df, lower_thresholds, substitution=""):
+def apply_lower_thresholds(df, lower_thresholds, metadata_id, substitution="NaN"):
     for column, lower_threshold in lower_thresholds.items():
         try:
             df[column] = df[column].mask(df[column] < lower_threshold, other=substitution)
         except KeyError as e:
-            logger.log_warning("Key was not found in the dataframe and a lower threshold of "
+            logger.log_warning("ID: " + metadata_id + " Key was not found in the dataframe and a lower threshold of "
                                "lower_threshold was not applied to column " + column + ". KeyError: " + str(e))
         except TypeError:
             is_num_col = df[column].apply(is_number)
@@ -79,19 +48,20 @@ def apply_lower_thresholds(df, lower_thresholds, substitution=""):
 # given a df and a dictionary of column to threshold mappings, apply the threshold to
 # each column. If value is higher than the upper_threshold, then the substitution replaces
 # the value
-def apply_upper_thresholds(df, upper_thresholds, substitution=""):
+def apply_upper_thresholds(df, upper_thresholds, metadata_id, substitution="NaN"):
     for column, upper_threshold in upper_thresholds.items():
         try:
             df[column] = df[column].mask(df[column] > upper_threshold, other=substitution)
         except KeyError as e:
-            logger.log_warning("Key column was not found in the dataframe and a lower threshold of lower_threshold"
-                               " was not applied to column " + column + ". KeyError: " + str(e))
+            logger.log_warning("ID: " + metadata_id + " Key column was not found in the dataframe and a lower threshold"
+                               " of lower_threshold was not applied to column " + column + ". KeyError: " + str(e))
         except TypeError:
             is_num_col = df[column].apply(is_number)
             df.loc[is_num_col, column] = df.loc[is_num_col, column].mask(df.loc[is_num_col, column] > upper_threshold,
                                                                          other=substitution)
             # Commented out logging upper/lower threshold removed data can trigger the warning
-            # dat_logging.log_warning("Comparison with the type upper threshold is incompatible. Applying "
+            # dat_logging.log_warning("ID: " + metadata_id + "Comparison with the type upper threshold is incompatible."
+            #                         "Applying "
             #                         "threshold to all numerical values. Column: " + column + " TypeError: " + str(e))
     return df
 
@@ -99,7 +69,7 @@ def apply_upper_thresholds(df, upper_thresholds, substitution=""):
 # apply some transformation to the given df, based on a dictionary of column to transformation
 # mappings. If the transformation is a string then all values are replaced with the string, if it
 # is an int or float, then the transformation is multiplied to the column
-def apply_transformations(df, transformations):
+def apply_transformations(df, transformations, metadata_id):
     for column, transformation in transformations.items():
         try:
             if type(transformation) is str:
@@ -108,12 +78,13 @@ def apply_transformations(df, transformations):
                 if is_numeric_dtype(df[column]):
                     df[column] = df[column] * transformation
                 else:
-                    logger.log_warning("Found non numerical values when trying to apply a numerical transformation"
-                                       "in column " + column + " applying transformation to all numerical data.")
+                    logger.log_warning("ID: " + metadata_id + " Found non numerical values when trying to apply a "
+                                       "numerical transformation in column " + column + " applying transformation to"
+                                       " all numerical data.")
                     is_num_col = df[column].apply(is_number)
                     df.loc[is_num_col, column] = df.loc[is_num_col, column] * transformation
         except KeyError as e:
-            logger.log_non_fatal_error("Trying to apply transformation " + str(transformation) +
+            logger.log_non_fatal_error("ID: " + metadata_id + " Trying to apply transformation " + str(transformation) +
                                        " when column " + column + " doesnt exist. KeyError: " + str(e))
     return df
 
@@ -136,12 +107,11 @@ def format_time_column(df, timestamp, df_metadata, column, format_key):
             elif column == "DATE":
                 df.loc[:, column] = timestamp.dt.date
     except ValueError as e:
-        logger.log_non_fatal_error("For file " + df_metadata["destination_file"] + " an improper date format was "
-                                                                                   "given, ValueError: " + str(e))
+        logger.log_non_fatal_error("ID: " + df_metadata["id"] + " An improper date format was given, "
+                                   "ValueError: " + str(e))
 
 
-# Formats all date columns in df based on df_metadata, as well as handling getting the
-# get_data_since property
+# Formats all date columns in df based on df_metadata
 def date_processing(df, df_metadata=None):
     if df_metadata is None:
         df_metadata = {}
@@ -152,10 +122,6 @@ def date_processing(df, df_metadata=None):
     format_time_column(df, timestamp, df_metadata, "TIME", "time_format")
     format_time_column(df, timestamp, df_metadata, "TMSTAMP", "timestamp_format")
 
-    if "get_data_since" in df_metadata:
-        start_date = get_date_since_to_date(df_metadata["get_data_since"])
-        df = df[timestamp > start_date]
-
     return df
 
 
@@ -163,13 +129,13 @@ def date_processing(df, df_metadata=None):
 def df_data_operations(df, df_metadata):
     if "lower_thresholds" in df_metadata:
         lower_threshold = df_metadata["lower_thresholds"]
-        df = apply_lower_thresholds(df, lower_threshold)
+        df = apply_lower_thresholds(df, lower_threshold, df_metadata["id"])
     if "upper_thresholds" in df_metadata:
         upper_threshold = df_metadata["upper_thresholds"]
-        df = apply_upper_thresholds(df, upper_threshold)
+        df = apply_upper_thresholds(df, upper_threshold, df_metadata["id"])
     if "transformations" in df_metadata:
         transformations = df_metadata["transformations"]
-        df = apply_transformations(df, transformations)
+        df = apply_transformations(df, transformations, df_metadata["id"])
     # pandas automatically adds triple quotes, undesired effect
     # if "quoted_columns" in df_metadata:
     #     quoted_columns = df_metadata["quoted_columns"]
@@ -193,7 +159,7 @@ def copy_individual_stn_data(partner_data, dat_file_full, df_stn, version):
         mapped_dat_files = partner_data["copy_individual_stn_data"][version][".dat_to_partner_file_mapping"]
         version_data = partner_data["copy_individual_stn_data"][version]
 
-        if dat_file in mapped_dat_files:
+        if check_run_time_regex(version_data) and dat_file in mapped_dat_files:
             if "direct_copy" not in version_data or not version_data["direct_copy"]:
                 if df_stn is None:
                     df_stn = load_dat(dat_file_full)
@@ -202,6 +168,9 @@ def copy_individual_stn_data(partner_data, dat_file_full, df_stn, version):
                 df_processed = date_processing(df_processed, version_data)
                 df_processed = column_formatting(df_processed, version_data)
                 df_processed = process_column_mapping(df_processed, version_data, dat_file)
+
+                destination_file = dest_dir + partner_data["base_directory"] + "/" + mapped_dat_files[dat_file]
+                df_processed = merge_retention_data(df_processed, version_data, destination_file)
                 save_df(df_processed, version_data, partner_data["base_directory"], mapped_dat_files[dat_file])
             else:
                 copy_file_directly(partner_data["base_directory"], dat_file_full, mapped_dat_files[dat_file])
@@ -220,21 +189,36 @@ def invert_dict(d):
     return {v: k for k, v in d.items()}
 
 
+# a more precise but slow way to format a column
+def process_row(value, format_str):
+    if isinstance(value, float):
+        if pd.isna(value):
+            return ""
+        value = format_str.format(value)  # Example operation: multiply by 2
+        return value
+    else:
+        return ""
+
+
 # apply special formatting to the columns to truncate decimals or add trailing zeros
 def column_formatting(df, metadata):
     if "column_format" in metadata:
         for column, formatting in metadata["column_format"].items():
             try:
-                df[column] = df[column].apply(formatting.format)
+                df[column] = df[column].apply(lambda row: process_row(row, formatting))
             except ValueError as e:
-                logger.log_non_fatal_error("Error in the value of the string format ValueError: " + str(e))
+                logger.log_warning("ID: " + metadata["id"] + " Error in the value of the string format ValueError: "
+                                   + str(e))
+                df[column] = df[column].astype(float)
+                df[column] = df[column].apply(lambda row: process_row(row, formatting))
             except IndexError as e:
-                logger.log_non_fatal_error("Column does not exist when trying to apply string formatting: " + str(e))
+                logger.log_non_fatal_error("ID: " + metadata["id"] + " Column does not exist when trying to apply"
+                                           " string formatting: " + str(e))
     return df
 
 
 # process the concatenated data to be as specified for an individual partner
-def process_concat_data(df, metadata):
+def process_concat_data(df, metadata, base_directory, destination_file):
     if "previous_rows" in metadata:
         previous_rows = metadata["previous_rows"]
     else:
@@ -248,13 +232,16 @@ def process_concat_data(df, metadata):
     if "StationName" in df.columns:
         df = df.sort_values(["StationName", "TMSTAMP"])
     else:
-        df = df.sort_values["TMSTAMP"]
+        df = df.sort_values(["TMSTAMP"])
 
     if previous_rows != "all" and type(previous_rows) is int:
         df = df.groupby("StnID").tail(previous_rows)
 
     df = column_formatting(df, metadata)
     df = process_column_mapping(df, metadata)
+
+    destination_file = dest_dir + base_directory + "/" + destination_file
+    df = merge_retention_data(df, metadata, destination_file)
 
     return df
 
@@ -266,14 +253,67 @@ def add_header(metadata, partner, dest_file):
     try:
         shutil.copy(src_file, dest_file)
     except FileNotFoundError as e:
-        logger.log_non_fatal_error("No header file found, default header used FileNotFoundError: " + str(e))
+        logger.log_non_fatal_error("ID: " + metadata["id"] + " No header file found, default header used"
+                                   " FileNotFoundError: " + str(e))
         return False
     return True
 
 
+# Future work: Could add options to control how NaN values are deliverd to partners
+def get_partner_index_cols_names(metadata):
+    if "column_mapping" in metadata:
+        col_map = metadata["column_mapping"]
+        return [col_map["TMSTAMP"], col_map["StnID"]]
+    else:
+        return ["TMSTAMP", "StnID"]
+
+
+def read_partner_data(metadata, dest_file):
+    sep = ","
+    skip_rows = []
+    columns = list(metadata["column_mapping"].values())
+
+    if "csv_deliminator" in metadata:
+        sep = metadata["csv_deliminator"]
+    if "skip_rows" in metadata:
+        skip_rows = metadata["skip_rows"]
+
+    df = pd.read_csv(dest_file, sep=sep, skiprows=skip_rows, header=None, names=columns, na_values=["", "nan"])
+
+    partner_metadata = metadata
+    if "column_format" in partner_metadata:
+        for column in metadata["column_mapping"]:
+            if column in partner_metadata["column_format"]:
+                partner_col = partner_metadata["column_mapping"][column]
+                previous_col_format = partner_metadata["column_format"][column]
+                del partner_metadata["column_format"][column]
+                partner_metadata["column_format"][partner_col] = previous_col_format
+
+    df = column_formatting(df, partner_metadata)
+    return df
+
+
+def merge_retention_data(dats_df, metadata, dest_file):
+    if "retain_data" in metadata and metadata["retain_data"]:
+        if os.path.isfile(dest_file):
+            partner_df = read_partner_data(metadata, dest_file)
+            concatenated_df = pd.concat([partner_df, dats_df])
+            concatenated_df = concatenated_df.drop_duplicates(keep="last",
+                                                              subset=get_partner_index_cols_names(metadata))
+            index_cols = get_partner_index_cols_names(metadata)
+            sorted_df = concatenated_df.sort_values(index_cols, ascending=True)
+            return sorted_df
+        else:
+            logger.log_warning("ID: " + metadata["id"] + " Could not find partner file " + dest_file +
+                               ", starting a new file with the current dat.")
+            return dats_df
+    else:
+        return dats_df
+
+
 # save a df to the destination_file
-def save_df(df, metadata, base_directory, destination_file):
-    destination_file = dest_dir + base_directory + "/" + destination_file
+def save_df(df, metadata, base_directory, destination_file_suffix):
+    destination_file = dest_dir + base_directory + "/" + destination_file_suffix
     delimiter = ","
     header = True
     mode = "w"
@@ -295,21 +335,27 @@ def save_df(df, metadata, base_directory, destination_file):
         df.to_csv(destination_file, index=False, sep=delimiter, header=header, mode=mode)
         print("Saving df to ", destination_file)
     except OSError as e:
-        logger.log_fatal_error("OSError when saving to file " + destination_file + " OSError: " + str(e))
+        logger.log_fatal_error("ID: " + metadata["id"] + " OSError when saving to file " + destination_file +
+                               " OSError: " + str(e))
 
 
 # go through metadata related to concatenated data
 def iterate_concat_data(df_concat, version_metadata, base_directory):
     if type(version_metadata) is list:
         for request in version_metadata:
-            df = process_concat_data(df_concat.copy(), request)
-            save_df(df, request, base_directory, request["destination_file"])
+            if check_run_time_regex(request):
+                logger.log_info("Saving file " + request["destination_file"] + " to partner " + base_directory)
+                df = process_concat_data(df_concat.copy(), request, base_directory, request["destination_file"])
+                save_df(df, request, base_directory, request["destination_file"])
     elif type(version_metadata) is dict:
-        df = process_concat_data(df_concat.copy(), version_metadata)
-        save_df(df, version_metadata, base_directory, version_metadata["destination_file"])
+        if check_run_time_regex(version_metadata):
+            logger.log_info("Saving file " + version_metadata["destination_file"] + " to partner " + base_directory)
+            df = process_concat_data(df_concat.copy(), version_metadata, base_directory,
+                                     version_metadata["destination_file"])
+            save_df(df, version_metadata, base_directory, version_metadata["destination_file"])
     else:
-        logger.log_non_fatal_error("Unknown data when parsing the version meta data for " +
-                                   base_directory + ". Skipping copying this data")
+        logger.log_non_fatal_error("Unknown data when parsing the version meta data "
+                                   "for " + base_directory + ". Skipping copying this data")
 
 
 # take the concatenated data and process it based on partner specification
@@ -319,7 +365,6 @@ def copy_concat_stn_data(df_concat_15, df_concat_60, df_concat_24, partner_json)
     num_processes = 6
     tasks = []
     with multiprocessing.Pool(num_processes) as pool:
-        # tasks = [(iterate_concat_data, (df_concat_15, concat_data["15"], base_dir, )) for dat_file in dat_files]
         for partner in partner_json:
             if "copy_concatenated_stn_data" in partner_json[partner]:
                 base_dir = partner_json[partner]["base_directory"]
@@ -334,7 +379,13 @@ def copy_concat_stn_data(df_concat_15, df_concat_60, df_concat_24, partner_json)
 
         results = [pool.apply_async(pool_calculation, task) for task in tasks]
         for result in results:
-            result.get(timeout=15)
+            try:
+                result.get(timeout=180)
+            except multiprocessing.TimeoutError as e:
+                logger.log_non_fatal_error("Timed out when waiting for multi-threading to wait for a response "
+                                           "TimeoutError: " + str(e))
+            except Exception as e:
+                logger.log_non_fatal_error("Unknown multithreading error occurred attempting to continue " + str(e))
 
 
 # load a dat file, only read 2nd of 2 headers
@@ -346,6 +397,16 @@ def load_dat(filename):
 def post_processing_concat_file(df, station_metadata):
     df = df.merge(station_metadata, how="left", on=["StnID"])
     return df
+
+
+# based on partner data, check if the current date matches the run_time_regex
+def check_run_time_regex(version_metadata):
+    current_date = str(datetime.datetime.now())
+    if "run_time_regex" in version_metadata:
+        run_time_regex = version_metadata["run_time_regex"]
+        return bool(re.search(run_time_regex, current_date))
+    else:
+        return True
 
 
 # rename columns in df
@@ -363,7 +424,7 @@ def process_column_mapping(df, metadata, dat_file=None):
                 df = df.rename(columns=column_mapping)
         except KeyError as e:
             if column_mapping is None:
-                logger.log_non_fatal_error("Error when mapping columns KeyError " + str(e))
+                logger.log_non_fatal_error("ID: " + metadata["id"] + " Error when mapping columns KeyError " + str(e))
             else:
                 columns = []
                 for column, column_mapped in column_mapping.items():
@@ -371,23 +432,26 @@ def process_column_mapping(df, metadata, dat_file=None):
                         df = df.rename(columns={column: column_mapped})
                         columns.append(column_mapped)
                     else:
-                        logger.log_non_fatal_error("Column " + column + " does not exist in the .dat file's "
-                                                   "columns or metadata columns. Mapping to partners column "
-                                                   + column_mapped + " was not completed, and will not be included"
-                                                   " in the final file.")
+                        logger.log_non_fatal_error("ID: " + metadata["id"] + " Column " + column + " does not exist in "
+                                                   "the .dat file's columns or metadata columns. Mapping to partners"
+                                                   "column" + column_mapped + " was not completed, and will not "
+                                                   "be included in the final file.")
                 df = df[columns]
     else:
-        logger.log_warning("No column mapping provided for destination file " + dest_dir)
+        logger.log_warning("ID: " + metadata["id"] + " No column mapping provided for destination file " + dest_dir)
 
     return df
 
 
-# returning None indicates that the loop should continue
+# Given a single dat_file read it and then apply appropriate processing,
+# then copying the single file to partners if the partner json says that
+# it is required
+# returning None indicates that the loop should continue, otherwise returns
+# a tuple of the df (dat file -> df) and the time version (15, 60, 24)
 def process_single_dat(partner_json, station_metadata, dat_file):
     try:
         df_stn = None
         dat_file_complete = dat_file
-        print(dat_file_complete)
 
         # from the .dat file name find the matching station id
         # isolate the name of the station
@@ -411,8 +475,6 @@ def process_single_dat(partner_json, station_metadata, dat_file):
         for partner in partner_json:
             # check if we need to copy the files over to a specific partner
             if "copy_individual_stn_data" in partner_json[partner]:
-                # collect the time_version, stn_id?, collect the df_stn
-                # merge all the 15s, 60s, and 24s (replaces the if elif statements below)
                 df_stn = copy_individual_stn_data(partner_json[partner], dat_file_complete, df_stn, time_version)
 
         # all data gets added to the contacted file, given that we have a valid stnID
@@ -424,10 +486,11 @@ def process_single_dat(partner_json, station_metadata, dat_file):
 
     except Exception as e:
         logger.log_fatal_error("Unknown error caught when processing dat file " + dat_file + " Exception: "
-                               + str(e))
+                               + str(e).replace("\n", ""))
         return None
 
 
+# simple bootstrap which can be used by pool workers
 def pool_calculation(func, args):
     return func(*args)
 
@@ -442,46 +505,67 @@ def process_all_dats():
     num_processes = 4
     with multiprocessing.Pool(num_processes) as pool:
         logger.log_info("Starting .dat file transfer to partner")
-        partner_json_file = open("./partner_data.json")
-        partner_json = json.load(partner_json_file)
+        partner_json = {}
+        try:
+            partner_json_file = open("./partner_data.json")
+            partner_json = json.load(partner_json_file)
+        except json.decoder.JSONDecodeError as e:
+            logger.log_fatal_error("Error decoding the JSON file, partner_data.json. Please verify that "
+                                   "partner_data.json has the correct formatting. Error: " + e.msg)
+            exit(1)
+
         dat_files = glob.glob(dat_dir + "*.dat")
         station_metadata = pd.read_csv("station_metadata.csv")
 
-        # iterate through .dat files
-        # for dat_file in dat_files:
+        # create a task for each dat file. This is prepping for the multithreading
+        # which will send workers to then process each individual dat file
         tasks = [(process_single_dat, (partner_json, station_metadata, dat_file)) for dat_file in dat_files]
         results = [pool.apply_async(pool_calculation, task) for task in tasks]
 
+        # iterate through the result of the workers and merge data
+        # order does not matter, thus we can use apply_async safely
         for result in results:
-            result = result.get(timeout=10)
-            if result is not None:
-                df_stn = result[0]
-                time_version = result[1]
-                if time_version == "15":
-                    list_concat_15.append(df_stn)
-                elif time_version == "60":
-                    list_concat_60.append(df_stn)
-                elif time_version == "24":
-                    list_concat_24.append(df_stn)
+            try:
+                result = result.get(timeout=60)
+                if result is not None:
+                    df_stn = result[0]
+                    time_version = result[1]
+                    if time_version == "15":
+                        list_concat_15.append(df_stn)
+                    elif time_version == "60":
+                        list_concat_60.append(df_stn)
+                    elif time_version == "24":
+                        list_concat_24.append(df_stn)
+            except multiprocessing.TimeoutError as e:
+                logger.log_non_fatal_error("Timed out when waiting for multi-threading to wait for a response "
+                                           "TimeoutError: " + str(e))
+            except Exception as e:
+                logger.log_non_fatal_error("Unknown multithreading error occurred attempting to continue " + str(e))
 
+    # create single concatenated df based off of the individual dat dfs
     df_concat_15 = pd.concat(list_concat_15)
     df_concat_60 = pd.concat(list_concat_60)
     df_concat_24 = pd.concat(list_concat_24)
 
-    # merge in canadian metadata
+    # merge in station metadata
     df_concat_15 = post_processing_concat_file(df_concat_15, station_metadata)
     df_concat_60 = post_processing_concat_file(df_concat_60, station_metadata)
     df_concat_24 = post_processing_concat_file(df_concat_24, station_metadata)
 
     # check if partners need the concatenated file, move over data if necessary
     copy_concat_stn_data(df_concat_15, df_concat_60, df_concat_24, partner_json)
-    logger.log_info("Finished .dat file transfer to partner")
+    logger.log_info("Finished .dat file transfer to partner\n")
 
 
 def main():
     start_time = time.time()
     tracemalloc.start()
-    process_all_dats()
+    try:
+        process_all_dats()
+    except Exception as e:
+        logger.log_fatal_error("Found uncaught error with unknown consequences. Prematurely exiting program. " + str(e))
+        exit(1)
+
     print("Successfully completed running program in", time.time() - start_time, "seconds, memory usage:",
           tracemalloc.get_traced_memory()[1] / (sys.getsizeof([]) * 1000000.0), "MB")
     tracemalloc.stop()

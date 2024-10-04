@@ -1,3 +1,4 @@
 ::batch file to run the python program which processes the bat files
-
-start C:\DatFileProcessing\split_replacement\process_dat.py
+@echo off
+cd /d D:\PycharmProjects\prod_server\split_replacement
+python3 process_dat.py

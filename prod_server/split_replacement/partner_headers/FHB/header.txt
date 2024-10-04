@@ -1,1 +1,1 @@
-"TMSTAMPtestest","StationName","StnID","Avg_AirT","AvgRH","Pluvio_Rain"
+"TMSTAMP","StationName","StnID","Avg_AirT","AvgRH","Pluvio_Rain"

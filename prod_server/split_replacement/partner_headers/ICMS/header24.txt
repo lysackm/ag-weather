@@ -1,2 +1,2 @@
-Date       StnID   AvgAir_T MaxAir_T MinAir_T AvgRH  MaxRH   MinRH   Rain   AvgWS    MaxWS   AvgWD  SolRad  AvgSoil_T AvgSoil_T  ET
-                        (°C)     (°C)    (°C)    (%)    (%)     (%)     (mm)   (km/h)   (km/h)   (°)   (MJ/m2) (°C 5cm)  (°C 20cm) (mm)
+Date         StnID AvgAir_T MaxAir_T MinAir_T AvgRH  MaxRH   MinRH   Rain   AvgWS    MaxWS   AvgWD  SolRad  AvgSoil_T AvgSoil_T  ET
+                     (°C)     (°C)    (°C)    (%)    (%)     (%)     (mm)   (km/h)   (km/h)   (°)   (MJ/m2) (°C 5cm)  (°C 20cm) (mm)
