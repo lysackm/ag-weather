@@ -20,7 +20,7 @@ dat_dir = "D:\\data\\remote_server_mock\\.dats\\"
 dest_dir = "D:\\data\\remote_server_mock\\.saved_data\\"
 # prod file directories
 # dat_dir = "C:/Campbellsci/Dats/"
-# dest_dir = "C:/WWW/mbagweather.ca/www/Partners/StagingTest/"
+# dest_dir = "C:/WWW/mbagweather.ca/www/Partners/"
 
 logger = Logger()
 
@@ -278,7 +278,13 @@ def read_partner_data(metadata, dest_file):
     if "skip_rows" in metadata:
         skip_rows = metadata["skip_rows"]
 
-    df = pd.read_csv(dest_file, sep=sep, skiprows=skip_rows, header=None, names=columns, na_values=["", "nan"])
+    df = pd.read_csv(dest_file,
+                     sep=sep,
+                     skiprows=skip_rows,
+                     header=None,
+                     names=columns,
+                     na_values=["", "nan"],
+                     encoding='unicode_escape')
 
     partner_metadata = metadata
     if "column_format" in partner_metadata:

@@ -935,9 +935,9 @@
         "skip_rows": [0, 1],
         "header": "header24.txt",
         "column_format": {
-          "AvgAir_T": "{:^.1f}",
-          "MaxAir_T": "{:^.1f}",
-          "MinAir_T": "{:^.1f}",
+          "AvgAir_T": "{:^ 2.1f}",
+          "MaxAir_T": "{:^ 2.1f}",
+          "MinAir_T": "{:^ 2.1f}",
           "AvgRH": "{:^.0f}",
           "MaxRH": "{:^.0f}",
           "MinRH": "{:^.0f}",
@@ -1004,7 +1004,7 @@
         "skip_rows": [0, 1],
         "header": "header60.txt",
         "column_format": {
-          "Air_T": "{:^.1f}",
+          "Air_T": "{:^ 2.1f}",
           "RH": "{:^.0f}",
           "Pluvio_Rain": "{:^.1f}",
           "AvgWS": "{:^.1f}",
@@ -1086,9 +1086,9 @@
         "skip_rows": [0, 1],
         "header": "header24.txt",
         "column_format": {
-          "AvgAir_T": "{:^.1f}",
-          "MaxAir_T": "{:^.1f}",
-          "MinAir_T": "{:^.1f}",
+          "AvgAir_T": "{:^ 2.1f}",
+          "MaxAir_T": "{:^ 2.1f}",
+          "MinAir_T": "{:^ 2.1f}",
           "AvgRH": "{:^.0f}",
           "MaxRH": "{:^.0f}",
           "MinRH": "{:^.0f}",
@@ -1153,7 +1153,7 @@
         "skip_rows": [0, 1],
         "header": "header60.txt",
         "column_format": {
-          "Air_T": "{:^.1f}",
+          "Air_T": "{:^ 2.1f}",
           "RH": "{:^.0f}",
           "Pluvio_Rain": "{:^.1f}",
           "AvgWS": "{:^.1f}",
