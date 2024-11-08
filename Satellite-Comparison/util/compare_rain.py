@@ -38,14 +38,14 @@ def main():
 
 
 def rain_stats():
-    df = pd.read_csv("../make_combined_csv/output/Pluvio_Rain_output.csv")
+    df = pd.read_csv("../make_combined_csv/output/temp-backup/Pluvio_Rain_output.csv")
     print("Station rain below 0.1: ", df[df["stn_Pluvio_Rain"] < 0.1]["stn_Pluvio_Rain"].size / df["stn_Pluvio_Rain"].size)
     print("era5-Land rain below 0.1: ", df[df["era5_Pluvio_Rain"] < 0.1]["stn_Pluvio_Rain"].size / df["stn_Pluvio_Rain"].size)
     print("Merra rain below 0.1: ", df[df["merra_Pluvio_Rain"] < 0.1]["stn_Pluvio_Rain"].size / df["stn_Pluvio_Rain"].size)
 
 
 def rain_filtered():
-    df = pd.read_csv("../make_combined_csv/output/Pluvio_Rain_output.csv")
+    df = pd.read_csv("../make_combined_csv/output/temp-backup/Pluvio_Rain_output.csv")
     df = df[df["stn_Pluvio_Rain"] < 0.1]
 
     print(df[""])

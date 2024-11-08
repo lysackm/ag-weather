@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 from enum import Enum
+import matplotlib.pyplot as plt
 
 
 # enum which represents the types of data which statistics can
@@ -38,7 +39,6 @@ def generic_performance(df, col):
 def generic_performance_mbe(df, col):
     mbe = df[col].mean()
     return mbe
-
 
 
 # seasonal_breakdown
@@ -100,7 +100,7 @@ def monthly_mbe_breakdown(df, col):
 # Manitoba.
 #
 def spacial_correlation(df, col, show_graph=False, output_file="", title=""):
-    stn_metadata = pd.read_csv("../../Cleaning-Data/cleaning-data/util/station-metadata.csv")
+    stn_metadata = pd.read_csv("../../Cleaning-Data/cleaning-data/util/station-metadata-old.csv")
     stn_metadata["StationName"] = stn_metadata["StationName"].apply(
         lambda x: x.lower().strip().replace('.', '').replace(' ', ''))
 
@@ -168,11 +168,12 @@ def format_seasonal_stats(monthly_stats):
 # formatting the data for table one
 # RMSE, MBE, PCC (pierson correlation constant) generic means
 # over all hours, one value per
-def format_table_one(merra_rmse, era5_rmse, merra_mbe, era5_mbe, merra_pcc, era5_pcc):
+def format_table_one(merra_rmse, era5_rmse, merra_mbe, era5_mbe, merra_pcc, era5_pcc, merra_ex, era5_ex):
     for i in merra_rmse.keys():
         attr_name = attr_names[i]
-        row = attr_name + " & " + str(merra_rmse[i]) + " & " + str(merra_mbe[i]) + " & " + str(merra_pcc[i]) + " & " +\
-              str(era5_rmse[i]) + " & " + str(era5_mbe[i]) + " & " + str(era5_pcc[i]) + "\\\\"
+        row = attr_name + " & " + str(merra_rmse[i]) + " & " + str(merra_mbe[i]) + " & " + str(merra_pcc[i]) + " & " + \
+              str(merra_ex[i]) + " & " + str(era5_rmse[i]) + " & " + str(era5_mbe[i]) + " & " + str(era5_pcc[i]) \
+              + " & " + str(era5_ex[i]) + "\\\\"
         print(row)
 
 
@@ -184,11 +185,13 @@ def format_table_two(merra_mean_rmse, era5_mean_rmse, merra_mean_mbe, era5_mean_
     for i in merra_mean_rmse.keys():
         attr_name = attr_names[i]
 
-        row = attr_name + " & " + str(merra_mean_rmse[i]) + " & " + str(merra_mean_mbe[i]) + " & " + str(merra_lin_rmse[i]) + " & " +\
+        row = attr_name + " & " + str(merra_mean_rmse[i]) + " & " + str(merra_mean_mbe[i]) + " & " + str(
+            merra_lin_rmse[i]) + " & " + \
               str(merra_lin_mbe[i]) + " & " + str(merra_for_rmse[i]) + " & " + str(merra_for_mbe[i])
 
-        row += "\n" + attr_name + " & " + str(era5_mean_rmse[i]) + " & " + str(era5_mean_mbe[i]) + " & " + str(era5_lin_rmse[i]) + " & " +\
-              str(era5_lin_mbe[i]) + " & " + str(era5_for_rmse[i]) + " & " + str(era5_for_mbe[i])
+        row += "\n" + attr_name + " & " + str(era5_mean_rmse[i]) + " & " + str(era5_mean_mbe[i]) + " & " + str(
+            era5_lin_rmse[i]) + " & " + \
+               str(era5_lin_mbe[i]) + " & " + str(era5_for_rmse[i]) + " & " + str(era5_for_mbe[i])
         print(row)
 
 
@@ -211,7 +214,7 @@ def print_table_three():
     format_table_three(uncorrected["monthly_merra_rmse"],
                        mean["monthly_merra_rmse"],
                        lin["monthly_merra_rmse"],
-                       rand["monthly_merra_rmse"],)
+                       rand["monthly_merra_rmse"], )
 
 
 def print_table_four():
@@ -223,7 +226,70 @@ def print_table_four():
     format_table_three(uncorrected["monthly_era5_rmse"],
                        mean["monthly_era5_rmse"],
                        lin["monthly_era5_rmse"],
-                       rand["monthly_era5_rmse"],)
+                       rand["monthly_era5_rmse"], )
+
+
+def make_percent_improvements_bar_chart():
+    attrs = ["Air Temperature (°C)", "Wind Speed (m/s)", "Precipitation (mm)", "Pressure (hPa)",
+             "Relative Humidity (%)"]
+
+    # percents = {
+    #     "MERRA2 Mean Bias": [8.81, 11.19, -0.1, 2.65, 22.06],
+    #     "MERRA2 Linear Reg": [10.14, 18.49, 4.71, 2.96, 36.68],
+    #     "MERRA2 RF": [112.99, 72.87, 15.53, 432.11, 168.18],
+    #     "ERA-5 Land Mean Bias": [10.61, 5.75, 0.12, 0.76, 10.68],
+    #     "ERA-5 Land Linear Reg": [12.06, 7.28, 5.73, 0.87, 14.31],
+    #     "ERA-5 Land RF": [83.62, 60.21, 10, 152.53, 83.79]
+    # }
+    percents = {
+        "MERRA-2 Mean Bias Correction": [9, 11, 0, 3, 22],
+        "MERRA-2 Linear Regression Correction": [10, 18, 5, 3, 37],
+        "MERRA-2 Random Forest Correction": [113, 73, 16, 432, 168],
+        "ERA5-Land Mean Bias Correction": [11, 6, 0, 1, 11],
+        "ERA5-Land Linear Regression Correction": [12, 7, 6, 1, 14],
+        "ERA5-Land Random Forest Correction": [84, 60, 10, 153, 84]
+    }
+
+    colors = {
+        "MERRA-2 Mean Bias Correction": "bisque",
+        "MERRA-2 Linear Regression Correction": "orange",
+        "MERRA-2 Random Forest Correction": "maroon",
+        "ERA5-Land Mean Bias Correction": "deepskyblue",
+        "ERA5-Land Linear Regression Correction": "blue",
+        "ERA5-Land Random Forest Correction": "darkblue"
+    }
+
+    # air_temp = [8.81, 10.14, 112.99, 10.61, 12.06, 83.62]
+    # ws = [11.19, 18.49, 72.87, 5.75,  7.28, 60.21]
+    # precip = [-0.1, 4.71, 15.53, 0.12,  5.73, 10]
+    # pressure = [2.65, 2.96, 432.11, 0.76,   0.87, 152.53]
+    # rh = [22.06, 36.68, 168.18, 10.68, 14.31, 83.79]
+
+    x = np.arange(len(attrs))  # the label locations
+    width = 0.15  # the width of the bars
+    multiplier = 0
+
+    plt.style.use("ggplot")
+    plt.rcParams['axes.facecolor'] = 'w'
+    plt.rcParams['axes.edgecolor'] = 'dimgrey'
+    plt.rcParams['grid.color'] = 'lightgrey'
+    fig, ax = plt.subplots(layout='constrained')
+
+    for attribute, measurement in percents.items():
+        offset = width * multiplier
+        rects = ax.bar(x + offset, measurement, width, label=attribute, color=colors[attribute])
+        ax.bar_label(rects, padding=3)
+        multiplier += 1
+
+    # Add some text for labels, title and custom x-axis tick labels, etc.
+    ax.set_ylabel('Percent Improvement', color="black")
+    ax.set_xticks(x + 2.5 * width, attrs, color="black")
+    ax.legend(loc='upper left', ncols=2, prop={"size": 13})
+
+    ax.set_ylim(0, 500)
+    # plt.yscale("log")
+
+    plt.show()
 
 
 def format_table_three(uncorrected, mean, lin, randFor):
@@ -232,34 +298,37 @@ def format_table_three(uncorrected, mean, lin, randFor):
     files = glob.glob("output/*.csv")
 
     for file in files:
-        if file in ["output\AvgAir_T_output.csv", "output\AvgWS_output.csv", "output\Pluvio_Rain_output.csv"]:
+        if file in ["output\\AvgAir_T_output.csv", "output\\AvgWS_output.csv", "output\\Pluvio_Rain_output.csv",
+                    "output\\Press_hPa_output.csv", "output\\RH_output.csv"]:
             uncorrected_months = uncorrected[file]
             mean_months = mean[file]
             lin_months = lin[file]
             randFor_months = randFor[file]
 
             for i in range(12):
-                output[i] += " & " + str(uncorrected_months[i]) + " & " + str(mean_months[i]) + " & " + str(lin_months[i]) + " & " + str(randFor_months[i])
+                output[i] += " & " + str(uncorrected_months[i]) + " & " + str(mean_months[i]) + " & " + str(
+                    lin_months[i]) + " & " + str(randFor_months[i]) + "\n"
 
     for month in output:
         print(month + "\\\\")
 
     print("\n")
-    output = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
-              "November", "December"]
 
-    for file in files:
-        if file in ["output\Press_hPa_output.csv", "output\RH_output.csv"]:
-            uncorrected_months = uncorrected[file]
-            mean_months = mean[file]
-            lin_months = lin[file]
-            randFor_months = randFor[file]
-
-            for i in range(12):
-                output[i] += " & " + str(uncorrected_months[i]) + " & " + str(mean_months[i]) + " & " + str(lin_months[i]) + " & " + str(randFor_months[i])
-
-    for month in output:
-        print(month + "\\\\")
+    # output = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
+    #           "November", "December"]
+    # for file in files:
+    #     if file in ["output\\Press_hPa_output.csv", "output\\RH_output.csv"]:
+    #         uncorrected_months = uncorrected[file]
+    #         mean_months = mean[file]
+    #         lin_months = lin[file]
+    #         randFor_months = randFor[file]
+    #
+    #         for i in range(12):
+    #             output[i] += " & " + str(uncorrected_months[i]) + " & " + str(mean_months[i]) + " & " + str(
+    #                 lin_months[i]) + " & " + str(randFor_months[i])
+    #
+    # for month in output:
+    #     print(month + "\\\\")
 
 
 # change a filename to get the attribute or column name from it
@@ -275,6 +344,22 @@ def correlation_coefficient(df, col1, col2):
     print(correlation)
     print("\n\n")
     return correlation[col1][col2]
+
+
+def extreme_rmse(df, attribute, col1, col2):
+    if attribute in ["AvgWS", "Pluvio_Rain"]:
+        if attribute == "Pluvio_Rain":
+            print("Extreme rmse\n\n\n", df[col1].quantile(q=0.95))
+        df = df[df[col1] > df[col1].quantile(q=0.95)]
+        return np.sqrt(df[col2].mean())
+    elif attribute in ["AvgAir_T", "Press_hPa"]:
+        df_1 = df[df[col1] > df[col1].quantile(q=0.975)]
+        df_2 = df[df[col1] < df[col1].quantile(q=0.025)]
+        df = pd.concat([df_1, df_2])
+        return np.sqrt(df[col2].mean())
+    elif attribute in ["RH"]:
+        df = df[df[col1] < df[col1].quantile(q=0.05)]
+        return np.sqrt(df[col2].mean())
 
 
 # apply_corrections
@@ -313,6 +398,8 @@ def apply_corrections(df, attr, stn_col, merra_col, era5_col, data_type):
             era5_err_df = pd.DataFrame.from_dict(era5_dict, orient="index", columns=["era5_corr"])
             era5_err_df = era5_err_df.set_index(pd.to_numeric(era5_err_df.index))
 
+            df = df.drop(columns=["key_0"])
+
             df = df.merge(era5_err_df, how="left", left_on=df["time"].dt.month, right_index=True)
 
             df["era5_err"] = df[stn_col] - (df[era5_col] - df["era5_corr"])
@@ -336,6 +423,8 @@ def apply_corrections(df, attr, stn_col, merra_col, era5_col, data_type):
             era5_dict = linear_reg["era5"][attr]
             era5_err_df = pd.DataFrame.from_dict(era5_dict, orient="index", columns=["era5_slope", "era5_intercept"])
             era5_err_df = era5_err_df.set_index(pd.to_numeric(era5_err_df.index))
+
+            df = df.drop(columns=["key_0"])
 
             df = df.merge(era5_err_df, how="left", left_on=df["time"].dt.month, right_index=True)
 
@@ -362,6 +451,9 @@ def print_stats(data_type):
 
     merra_pcc = {}
     era5_pcc = {}
+
+    merra_ex = {}
+    era5_ex = {}
 
     for file in files:
         df = pd.read_csv(file)
@@ -428,8 +520,13 @@ def print_stats(data_type):
         if era5_col in df.columns:
             era5_pcc[file] = correlation_coefficient(df, stn_col, era5_col)
 
+        if merra_col in df.columns:
+            merra_ex[file] = extreme_rmse(df, attr, stn_col, "merra_sqr_err")
+        if era5_col in df.columns:
+            era5_ex[file] = extreme_rmse(df, attr, stn_col, "era5_sqr_err")
+
     format_table_one(generic_merra_all, generic_era5_all, generic_mbe_merra_all, generic_mbe_era5_all, merra_pcc,
-                     era5_pcc)
+                     era5_pcc, merra_ex, era5_ex)
 
     # print(generic_merra_all, generic_era5_all)
     # print(monthly_merra_all, monthly_era5_all)
@@ -453,5 +550,8 @@ def print_stats(data_type):
 data_type_run = DataType.raw
 # print_stats(data_type_run)
 
-print_table_four()
+# print_table_three()
+# print("\ntable 4\n")
+# print_table_four()
 
+make_percent_improvements_bar_chart()

@@ -4,8 +4,9 @@ from datetime import datetime
 
 import pandas as pd
 from dateutil import relativedelta
-from matplotlib import pyplot as plt, cycler
+from matplotlib import pyplot as plt
 import numpy as np
+from matplotlib.rcsetup import cycler
 from scipy.stats import pearsonr
 from sklearn import linear_model
 
@@ -242,7 +243,7 @@ def get_map_data():
 
 # generate graphable data and statistics
 def get_rain_data():
-    file = "output/Pluvio_Rain_output.csv"
+    file = "output/temp-backup/Pluvio_Rain_output.csv"
 
     df = pd.read_csv(file)
 
@@ -318,7 +319,7 @@ def get_rain_data():
 
 
 def get_rain_daily_data():
-    file = "output/Pluvio_Rain_output.csv"
+    file = "output/temp-backup/Pluvio_Rain_output.csv"
 
     df = pd.read_csv(file)
     df["time"] = pd.to_datetime(df["time"])
@@ -356,6 +357,6 @@ def get_rain_daily_data():
 # call the function that you want to generate the new data
 # get_rain_data()
 # get_rain_daily_data()
-# get_line_chart_data_daily()
-# get_map_data()
-# get_line_chart_data()
+get_line_chart_data_daily()
+get_map_data()
+get_line_chart_data()

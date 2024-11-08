@@ -73,15 +73,16 @@ def remove_outliers_closest_neighbor(attr_filename, output_file, col_name, thres
         # print("stn_df", stn_df.index)
 
         # outliers set to NaN
-        stn_df.loc[abs(joined_df[col_name + "_x"] - joined_df[col_name + "_y"]) > threshold, col_name] = np.NaN
+        print("len", len(stn_df.loc[abs(joined_df[col_name + "_x"] - joined_df[col_name + "_y"]) > threshold, col_name]))
+        stn_df.loc[abs(joined_df[col_name + "_x"] - joined_df[col_name + "_y"]) > threshold, col_name] = np.nan
 
         # also set other columns to NaN (columns which use the station data which could be an outlier)
         if "merra_err" in stn_df.columns:
             stn_df.loc[abs(joined_df[col_name + "_x"] - joined_df[col_name + "_y"]) > threshold,
-                       ["merra_err", "merra_sqr_err"]] = np.NaN
+                       ["merra_err", "merra_sqr_err"]] = np.nan
         if "era5_err" in stn_df.columns:
             stn_df.loc[abs(joined_df[col_name + "_x"] - joined_df[col_name + "_y"]) > threshold,
-                       ["era5_err", "era5_sqr_err"]] = np.NaN
+                       ["era5_err", "era5_sqr_err"]] = np.nan
 
         # print(stn_df[abs(joined_df[col_name + "_x"] - joined_df[col_name + "_y"]) > threshold]["merra_err"])
 
@@ -113,10 +114,10 @@ def clean_all_csvs_closest_neighbors():
     #   air temp: +/- 10 degrees
     #   humidity: +/- 20 %
     #   wind speed: +/- 10m/s
-    #   air pressure: +/- 15hPa
+    #   air pressure: +/- 10hPa
     air_thresh = 5.0
     ws_thresh = 10.0
-    press_thresh = 15.0
+    press_thresh = 10.0
     hum_thresh = 20.0
     solar_thresh = 1.0
     soil_thresh = 7.0
@@ -137,7 +138,8 @@ def clean_all_csvs_closest_neighbors():
             threshold = attr_offsets[attr_name]
             # all the work done in this function call. Can comment out for testing purposes
             remove_outliers_closest_neighbor(file, output_file, col_name, threshold)
-            # print(file, output_file, col_name, threshold)
+            print(file, output_file, col_name, threshold)
 
 
-clean_all_csvs_closest_neighbors()
+if __name__ == "__main__":
+    clean_all_csvs_closest_neighbors()

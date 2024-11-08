@@ -15,34 +15,38 @@ pd.options.mode.chained_assignment = None  # default='warn'
 years = [2018, 2019, 2020, 2021, 2022]
 
 # column names for manitoba weather station data
-stn_attrs = ['AvgAir_T', 'AvgWS', 'Soil_TP5_TempC', ['Soil_TP5_TempC', 'Soil_TP20_TempC'], 'Soil_TP20_TempC',
-             'Soil_TP50_TempC', ['Soil_TP50_TempC', 'Soil_TP100_TempC'],
-             ['Soil_TP20_TempC', 'Soil_TP50_TempC', 'Soil_TP100_TempC'], 'SolarRad', ['TBRG_Rain', 'Pluvio_Rain'],
-             "Press_hPa", 'Soil_TP5_VMC', 'Soil_TP20_VMC', ['Soil_TP20_VMC', 'Soil_TP50_VMC', 'Soil_TP100_VMC'],
-             'Soil_TP100_VMC', 'RH']
+# stn_attrs = ['AvgAir_T', 'AvgWS', 'Soil_TP5_TempC', ['Soil_TP5_TempC', 'Soil_TP20_TempC'], 'Soil_TP20_TempC',
+#              'Soil_TP50_TempC', ['Soil_TP50_TempC', 'Soil_TP100_TempC'],
+#              ['Soil_TP20_TempC', 'Soil_TP50_TempC', 'Soil_TP100_TempC'], 'SolarRad', ['TBRG_Rain', 'Pluvio_Rain'],
+#              "Press_hPa", 'Soil_TP5_VMC', 'Soil_TP20_VMC', ['Soil_TP20_VMC', 'Soil_TP50_VMC', 'Soil_TP100_VMC'],
+#              'Soil_TP100_VMC', 'RH']
 
 # attribute names for era5
-era5_attrs = ['t2m', ['v10m', 'u10m'], 'stl1', None, 'stl2',
-              None, None,
-              'stl3', 'ssrd', 'tp',
-              ['sp', 't2m'], 'swvl1', 'swvl2', 'swvl3',
-              None, ['t2m', 'd2m'], 'd2m']
+# era5_attrs = ['t2m', ['v10m', 'u10m'], 'stl1', None, 'stl2',
+#               None, None,
+#               'stl3', 'ssrd', 'tp',
+#               "sp", 'swvl1', 'swvl2', 'swvl3',
+#               None, ['t2m', 'd2m'], 'd2m']
 # attribute names for merra2
-merra_attrs = ["T2M", ["V10M", "U10M"], None, "TSOIL1", "TSOIL2",
-               "TSOIL3", "TSOIL4",
-               None, "SWGDN", "PRECTOTLAND",
-               ["PS", "T2M"], "SFMC", None, None,
-               "RZMC", ["T2M", "T2MDEW"], "T2MDEW"]
+# merra_attrs = ["T2M", ["V10M", "U10M"], None, "TSOIL1", "TSOIL2",
+#                "TSOIL3", "TSOIL4",
+#                None, "SWGDN", "PRECTOTLAND",
+#                "PS", "SFMC", None, None,
+#                "RZMC", ["T2M", "T2MDEW"], "T2MDEW"]
 
 # For testing purposes
-# stn_attrs = ['SolarRad']
-# era5_attrs = ["ssrd"]
-# merra_attrs = ["SWGDN"]
+stn_attrs = ['AvgAir_T', 'AvgWS', ['TBRG_Rain', 'Pluvio_Rain'], "Press_hPa", 'RH']
+era5_attrs = ['t2m', ['v10m', 'u10m'], 'tp', "sp", ['t2m', 'd2m']]
+merra_attrs = ["T2M", ["V10M", "U10M"], "PRECTOTLAND", "PS", ["T2M", "T2MDEW"]]
+# stn_attrs = ["Press_hPa"]
+# era5_attrs = ["sp"]
+# merra_attrs = ["PS"]
 
 # attribute names for merra broken down by database
 # _2 folders were there since they were added outside the
 # original data scope and had to be downloaded later
-M2T1NXSLV = ["T2M", ["V10M", "U10M"], "QV2M", ["PS", "T2M"], "T2MDEW", ["T2M", "T2MDEW"]]
+# M2T1NXSLV = ["T2M", ["V10M", "U10M"], "QV2M", ["PS", "T2M"], "T2MDEW", ["T2M", "T2MDEW"]]
+M2T1NXSLV = ["T2M", ["V10M", "U10M"], "QV2M", "PS", "T2MDEW", ["T2M", "T2MDEW"]]
 M2T1NXLND = ["TSOIL1", "TSOIL2", "TSOIL3", "TSOIL4", "PRECTOTLAND"]
 M2T1NXLND_2 = ["SFMC", "RZMC", "PRMC"]
 M2T1NXRAD = ["SWGDN"]
@@ -213,6 +217,14 @@ conversions = {
 }
 
 
+def calculate_stn_surface_pressure(stn_data, stn_metadata):
+    # print("elevation", stn_metadata["elevation"], sep="\n")
+    stn_data = stn_data.merge(stn_metadata[["Station", "elevation"]], how="left", on="Station")
+    stn_data["Press_hPa"] = stn_data["Press_hPa"] - (1013.25 * (1 - (1 - (stn_data["elevation"]/44307.69231))**5.25328))
+    stn_data.drop(columns=["elevation"], inplace=True)
+    return stn_data
+
+
 def calculate_era5_surface_pressure(sp, t2m, stn_data):
     stn_data["time"] = stn_data["time"].dt.tz_localize(tz=None)
 
@@ -228,6 +240,7 @@ def calculate_era5_surface_pressure(sp, t2m, stn_data):
     denominator = attrs_df["t2m"] + 0.0065 * attrs_df["elevation"]
 
     # equation source https://keisan.casio.com/exec/system/1224575267
+    # website was taken down on sept 30th 2023
     sp["sp"] = sp["sp"] / 100 * (1 - numerator.div(denominator)) ** -5.257
 
     return sp
@@ -309,7 +322,8 @@ def load_era5_data(era5_attr, year):
         if era5_attr is None:
             return None
         if era5_attr[0] == "sp":
-            return load_era5_pressure_data(era5_attr, year)
+            # return load_era5_pressure_data(era5_attr, year)
+            return None
         if era5_attr[0] == "v10m":
             return load_era5_wind_data(era5_attr, year)
         if era5_attr[0] == "t2m":
@@ -447,22 +461,26 @@ def load_merra_data(merra_attr, day, stn_attr, stn_data):
             elif stn_attr == "RH":
                 merra_df = load_merra_rh_data(merra_attr, merra_data, stn_attr)
                 merra_attr = stn_attr
+            # Commented out lines to correct for pressure
             elif stn_attr == "Press_hPa":
-                merra_df = load_merra_pressure_data(merra_attr, merra_data, stn_attr, stn_data)
-                merra_attr = stn_attr
+                # merra_df = load_merra_pressure_data(merra_attr, merra_data, stn_attr, stn_data)
+                # merra_attr = stn_attr
+                merra_data = merra_data[merra_attr]
+                merra_data = shift_merra_timescale(merra_data)
+                merra_df = merra_data.to_dataframe()
 
         else:  # missing data
             # raise error that there is missing data when important
             raise AttributeError
+
+        merra_df[merra_attr] = merra_df[merra_attr].apply(conversions.get(merra_attr, lambda x: x))
+        merra_df = merra_df.rename(columns={"lat": "merra_lat", "lon": "merra_lon", merra_attr: "merra_" + stn_attr})
+        return merra_df
     except FileNotFoundError as file_not_found:
         if merra_attr is None:
             return None
         print("load_merra_data", file_not_found)
         exit(1)
-
-    merra_df[merra_attr] = merra_df[merra_attr].apply(conversions.get(merra_attr, lambda x: x))
-    merra_df = merra_df.rename(columns={"lat": "merra_lat", "lon": "merra_lon", merra_attr: "merra_" + stn_attr})
-    return merra_df
 
 
 # Given a years worth of station data in stn_df return a singular days worth of data on
@@ -475,7 +493,6 @@ def filter_stn_by_day(stn_df, day, stn_attr):
 
     try:
         stn_data = stn_df[["StnID", "time", "Station", stn_attr]]
-        stn_data["time"] = stn_data["time"] + pd.Timedelta(hours=-1)
         stn_data = stn_data[(stn_data["time"] >= early_bound) & (stn_data["time"] < late_bound)]
 
         local = pytz.timezone('America/Winnipeg')
@@ -524,14 +541,15 @@ def filter_era5_by_day(day, era5_da, era5_attr, stn_attr, stn_data):
 
             era5_df = calculate_relative_humidity(t2m_data, d2m_data)
             era5_attr = "rh"
-        elif stn_attr == "Press_hPa":
-            sp_data = era5_da[0].sel(longitude=long, latitude=lat, time=era5_times, method="nearest")
-            t2m_data = era5_da[1].sel(longitude=long, latitude=lat, time=era5_times, method="nearest")
-
-            sp_data = sp_data.to_dataframe()
-            t2m_data = t2m_data.to_dataframe()
-            era5_df = calculate_era5_surface_pressure(sp_data, t2m_data, stn_data)
-            era5_attr = "sp"
+        # Commented out to correct for pressure
+        # elif stn_attr == "Press_hPa":
+        #     sp_data = era5_da[0].sel(longitude=long, latitude=lat, time=era5_times, method="nearest")
+        #     t2m_data = era5_da[1].sel(longitude=long, latitude=lat, time=era5_times, method="nearest")
+        #
+        #     sp_data = sp_data.to_dataframe()
+        #     t2m_data = t2m_data.to_dataframe()
+        #     era5_df = calculate_era5_surface_pressure(sp_data, t2m_data, stn_data)
+        #     era5_attr = "sp"
 
         elif era5_attr is None:
             return None
@@ -642,7 +660,8 @@ def adjust_precipitation():
 
 # An array which holds metadata that is not recorded in the hourly table.
 # Includes name, id (station number), longitude, and latitude
-stn_metadata = pd.read_csv("../../Cleaning-Data/cleaning-data/util/station-metadata.csv")
+stn_metadata = pd.read_csv("../../Cleaning-Data/cleaning-data/util/station-metadata-old.csv")
+# stn_metadata = pd.read_csv("../util/test.csv")
 stn_metadata = stn_metadata_preprocessing(stn_metadata)
 
 # lat and long are pairs of the stations latitude and longitude
@@ -674,7 +693,9 @@ def main():
             # da = data array, df = dataframe
             era5_da = load_era5_data(era5_attr, year)
             stn_df = load_stn_data(year)
+            stn_df = calculate_stn_surface_pressure(stn_df, stn_metadata)
 
+            # TODO should maybe compare and contrast to see if the TBRG is different in accuracy than the Pluvio
             if stn_attr == ['TBRG_Rain', 'Pluvio_Rain']:
                 stn_attr = get_rain_column(stn_df, year)
                 col_name = stn_attr
@@ -715,5 +736,6 @@ def main():
     if ['TBRG_Rain', 'Pluvio_Rain'] in stn_attrs:
         adjust_precipitation()
 
-# bootstrap
-# main()
+
+if __name__ == "__main__":
+    main()

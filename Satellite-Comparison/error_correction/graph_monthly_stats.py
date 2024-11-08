@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import json
 
-from matplotlib import cycler
+from matplotlib.rcsetup import cycler
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 
@@ -10,10 +10,9 @@ def graph_year_both_models(stats):
     plt.rcParams['axes.facecolor'] = 'w'
     plt.rcParams['axes.edgecolor'] = 'dimgrey'
     plt.rcParams['grid.color'] = 'lightgrey'
-    plt.rc("axes",
-           prop_cycle=(cycler('linestyle', ['-', '--', ':', '-.'])))
+    plt.rc("axes", prop_cycle=(cycler('linestyle', ['-', '--', ':', '-.'])))
 
-    file_names = ["RMSE_AvgAir_T", "RMSE_AvgWS", "RMSE_Pluvio_Rain", "RMSE_Press_hPa", "RMSE_RH", "RMSE_SolarRad"]
+    file_names = ["RMSE_AvgAir_T", "RMSE_AvgWS", "RMSE_Pluvio_Rain", "RMSE_Press_hPa", "RMSE_RH"]
 
     label_dict = {
         'merra raw': 'MERRA-2 Pre-Cor',
@@ -26,7 +25,10 @@ def graph_year_both_models(stats):
         'era5 random_forest': 'ERA5-Land RF-Cor'
     }
 
+    i = 0
+
     for attr, file_name in zip(stats, file_names):
+        i += 1
         for model in stats[attr]:
             for data_type in stats[attr][model]:
                 y_data = stats[attr][model][data_type]
@@ -35,18 +37,19 @@ def graph_year_both_models(stats):
                 colour = "orange" if model == "merra" else "blue"
 
                 label = label_dict[model + " " + data_type]
-                plt.plot(x_data, y_data, label=label, c=colour)
+                ax = plt.subplot(2, 3, i)
+                ax.plot(x_data, y_data, label=label, c=colour)
 
         months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-        plt.xticks(range(12), months)
+        ax.set(xticks=range(12), xticklabels=months)
 
-        plt.title(attr.replace("Average ", ""))
+        ax.set_title(attr.replace("Average ", ""))
 
-        plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
-
-        plt.savefig("stats/" + file_name + '.png', bbox_inches='tight')
-        # plt.savefig("stats/" + file_name + '.png')
-        plt.clf()
+    plt.legend(bbox_to_anchor=(2.1, 0.95), prop={"size": 15})
+    plt.savefig("stats/RMSE" + '.png', bbox_inches='tight')
+    plt.show()
+    # plt.savefig("stats/" + file_name + '.png')
+    plt.clf()
 
 
 # graph each model separately. That is that each graph is one model
@@ -81,15 +84,15 @@ def graph_year(stats):
 
 
 def main():
-    file2 = open("stats/stats2.json")
-    stats2 = json.load(file2)
+    file3 = open("stats/stats3.json")
+    stats3 = json.load(file3)
 
     # graph_year(stats2)
 
     file1 = open("stats/stats1.json")
     stats1 = json.load(file1)
 
-    graph_year_both_models(stats1)
+    graph_year_both_models(stats3)
 
 
 main()

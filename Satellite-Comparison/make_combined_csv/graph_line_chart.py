@@ -4,7 +4,7 @@ import glob
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from numpy import NaN
+from numpy import nan
 
 
 # graph the mean bias for all the attributes. One graph will have both
@@ -12,16 +12,16 @@ from numpy import NaN
 #  the scatter plot represents the average of the mean bias for tha single day
 def graph_mean_comparison():
     root_path = "D:\\data\\graphs\\scatter_plots\\"
-    attrs = ["AvgAir_T", "AvgWS", "Pluvio_Rain", "Press_hPa", "RH", "SolarRad"]
+    attrs = ["AvgAir_T", "AvgWS", "Pluvio_Rain", "Press_hPa", "RH"]
     titles = ['Air Temperature ($^\circ$C)', "Wind Speed (m/s)", "Precipitation (mm)",
-              "Pressure (hPa)", "Relative Humidity (%)", "Solar Radiation (mJ/m$^2$)"]
-    y_titles = ["$^\circ$C", "m/s", "mm", "hPa", "%", "(mJ/m$^2$)"]
+              "Pressure (hPa)", "Relative Humidity (%)"]
+    y_titles = ["$^\circ$C", "m/s", "mm", "hPa", "%"]
 
     plt.style.use("ggplot")
     plt.rcParams['axes.facecolor'] = 'w'
     plt.rcParams['axes.edgecolor'] = 'dimgrey'
     plt.rcParams['grid.color'] = 'lightgrey'
-
+    i = 0
     for attr, title, y_title in zip(attrs, titles, y_titles):
         print(attr)
 
@@ -42,9 +42,11 @@ def graph_mean_comparison():
                 x.append(daily_df.iloc[0].mean(axis=0, skipna=True))
                 # print(no_nan_df.mean(axis=0, skipna=True))
             except (KeyError, IndexError):
-                x.append(np.NaN)
+                x.append(np.nan)
 
-        plt.scatter(x_axis, x, linewidths=0, s=10, c=["orange"], label="MERRA-2")
+        i += 1
+        ax = plt.subplot(2, 3, i)
+        ax.scatter(x_axis, x, linewidths=0, s=10, c=["orange"], label="MERRA-2")
 
         x = []
         file = "daily/err/era5_" + attr + "_output.csv"
@@ -65,17 +67,22 @@ def graph_mean_comparison():
 
             # append mean of all values if values exist
             if no_nan_df.size == 1:
-                x.append(NaN)
+                x.append(nan)
             else:
                 x.append(no_nan_df.mean(axis=0, skipna=True))
 
-        plt.scatter(dates, x, linewidths=0, s=10, c=["blue"], label="ERA5-Land", alpha=0.5)
-        plt.title(title)
-        plt.xlim([datetime(2017, 10, 1), datetime(2023, 4, 1)])
-        plt.ylabel(y_title)
-        plt.legend()
-        plt.savefig(root_path + attr + ".png")
-        plt.clf()
+        ax.scatter(dates, x, linewidths=0, s=10, c=["blue"], label="ERA5-Land", alpha=0.5)
+        ax.set_title(title)
+        ax.set(xlim=[datetime(2017, 10, 1), datetime(2023, 4, 1)], ylabel=y_title)
+        # plt.xlim([datetime(2017, 10, 1), datetime(2023, 4, 1)])
+        # plt.ylabel(y_title)
+        # plt.legend()
+        # plt.savefig(root_path + attr + ".png")
+        # plt.clf()
+
+    leg = plt.legend(prop={"size": 15})
+    leg.set_draggable(True)
+    plt.show()
 
 
 # graph_mean
@@ -121,7 +128,7 @@ def graph_mean(is_sqr=False, is_daily=False):
 
             # append mean of all values if values exist
             if no_nan_df.size == 1:
-                x.append(NaN)
+                x.append(nan)
             else:
                 x.append(no_nan_df.mean(axis=0, skipna=True))
 
@@ -199,7 +206,7 @@ def graph_all_stns(is_sqr=False, is_daily=False):
                     # dates = pd.date_range(start="2018-01-01", periods=len(df[station]), freq="D")
                     dates = df["date"]
                 else:
-                    dates = pd.date_range(start="2018-01-01", periods=60, freq="M")
+                    dates = pd.date_range(start="2018-01-01", periods=60, freq="ME")
 
                 plt.plot(dates, df[station], label=station)
                 # plt.title(station)
@@ -231,10 +238,10 @@ def graph_all_stns(is_sqr=False, is_daily=False):
 # or hourly average (single point). If you want to change the time then some slight
 # modifications of the function will have to be made
 def get_averaged_time():
-    titles = {"AvgAir_T": 'Air Temperature ($^\circ$C)', "AvgWS": "Wind Speed (m/s)", "Pluvio_Rain": "Precipitation (mm)",
+    titles = {"AvgAir_T": 'Air Temperature ($^\\circ$C)', "AvgWS": "Wind Speed (m/s)", "Pluvio_Rain": "Precipitation (mm)",
               "Press_hPa": "Pressure (hPa)", "RH": "Relative Humidity (%)", "SolarRad": "Solar Radiation (mJ/m$^2$)"}
-    y_titles = {"AvgAir_T": '$^\circ$C', "AvgWS": "m/s", "Pluvio_Rain": "mm",
-              "Press_hPa": "hPa", "RH": "%", "SolarRad": "mJ/m$^2$"}
+    y_titles = {"AvgAir_T": '$^\\circ$C', "AvgWS": "m/s", "Pluvio_Rain": "mm",
+                "Press_hPa": "hPa", "RH": "%", "SolarRad": "mJ/m$^2$"}
 
     x_axis = range(24)
     files = glob.glob("output/*.csv")
@@ -245,7 +252,7 @@ def get_averaged_time():
     plt.rcParams['axes.facecolor'] = 'w'
     plt.rcParams['axes.edgecolor'] = 'dimgrey'
     plt.rcParams['grid.color'] = 'lightgrey'
-
+    i = 0
     for file in files:
         attr_df = pd.read_csv(file)
         attr_df["time"] = pd.to_datetime(attr_df["time"])
@@ -283,25 +290,28 @@ def get_averaged_time():
         # plot both err and sqr-err
         filename = root_path + "err\\hourly_" + file.replace("_output.csv", ".png").replace(
             "D:/data/processed-data\\", "").replace("output\\", "")
-        plt.plot(x_axis, orange, c="orange")
-        plt.plot(x_axis, blue, c="blue")
-        plt.title(titles[file.replace("D:/data/processed-data\\", "").replace("_output.csv", "").replace("output\\", "")])
-        plt.xlabel("Hour of Day (CST)")
-        plt.ylabel(y_titles[file.replace("D:/data/processed-data\\", "").replace("_output.csv", "").replace("output\\", "")])
-        plt.legend(["MERRA-2", "ERA5-Land"])
-        plt.savefig(filename)
+        i += 1
+        ax = plt.subplot(2, 3, i)
+        ax.plot(x_axis, orange, c="orange")
+        ax.plot(x_axis, blue, c="blue")
+        ax.set_title(titles[file.replace("D:/data/processed-data\\", "").replace("_output.csv", "").replace("output\\", "")])
+        ax.set(xlabel="Hour of Day (CST)", ylabel=y_titles[file.replace("D:/data/processed-data\\", "").replace("_output.csv", "").replace("output\\", "")])
 
         print("Merra", max(result[data_fetched[0]]) - min(result[data_fetched[0]]))
         print("Era5", max(result[data_fetched[1]]) - min(result[data_fetched[1]]))
+        #
+        # filename = root_path + "sqr-err\\hourly_" + file.replace("_output.csv", ".png").replace(
+        #     "D:/data/processed-data\\", "").replace("output\\", "")
+        # plt.plot(x_axis, np.sqrt(result[data_fetched[0].replace("_err", "_sqr_err")]), c="orange")
+        # plt.plot(x_axis, np.sqrt(result[data_fetched[1].replace("_err", "_sqr_err")]), c="blue")
+        # plt.title(titles[file.replace("D:/data/processed-data\\", "").replace("_output.csv", "").replace("output\\", "")])
+        # plt.legend(["MERRA-2", "ERA5-Land"])
+        # plt.savefig(filename)
+        # plt.clf()
 
-        filename = root_path + "sqr-err\\hourly_" + file.replace("_output.csv", ".png").replace(
-            "D:/data/processed-data\\", "").replace("output\\", "")
-        plt.plot(x_axis, np.sqrt(result[data_fetched[0].replace("_err", "_sqr_err")]), c="orange")
-        plt.plot(x_axis, np.sqrt(result[data_fetched[1].replace("_err", "_sqr_err")]), c="blue")
-        plt.title(titles[file.replace("D:/data/processed-data\\", "").replace("_output.csv", "").replace("output\\", "")])
-        plt.legend(["MERRA-2", "ERA5-Land"])
-        plt.savefig(filename)
-        plt.clf()
+    leg = plt.legend(["MERRA-2", "ERA5-Land"], prop={"size": 15})
+    leg.set_draggable(True)
+    plt.show()
 
 
 def generate_all_graphs():
@@ -317,7 +327,6 @@ def generate_all_graphs():
 
 
 # generate_all_graphs()
-# get_averaged_time()
-# graph_mean_comparison()
 get_averaged_time()
+# graph_mean_comparison()
 

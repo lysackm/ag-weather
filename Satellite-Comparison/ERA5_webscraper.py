@@ -26,30 +26,30 @@ import pandas as pd
 #             'soil_temperature_level_2', 'soil_temperature_level_3', 'surface_solar_radiation_downwards',
 #             'total_precipitation', 'volumetric_soil_water_layer_1', 'volumetric_soil_water_layer_2',
 #             'volumetric_soil_water_layer_3', '10m_v_component_of_wind', '10m_u_component_of_wind']
-# variables = ['10m_v_component_of_wind']  # used to download single attribute
-variables = ['2m_temperature',
-             'surface_solar_radiation_downwards',
-             'total_precipitation',
-             '10m_v_component_of_wind',
-             '10m_u_component_of_wind',
-             'surface_pressure',
-             '2m_dewpoint_temperature']
+variables = ['2m_temperature']  # used to download single attribute
+# variables = ['2m_temperature',
+#              'surface_solar_radiation_downwards',
+#              'total_precipitation',
+#              '10m_v_component_of_wind',
+#              '10m_u_component_of_wind',
+#              'surface_pressure',
+#              '2m_dewpoint_temperature']
 
 
 # attr_names are the name that the file will be called, arbitrary
 # attr_names = ['t2m', 'st1', 'st2', 'st3', 'rad', 'totprec', 'sw1', 'sw2', 'sw3', 'v10m', 'u10m']
-# attr_names = []  # used to download single attribute
-attr_names = ['t2m',
-              'rad',
-              'totprec',
-              'v10m',
-              'u10m',
-              'sp',
-              '2mdt']
+attr_names = ['t2m']  # used to download single attribute
+# attr_names = ['t2m',
+#               'rad',
+#               'totprec',
+#               'v10m',
+#               'u10m',
+#               'sp',
+#               '2mdt']
 
 # what years need to be downloaded
 # years = ['2018', '2019', '2020', '2021', '2022']
-years = range(1997, 2018)
+years = range(2003, 2024)
 
 for variable, attr_name in zip(variables, attr_names):
     for year in years:
