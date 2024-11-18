@@ -1,18 +1,27 @@
+import base64
 import datetime
 import json
-import smtplib
 from email.mime.text import MIMEText
 import requests
 import hashlib
 import cv2
 import numpy as np
+import os
 
-email_sender = "mbagWeather@outlook.com"
-email_recipient = ["Mark.Lysack@gov.mb.ca", "lysackm@myumanitoba.ca", "a_sass3@hotmail.com", "alison.sass@gov.mb.ca"]
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from apiclient import discovery
+
+email_sender = "mbagweather1@gmail.com"
+# email_recipient = ["Mark.Lysack@gov.mb.ca", "lysackm@myumanitoba.ca", "a_sass3@hotmail.com", "alison.sass@gov.mb.ca"]
+email_recipient = ["Mark.Lysack@gov.mb.ca"]
 smtp_server = "smtp-mail.outlook.com"
 smtp_port = 587
 
-email_password = open("program_var.txt", "r").read()
+SCOPES = ['https://www.googleapis.com/auth/gmail.send']
+CLIENT_SECRET_FILE = "client_secret.json"
+APPLICATION_NAME = "Gmail API Python Send Email"
 
 
 def get_metadata():
@@ -32,9 +41,6 @@ def get_curr_image_hash():
     img = cv2.imdecode(arr, -1)
     # crop the image so only the header appears. Only should change if the time changes on the chart
     crop_img = img[0:60, :]
-    cv2.imshow("img", crop_img)
-    cv2.waitKey(0)
-    exit()
 
     image_hash = hashlib.sha256(crop_img).hexdigest()
 
@@ -55,17 +61,52 @@ def get_last_updated_date(metadata):
     return datetime.datetime.strptime(date_string, "%Y-%m-%d %H:%M:%S")
 
 
-def send_email(date):
-    with smtplib.SMTP(smtp_server, smtp_port) as server:
-        server.starttls()
-        server.login(email_sender, email_password)
+def refresh_credentials():
+    creds = None
+    if os.path.exists("token.json"):
+        creds = Credentials.from_authorized_user_file("token.json", SCOPES)
 
-        for recipient in email_recipient:
-            msg = MIMEText('Ag Weather server seems to be down, last reported update at ' + date)
-            msg['Subject'] = 'Ag Weather prod server down'
-            msg['From'] = email_sender
-            msg['To'] = recipient
-            server.sendmail(email_sender, recipient, msg.as_string())
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+
+
+def get_credentials():
+    creds = None
+    if os.path.exists("token.json"):
+        creds = Credentials.from_authorized_user_file("token.json", SCOPES)
+
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                "credentials.json", SCOPES
+            )
+            creds = flow.run_local_server(port=0)
+        # Save the credentials for the next run
+        with open("token.json", "w") as token:
+            token.write(creds.to_json())
+
+    return creds
+
+
+def make_email(recipient, email_sender, date):
+    msg = MIMEText('Ag Weather server seems to be down, last reported update at ' + date)
+    msg['Subject'] = 'Ag Weather prod server down'
+    msg['From'] = email_sender
+    msg['To'] = recipient
+    return {"raw": base64.urlsafe_b64encode(msg.as_bytes()).decode()}
+
+
+# deprecated
+def send_email(date):
+    credentials = get_credentials()
+    service = discovery.build('gmail', 'v1', credentials=credentials)
+
+    for recipient in email_recipient:
+        msg = make_email(recipient, email_sender, date)
+        service.users().messages().send(userId=email_sender, body=msg).execute()
 
 
 def main():
@@ -91,4 +132,6 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # refresh_credentials()
+    # main()
+    send_email(str(datetime.datetime.now()))
