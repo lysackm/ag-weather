@@ -305,7 +305,6 @@ def get_user_regex():
         except re.error:
             valid_regex = False
 
-    print("\n\ndat_regex", dat_regex, "\n\n")
     return dat_regex
 
 
