@@ -6,6 +6,36 @@ import pandas
 import pandas as pd
 
 
+# Not generalized, only for 1 variable
+# sloppy
+def replace_outliers_refactor(df, date_col, attribute, threshold):
+    neighboring_stations_df = pd.read_csv("neighboring-stations.csv")
+
+    df = df[df[attribute].notna()]
+
+    df = df.merge(neighboring_stations_df, how="left", left_on=["StnID"], right_on=["Station"])
+
+    for i in range(3):
+        i = str(i)
+        df_copy = df[["StnID", attribute, date_col]]
+        df_copy.rename(columns={attribute: attribute + i}, inplace=True)
+        df = df.merge(df[["StnID", attribute, date_col]],
+                      how="left",
+                      left_on=["Neighbor" + i, date_col],
+                      right_on=["StnID", date_col])
+        df.rename(columns={"StnID_x": "StnID", attribute + "_x": attribute, attribute + "_y": attribute + i}, inplace=True)
+        # df[["StnID", attribute, attribute + i]] = df["StnID_x", attribute + "_x", attribute + "_y"]
+
+    df["mean"] = (df[attribute + "0"] + df[attribute + "1"] + df[attribute + "2"])/3.0
+    df[attribute] = df[attribute].mask(abs(df[attribute] - df["mean"]) > threshold)
+    df = df.drop(columns=['Neighbor0', 'Neighbor1', 'Neighbor2', 'StnID_y', 'StnID_y', "mean",
+                          attribute + "0", attribute + "1", attribute + "2", "Station"])
+
+    # print(df[df[attribute + "_filtered"].isna()][[attribute, "mean"]])
+
+    return df
+
+
 # dependents are values that are derived or only have meaning with the attribute
 def replace_outliers(df, date_col, attributes, attr_offsets, dependents):
     count = 0
@@ -62,14 +92,15 @@ def get_neighbors(stn_id, neighbor_frame):
 def qa_relative_24(df_24):
     date_col = "Date"
 
-    attributes = ["AvgAir_T", "MaxAir_T", "MinAir_T", "AvgRH", "MaxRH", "MinRH", "MaxWS", "AvgWS"]
+    attributes = ["AvgAir_T", "MaxAir_T", "MinAir_T", "AvgRH", "MaxRH", "MinRH", "MaxWS", "AvgWS", "Press_hPa"]
     # Heuristic offset bounds
     #   air temp: +/- 10 degrees
     #   humidity: +/- (10, 15, 20) %
     #   wind speed: +/- 10m/s
+    #   pressure: +/- 10 hPa
     humidity_offset = 20
     attr_offsets = {"AvgAir_T": 10, "MaxAir_T": 10, "MinAir_T": 10, "AvgRH": humidity_offset, "MaxRH": humidity_offset,
-                    "MinRH": humidity_offset, "MaxWS": 10, "AvgWS": 10}
+                    "MinRH": humidity_offset, "MaxWS": 10, "AvgWS": 10, "Press_hPa": 10}
     # "TotRS_MJ": 10
 
     dependents = {"AvgAir_T": ["EvapTot24"],
@@ -169,7 +200,13 @@ def general_qa():
 
 
 def main():
-    general_qa()
+    df_path = "../../Python_Scripts/Mark/frost_maps/data/station_temp_data.csv"
+    df = pd.read_csv(df_path)
+    date_col = "time"
+    attribute = "AvgAir_T"
+    threshold = 10
+    df = replace_outliers_refactor(df, date_col, attribute, threshold)
+    df.to_csv("../../Python_Scripts/Mark/frost_maps/data/station_temp_data_2.csv", index=False)
 
     # dff = pandas.read_csv("mock-station-data.csv")
     #
