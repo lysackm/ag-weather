@@ -91,22 +91,45 @@ def get_credentials():
     return creds
 
 
-def make_email(recipient, email_sender, date):
-    msg = MIMEText('Ag Weather server seems to be down, last reported update at ' + date)
-    msg['Subject'] = 'Ag Weather prod server down'
+def make_email(recipient, email_sender, date, subject="", message=""):
+    if message == "":
+        msg = MIMEText('Ag Weather server seems to be down, last reported update at ' + date)
+    else:
+        msg = MIMEText(message + ' Message sent on: ' + date)
+
+    if subject == "":
+        msg['Subject'] = 'Ag Weather prod server down'
+    else:
+        msg['Subject'] = subject
     msg['From'] = email_sender
     msg['To'] = recipient
     return {"raw": base64.urlsafe_b64encode(msg.as_bytes()).decode()}
 
 
 # deprecated
-def send_email(date):
+def send_email(date, subject="", message=""):
     credentials = get_credentials()
     service = discovery.build('gmail', 'v1', credentials=credentials)
 
     for recipient in email_recipient:
-        msg = make_email(recipient, email_sender, date)
+        msg = make_email(recipient, email_sender, date, subject, message)
         service.users().messages().send(userId=email_sender, body=msg).execute()
+
+
+def send_friday_email():
+    message = "As of now the prod server notification is still operational"
+    subject = "Prod email still working"
+
+    today = datetime.datetime.today()
+    weekday = today.weekday()
+    now = datetime.datetime.now()
+    hour = now.hour
+    minute = now.minute
+
+    print(weekday, hour, minute)
+
+    if weekday == 4 and hour == 8 and 0 <= minute <= 15:
+        send_email(str(today), subject, message)
 
 
 def main():
@@ -132,6 +155,6 @@ def main():
 
 
 if __name__ == "__main__":
-    # refresh_credentials()
-    # main()
-    send_email(str(datetime.datetime.now()))
+    refresh_credentials()
+    main()
+    send_friday_email()
