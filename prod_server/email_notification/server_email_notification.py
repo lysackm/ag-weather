@@ -14,8 +14,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from apiclient import discovery
 
 email_sender = "mbagweather1@gmail.com"
-# email_recipient = ["Mark.Lysack@gov.mb.ca", "lysackm@myumanitoba.ca", "a_sass3@hotmail.com", "alison.sass@gov.mb.ca"]
-email_recipient = ["Mark.Lysack@gov.mb.ca"]
+email_recipient = ["Mark.Lysack@gov.mb.ca", "lysackm@myumanitoba.ca", "a_sass3@hotmail.com", "alison.sass@gov.mb.ca"]
 smtp_server = "smtp-mail.outlook.com"
 smtp_port = 587
 
@@ -117,6 +116,8 @@ def send_email(date, subject="", message=""):
 
 
 def send_friday_email():
+    global email_recipient
+    email_recipient = ["Mark.Lysack@gov.mb.ca", "alison.sass@gov.mb.ca"]
     message = "As of now the prod server notification is still operational"
     subject = "Prod email still working"
 
@@ -125,8 +126,6 @@ def send_friday_email():
     now = datetime.datetime.now()
     hour = now.hour
     minute = now.minute
-
-    print(weekday, hour, minute)
 
     if weekday == 4 and hour == 8 and 0 <= minute <= 15:
         send_email(str(today), subject, message)
@@ -142,6 +141,8 @@ def main():
     image_hash = get_curr_image_hash()
 
     date_delta = date - live_page_date
+    # change the time_threshold to change how long the program should wait before sending an email notifying that
+    # the prod server is down
     time_threshold = datetime.timedelta(minutes=19)
 
     if image_hash != metadata["image_hash"]:
