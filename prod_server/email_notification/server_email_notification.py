@@ -1,7 +1,7 @@
 import base64
 import datetime
 import json
-from email.mime.text import MIMEText
+import google.auth.exceptions
 import requests
 import hashlib
 import cv2
@@ -12,6 +12,7 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from apiclient import discovery
+from email.mime.text import MIMEText
 
 email_sender = "mbagweather1@gmail.com"
 email_recipient = ["Mark.Lysack@gov.mb.ca", "lysackm@myumanitoba.ca", "a_sass3@hotmail.com", "alison.sass@gov.mb.ca"]
@@ -67,7 +68,19 @@ def refresh_credentials():
 
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
+            try:
+                creds.refresh(Request())
+            except google.auth.exceptions.RefreshError as re:
+                print("Refresh token has expired. Two factor authentication required.")
+                exit(1)
+
+
+def two_factor_auth():
+    flow = InstalledAppFlow.from_client_secrets_file(
+        "credentials.json", SCOPES
+    )
+    creds = flow.run_local_server(port=0)
+    return creds
 
 
 def get_credentials():
@@ -77,12 +90,12 @@ def get_credentials():
 
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
+            try:
+                creds.refresh(Request())
+            except google.auth.exceptions.RefreshError as re:
+                creds = two_factor_auth()
         else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                "credentials.json", SCOPES
-            )
-            creds = flow.run_local_server(port=0)
+            creds = two_factor_auth()
         # Save the credentials for the next run
         with open("token.json", "w") as token:
             token.write(creds.to_json())
