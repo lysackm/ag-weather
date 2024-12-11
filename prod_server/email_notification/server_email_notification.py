@@ -156,7 +156,7 @@ def main():
     date_delta = date - live_page_date
     # change the time_threshold to change how long the program should wait before sending an email notifying that
     # the prod server is down
-    time_threshold = datetime.timedelta(minutes=19)
+    time_threshold = datetime.timedelta(hours=1, minutes=19)
 
     if image_hash != metadata["image_hash"]:
         # dont send mail, update data
