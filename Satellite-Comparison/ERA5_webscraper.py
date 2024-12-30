@@ -5,21 +5,15 @@
 # website, building a query, then select "Show API request" in the bottom left corner. You can follow or modify this to
 # get the requests body.
 # To install the cdsapi library you will need a config file called .cdsapirc containing something similar to below. You
-# are able to get your UID and API key from this link: https://cds.climate.copernicus.eu/user. I had to refresh it
+# are able to get your UID and API key from this link: https://cds.climate.copernicus.eu/profile. I had to refresh it
 # before I was able to get the key properly. (Maybe clearing caches helps)
 # source: https://pypi.org/project/cdsapi/
 
-# url: https://cds.climate.copernicus.eu/api/v2
-# key: <UID>:<API key>
-# verify: 1
+# url: https://cds.climate.copernicus.eu/api
+# key: <PERSONAL-ACCESS-TOKEN>
 
 
 import cdsapi
-import netCDF4
-from netCDF4 import num2date
-import numpy as np
-import os
-import pandas as pd
 
 # variables is the name that it is in the database, specific and well known
 # variables = ['2m_temperature', 'soil_temperature_level_1',
@@ -49,13 +43,13 @@ attr_names = ['t2m']  # used to download single attribute
 
 # what years need to be downloaded
 # years = ['2018', '2019', '2020', '2021', '2022']
-years = range(2003, 2024)
+years = range(1990, 1995)
 
 for variable, attr_name in zip(variables, attr_names):
     for year in years:
         # Retrieve data and store as netCDF4 file
         c = cdsapi.Client()
-        file_location = './' + attr_name + str(year) + '.nc.zip'
+        target = './' + attr_name + str(year) + '.nc'
         c.retrieve(
             'reanalysis-era5-land',
             {
@@ -94,6 +88,7 @@ for variable, attr_name in zip(variables, attr_names):
                     52.34, -102.03, 49,
                     -95,
                 ],
-                'format': 'netcdf.zip',
+                'data_format': 'netcdf',
+                'download_format': 'unarchived'
             },
-            file_location)
+            target)
