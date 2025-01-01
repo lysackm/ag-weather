@@ -29,14 +29,17 @@ def get_current_date_string():
 
 
 class CreateBackup:
-    def __init__(self, file_regex, files, dats_dir, kp_splt_st_dt):
+    def __init__(self, file_regex, files, dats_dir, kp_splt_st_dt_may, kp_splt_st_dt_nov):
         self.file_regex = file_regex
         self.files = files
         self.dats_dir = dats_dir.replace("\\", "/")
-        self.backup_dir = "./auto_backup/dat_backups_" + get_current_date_string()
-        self.keep_split_start_date = kp_splt_st_dt
+        self.backup_dir = "./dat_backups_" + get_current_date_string()
+        self.keep_split_start_date_may = kp_splt_st_dt_may
+        self.keep_split_start_date_nov = kp_splt_st_dt_nov
         # May 1st. Change if the start date for the split files is different
-        self.split_start_date_regex = r"[0-9]{4}-05-01 [0-9]{2}:[0-9]{2}:[0-9]{2}"
+        self.split_start_date_may_regex = r"[0-9]{4}-05-01 [0-9]{2}:[0-9]{2}:[0-9]{2}"
+        # Nov 1st
+        self.split_start_date_nov_regex = r"[0-9]{4}-11-01 [0-9]{2}:[0-9]{2}:[0-9]{2}"
 
     def create_backup_dir(self):
         if not os.path.isdir(self.backup_dir):
@@ -98,8 +101,14 @@ class CreateBackup:
             else:
                 print(dat_file)
 
-    def save_start_date(self, line):
-        if re.search(self.split_start_date_regex, line[0:22]):
+    def save_start_date_nov(self, line):
+        if re.search(self.split_start_date_nov_regex, line[0:22]):
+            return True
+        else:
+            return False
+
+    def save_start_date_may(self, line):
+        if re.search(self.split_start_date_may_regex, line[0:22]):
             return True
         else:
             return False
@@ -107,8 +116,8 @@ class CreateBackup:
 
 class CreateBackupSavePreviousRows(CreateBackup):
     # saved_days: variable which indicates how
-    def __init__(self, file_regex, files, dats_dir, kp_splt_st_dt, previous_rows):
-        super().__init__(file_regex, files, dats_dir, kp_splt_st_dt)
+    def __init__(self, file_regex, files, dats_dir, kp_splt_st_dt_may, kp_splt_st_dt_nov, previous_rows):
+        super().__init__(file_regex, files, dats_dir, kp_splt_st_dt_may, kp_splt_st_dt_nov)
         self.previous_rows = previous_rows
 
     def clear_dat_data(self, dat_file):
@@ -121,11 +130,13 @@ class CreateBackupSavePreviousRows(CreateBackup):
             else:
                 data = file_data[len(file_data) - self.previous_rows: len(file_data)]
 
-            if self.keep_split_start_date:
+            if self.keep_split_start_date_may or self.keep_split_start_date_nov:
                 index = 2
                 start_date = []
                 for line in file_data[2:]:
-                    if self.save_start_date(line) and len(file_data) - index > self.previous_rows:
+                    if self.save_start_date_nov(line) and len(file_data) - index > self.previous_rows:
+                        start_date.append(line)
+                    if self.save_start_date_may(line) and len(file_data) - index > self.previous_rows:
                         start_date.append(line)
                     index += 1
                 file_content = header + start_date + data
@@ -143,8 +154,8 @@ class CreateBackupSavePreviousRows(CreateBackup):
 
 
 class CreateBackupSaveFromDate(CreateBackup):
-    def __init__(self, file_regex, files, dats_dir, kp_splt_st_dt, start_datetime):
-        super().__init__(file_regex, files, dats_dir, kp_splt_st_dt)
+    def __init__(self, file_regex, files, dats_dir, kp_splt_st_dt_may, kp_splt_st_dt_nov, start_datetime):
+        super().__init__(file_regex, files, dats_dir, kp_splt_st_dt_may, kp_splt_st_dt_nov)
         if type(start_datetime) is datetime.datetime:
             self.start_datetime = start_datetime
         elif type(start_datetime) is str:
@@ -166,7 +177,9 @@ class CreateBackupSaveFromDate(CreateBackup):
                     line_datetime = datetime.datetime.strptime(line[1:20], '%Y-%m-%d %H:%M:%S')
                     if line_datetime >= self.start_datetime:
                         data.append(line)
-                    elif self.keep_split_start_date and re.search(self.split_start_date_regex, line[0:22]):
+                    elif self.keep_split_start_date_may and self.save_start_date_may(line[0:22]):
+                        data.append(line)
+                    elif self.keep_split_start_date_nov and self.save_start_date_nov(line[0:22]):
                         data.append(line)
 
             file_content = header + data
@@ -258,6 +271,19 @@ def get_user_keep_may():
     return keep_may
 
 
+def get_user_keep_nov():
+    valid_input = False
+    keep_nov = False
+    while not valid_input:
+        keep_nov = input("Would you like to keep November 1st in the split file? Type 1 for yes, 2 for no: ")
+        if keep_nov != "1" and keep_nov != "2":
+            print("Invalid input.")
+        else:
+            keep_nov = keep_nov == "1"
+            valid_input = True
+    return keep_nov
+
+
 def get_user_num_lines():
     valid_input = False
     num_lines = False
@@ -316,14 +342,15 @@ def user_interface_bootstrap():
 
     dat_regex = get_user_regex()
     dat_file = get_user_dat_file()
-    keep_split_file_date = get_user_keep_may()
+    keep_split_file_date_may = get_user_keep_may()
+    keep_split_file_date_nov = get_user_keep_nov()
 
     if backup_type == "2":
         num_saved = get_user_num_lines()
-        create_backup = CreateBackupSavePreviousRows(dat_regex, dat_file, dats_dir, keep_split_file_date, num_saved)
+        create_backup = CreateBackupSavePreviousRows(dat_regex, dat_file, dats_dir, keep_split_file_date_may, keep_split_file_date_nov, num_saved)
     elif backup_type == "1":
         date = get_user_date()
-        create_backup = CreateBackupSaveFromDate(dat_regex, dat_file, dats_dir, keep_split_file_date, date)
+        create_backup = CreateBackupSaveFromDate(dat_regex, dat_file, dats_dir, keep_split_file_date_may, keep_split_file_date_nov, date)
 
     print_effected_dats = input("Would you like to see a list of the dat files which will be changed in this "
                                 "operation? 1 for yes, 2 for no: ")
