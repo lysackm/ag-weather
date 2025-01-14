@@ -1,34 +1,6 @@
 import pandas as pd
 
 
-# process is treated as a constructing 4 independent columns
-# daily time resolution
-# 120 stations PLUS long term hourly ECCC stations
-
-# start with mbag data where Pluvio and tipping bucket have been merged into one precipitation columns
-# Pluvio gets precident over tipping bucket
-
-# filter out ECCC data which is mapped to stations
-# find out which columns have useful data and can be substituted in.
-# add ECCC data
-
-# backfill all empty data with either NRCAN or Era5-Land
-# create a normal using reanalysis and not using reanalysis data, compare the two to see if there are significant
-# differences.
-
-# calculate derived columns
-
-# Will I have to download and derive data from hourly datasets?
-
-# Possible the best way to do it is to have several columns for each final attribute.
-# This means the index will be complete (since the reanalysis datasets should be continuous)
-# but the data will be sparce. Then it is a series of maskings and checking for null varibles, or slotting in
-# date ranges. ECCC will have strange readings, so its likely that a custom process will need to be done to process
-# that data.
-#
-# In this process it makes sense to start with the continuous data and then add the sparce, but more relevant
-# data.
-
 # p is a function defined in the p-days calculation
 def p(t):
     k = 1
@@ -42,7 +14,7 @@ def p(t):
     elif 30 <= t:
         return t * 0
 
-    print("fatal error, outside of defined behaviour in p(t)")
+    print("fatal error, outside of defined behaviour in p(t)", t)
     exit(1)
 
 
@@ -74,6 +46,12 @@ def calculate_gdd(t_min, t_max):
 
 def filter_dates(df):
     df = df[(df["NormYY"] >= 1991) & (df["NormYY"] <= 2020)]
+    return df
+
+
+def filter_stations(df):
+    stn_ids = pd.read_csv("./metadata/station_metadata.csv")["StnID"].to_list()
+    df = df[df["StnID"].isin(stn_ids)]
     return df
 
 
@@ -110,7 +88,7 @@ def merge_columns(df):
     df["PPT"] = df["PPT"].fillna(df["nrcan_PPT"])
     df["PPT_source"] = df["PPT_source"].mask(df["PPT"].isna(), "invalid")
 
-    df = df[["StnID", "SN", "NormYY", "NormMM", "NormDD", "DateDT",
+    df = df[["StnID", "NormYY", "NormMM", "NormDD", "DateDT",
              "Tavg", "Tavg_source", "Tmin", "Tmin_source", "Tmax", "Tmax_source", "PPT", "PPT_source"]]
 
     return df
@@ -122,13 +100,13 @@ def combine_daily_data():
     df_nrcan = df_nrcan.rename(columns={"PPT": "nrcan_PPT",
                                         "Tmin": "nrcan_Tmin",
                                         "Tmax": "nrcan_Tmax"})
-    df_nrcan = df_nrcan.set_index(["StnID", "SN", "NormYY", "NormMM", "NormDD", "DateDT"])
+    df_nrcan = df_nrcan.set_index(["StnID", "NormYY", "NormMM", "NormDD", "DateDT"])
 
     df_era5 = pd.read_csv("./data/standardized_daily/era5_temperature.csv")
     df_era5 = df_era5.rename(columns={"Tavg": "era5_Tavg",
                                       "Tmin": "era5_Tmin",
                                       "Tmax": "era5_Tmax"})
-    df_era5 = df_era5.set_index(["StnID", "SN", "NormYY", "NormMM", "NormDD", "DateDT"])
+    df_era5 = df_era5.set_index(["StnID", "NormYY", "NormMM", "NormDD", "DateDT"])
 
     # contains PPT, Tmin, Tmax
     df_eccc = pd.read_csv("./data/standardized_daily/eccc.csv")
@@ -136,7 +114,7 @@ def combine_daily_data():
                                       "Tmin": "eccc_Tmin",
                                       "Tmax": "eccc_Tmax",
                                       "Tavg": "eccc_Tavg"})
-    df_eccc = df_eccc.set_index(["StnID", "SN", "NormYY", "NormMM", "NormDD", "DateDT"])
+    df_eccc = df_eccc.set_index(["StnID", "NormYY", "NormMM", "NormDD", "DateDT"])
 
     # contains Tmin, Tmax, PPT
     df_mbag = pd.read_csv("./data/standardized_daily/mbag_stations.csv")
@@ -144,7 +122,7 @@ def combine_daily_data():
                                       "Tmin": "mbag_Tmin",
                                       "Tmax": "mbag_Tmax",
                                       "Tavg": "mbag_Tavg"})
-    df_mbag = df_mbag.set_index(["StnID", "SN", "NormYY", "NormMM", "NormDD", "DateDT"])
+    df_mbag = df_mbag.set_index(["StnID", "NormYY", "NormMM", "NormDD", "DateDT"])
 
     df_joined = df_nrcan.join([df_era5, df_eccc, df_mbag],
                               how="outer")
@@ -155,6 +133,7 @@ def combine_daily_data():
 def create_composite_daily_data():
     df = combine_daily_data()
     df = merge_columns(df)
+    df = filter_stations(df)
     df = filter_dates(df)
     df.to_csv("./data/merged_dataset_2024_normal.csv", index=False)
     return df
@@ -164,7 +143,7 @@ def create_composite_climate_normal():
     df = create_composite_daily_data()
 
     # drop source columns and DateDT, NormYY (NormYY is set as 2020, DateDT will be constructed) and SN
-    df = df.drop(columns=["Tavg_source", "Tmin_source", "Tmax_source", "PPT_source", "DateDT", "NormYY", "SN"])
+    df = df.drop(columns=["Tavg_source", "Tmin_source", "Tmax_source", "PPT_source", "DateDT", "NormYY"])
 
     # group by NormMM, NormDD, StnID, SN
     df = df.groupby(["NormMM", "NormDD", "StnID"]).mean()

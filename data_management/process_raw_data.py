@@ -2,6 +2,7 @@ import xarray as xr
 import glob
 import pandas as pd
 import warnings
+from datetime import timedelta
 
 warnings.filterwarnings("error")
 
@@ -80,8 +81,7 @@ def month_and_day_to_doy(row):
     return doy
 
 
-def apply_function_daily(df_2, df, src_column, operation, dest_column=""):
-    min_count = 1
+def apply_function_daily(df_daily, df, src_column, operation, dest_column=""):
     if dest_column == "":
         dest_column = src_column
 
@@ -90,33 +90,30 @@ def apply_function_daily(df_2, df, src_column, operation, dest_column=""):
     df["NormDD"] = df["time"].dt.day
 
     groupby_columns = [df["NormYY"], df["NormMM"], df["NormDD"], df["StnID"]]
+    df_daily[dest_column] = df[src_column].groupby(by=groupby_columns).agg(operation).values
 
-    if operation == "avg":
-        # get avg columns
-        # sum divided by the count, so that we can use min_count
-        numerator = df[src_column].groupby(by=groupby_columns).sum(min_count=min_count)
-        denominator = df[src_column].groupby(by=groupby_columns).count()
-        df_2[dest_column] = (numerator / denominator).values
-    elif operation == "sum":
-        df_2[dest_column] = df[src_column].groupby(by=groupby_columns).sum(min_count=min_count).values
-    elif operation == "min":
-        df_2[dest_column] = df[src_column].groupby(by=groupby_columns).min(min_count=min_count).values
-    elif operation == "max":
-        df_2[dest_column] = df[src_column].groupby(by=groupby_columns).max(min_count=min_count).values
-    else:
-        print("Warning: no specified function for column " + src_column)
-
-    return df_2
+    return df_daily
 
 
-# TODO climatological day starts at utc=06:00
 def hourly_to_daily_df(df, columns, daily_merge_operations):
     operations = ["max", "min", "avg", "sum"]
-    df_daily = df[columns].groupby(by=[df["time"].dt.year.rename("NormYY"),
-                                       df["time"].dt.month.rename("NormMM"),
-                                       df["time"].dt.day.rename("NormDD"),
-                                       df["SN"],
-                                       df["StnID"]]).mean()
+
+    # If the daily time starts not at 00:00 then this will not detect it
+    is_hourly = not (df["time"].dt.hour == 0).all()
+    if is_hourly:
+        # climatological day starts at utc=06:00
+        df["time_utc_adjusted"] = df["time_utc"] - timedelta(hours=6)
+        df["time"] = df["time_utc_adjusted"]
+        df_daily = df[columns].groupby(by=[df["time_utc_adjusted"].dt.year.rename("NormYY"),
+                                           df["time_utc_adjusted"].dt.month.rename("NormMM"),
+                                           df["time_utc_adjusted"].dt.day.rename("NormDD"),
+                                           df["StnID"]]).mean()
+
+    else:
+        df_daily = df[columns].groupby(by=[df["time"].dt.year.rename("NormYY"),
+                                           df["time"].dt.month.rename("NormMM"),
+                                           df["time"].dt.day.rename("NormDD"),
+                                           df["StnID"]]).mean()
     df_daily.reset_index()
 
     for column in columns:
@@ -124,16 +121,16 @@ def hourly_to_daily_df(df, columns, daily_merge_operations):
         if type(daily_merge_operations[column]) is list:
             for daily_merge_operation in daily_merge_operations[column]:
                 if daily_merge_operation in column:
-                    df_daily = apply_function_daily(df_daily, df.copy(), column, daily_merge_operation)
+                    df_daily = apply_function_daily(df_daily, df, column, daily_merge_operation)
                 elif any(substring in column for substring in operations):
                     old_operation = [substring for substring in operations if substring in column][0]
                     dest_column = column.replace(old_operation, "") + daily_merge_operation
-                    df_daily = apply_function_daily(df_daily, df.copy(), column, daily_merge_operation, dest_column)
+                    df_daily = apply_function_daily(df_daily, df, column, daily_merge_operation, dest_column)
                 else:
                     dest_column = column + "_" + daily_merge_operation
-                    df_daily = apply_function_daily(df_daily, df.copy(), column, daily_merge_operation, dest_column)
+                    df_daily = apply_function_daily(df_daily, df, column, daily_merge_operation, dest_column)
         else:
-            df_daily = apply_function_daily(df_daily, df.copy(), column, daily_merge_operations[column])
+            df_daily = apply_function_daily(df_daily, df, column, daily_merge_operations[column])
 
     return df_daily
 
@@ -383,9 +380,9 @@ def nrcan_climate_normal():
     create_climate_normal_nrcan = CreateClimateNormal("./nrcan.csv",
                                                       "nrcan.csv",
                                                       ["Tmin", "Tmax", "PPT"])
-    daily_merge_operations = {"Tmin": "avg",
+    daily_merge_operations = {"Tmin": "mean",
                               "Tmax": "sum",
-                              "PPT": "avg"}
+                              "PPT": "mean"}
     create_climate_normal_nrcan.create_normal(daily_merge_operations)
     create_climate_normal_nrcan.save_climate_normal()
 
@@ -394,7 +391,7 @@ def ear5_climate_normal():
     create_climate_normal_era5 = CreateClimateNormal("era5_temperature.csv",
                                                      "era5_temperature.csv",
                                                      ["Tavg"])
-    daily_merge_operations = {"Tavg": "avg"}
+    daily_merge_operations = {"Tavg": "mean"}
     create_climate_normal_era5.create_normal(daily_merge_operations)
     create_climate_normal_era5.unit_convert_column("Tavg", -273.15)
     create_climate_normal_era5.save_climate_normal()
@@ -451,7 +448,7 @@ def daily_standardize_era5():
     utc_col = "time_utc"
     stn_col = "StnID"
     daily_merge_operations = {
-        "Tavg": ["avg", "max", "min"]
+        "Tavg": ["mean", "max", "min"]
     }
 
     standardize_daily_data = StandardizeDailyData(file, file)
@@ -469,7 +466,7 @@ def daily_standardize_mbag():
     date_col = "TMSTAMP"
     stn_col = "StnID"
     daily_merge_operations = {
-        "Tavg": "avg",
+        "Tavg": "mean",
         "Tmax": "max",
         "Tmin": "min",
         "PPT": "sum"
@@ -502,8 +499,8 @@ def daily_standardize_nrcan():
     utc_date_col = "time_utc"
     stn_col = "StnID"
     daily_merge_operations = {
-        "Tmin": "avg",
-        "Tmax": "avg",
+        "Tmin": "mean",
+        "Tmax": "mean",
         "PPT": "sum"
     }
 
@@ -524,9 +521,9 @@ def daily_standardize_eccc():
         "Total Precip (mm)": "PPT"
     }
     daily_merge_operations = {
-        "Tmin": "avg",
-        "Tmax": "avg",
-        "Tavg": "avg",
+        "Tmin": "mean",
+        "Tmax": "mean",
+        "Tavg": "mean",
         "PPT": "sum"
     }
 
@@ -537,7 +534,6 @@ def daily_standardize_eccc():
     standardize_daily_data.save_df()
 
 
-# TODO, climatological days start at utc 06:00
 def main():
     # ear5_climate_normal()
     # nrcan()
@@ -546,9 +542,9 @@ def main():
     # eccc()
     # station_eccc()
 
-    # daily_standardize_era5()
-    # daily_standardize_mbag()
-    # daily_standardize_nrcan()
+    daily_standardize_era5()
+    daily_standardize_mbag()
+    daily_standardize_nrcan()
     daily_standardize_eccc()
 
 
