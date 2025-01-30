@@ -6,6 +6,7 @@ import sys
 import glob
 import time
 import json
+import traceback
 import tracemalloc
 import shutil
 import pandas as pd
@@ -29,6 +30,11 @@ logger = Logger()
 # each column. If value is lower than the lower_threshold, then the substitution replaces
 # the value
 def apply_lower_thresholds(df, lower_thresholds, metadata_id, substitution="NaN"):
+    if type(lower_thresholds) is not dict:
+        logger.log_non_fatal_error("ID: " + metadata_id + " lower_thresholds was not a dictionary as expected. No "
+                                   "lower thresholds are applied to the dataframe.")
+        return df
+
     for column, lower_threshold in lower_thresholds.items():
         try:
             df[column] = df[column].mask(df[column] < lower_threshold, other=substitution)
@@ -49,6 +55,11 @@ def apply_lower_thresholds(df, lower_thresholds, metadata_id, substitution="NaN"
 # each column. If value is higher than the upper_threshold, then the substitution replaces
 # the value
 def apply_upper_thresholds(df, upper_thresholds, metadata_id, substitution="NaN"):
+    if type(upper_thresholds) is not dict:
+        logger.log_non_fatal_error("ID: " + metadata_id + " upper_thresholds was not a dictionary as expected. No "
+                                   "upper thresholds are applied to the dataframe.")
+        return df
+
     for column, upper_threshold in upper_thresholds.items():
         try:
             df[column] = df[column].mask(df[column] > upper_threshold, other=substitution)
@@ -92,22 +103,22 @@ def apply_transformations(df, transformations, metadata_id):
 # In the df add quotes to the values of the columns listed in quoted_columns
 def apply_quotes(df, quoted_columns):
     for column in quoted_columns:
-        df[column] = '"' + df[column] + '"'
+        df[column] = '\"' + df[column] + '\"'
     return df
 
 
 # Format the column to the specified format in df_metadata
-def format_time_column(df, timestamp, df_metadata, column, format_key):
+def format_time_column(df, timestamp, df_metadata_dict, column, format_key):
     try:
-        if format_key in df_metadata:
-            df.loc[:, column] = timestamp.dt.strftime(df_metadata[format_key])
+        if format_key in df_metadata_dict:
+            df.loc[:, column] = timestamp.dt.strftime(df_metadata_dict[format_key])
         else:
             if column == "TIME":
                 df.loc[:, "TIME"] = timestamp.dt.time
             elif column == "DATE":
                 df.loc[:, column] = timestamp.dt.date
     except ValueError as e:
-        logger.log_non_fatal_error("ID: " + df_metadata["id"] + " An improper date format was given, "
+        logger.log_non_fatal_error("ID: " + df_metadata_dict["id"] + " An improper date format was given, "
                                    "ValueError: " + str(e))
 
 
@@ -137,9 +148,9 @@ def df_data_operations(df, df_metadata):
         transformations = df_metadata["transformations"]
         df = apply_transformations(df, transformations, df_metadata["id"])
     # pandas automatically adds triple quotes, undesired effect
-    # if "quoted_columns" in df_metadata:
-    #     quoted_columns = df_metadata["quoted_columns"]
-    #     df = apply_quotes(df, quoted_columns)
+    if "quoted_columns" in df_metadata:
+        quoted_columns = df_metadata["quoted_columns"]
+        df = apply_quotes(df, quoted_columns)
     return df
 
 
@@ -164,8 +175,23 @@ def copy_individual_stn_data(partner_data, dat_file_full, df_stn, version):
                 if df_stn is None:
                     df_stn = load_dat(dat_file_full)
                 df_processed = df_stn.copy()
-                df_processed = df_data_operations(df_processed, version_data)
+
+                if "previous_rows" in version_data:
+                    previous_rows = version_data["previous_rows"]
+                else:
+                    previous_rows = "all"
+
+                if "StationName" in df_processed.columns:
+                    df_processed = df_processed.sort_values(["StationName", "TMSTAMP"])
+                else:
+                    df_processed = df_processed.sort_values(["TMSTAMP"])
+
                 df_processed = date_processing(df_processed, version_data)
+                df_processed = df_data_operations(df_processed, version_data)
+
+                if previous_rows != "all" and type(previous_rows) is int:
+                    df_processed = df_processed.groupby("StnID").tail(previous_rows)
+
                 df_processed = column_formatting(df_processed, version_data)
                 df_processed = process_column_mapping(df_processed, version_data, dat_file)
 
@@ -194,7 +220,7 @@ def process_row(value, format_str):
     if isinstance(value, float):
         if pd.isna(value):
             return ""
-        value = format_str.format(value)  # Example operation: multiply by 2
+        value = format_str.format(value)
         return value
     else:
         return ""
@@ -213,7 +239,7 @@ def column_formatting(df, metadata):
                 df[column] = df[column].apply(lambda row: process_row(row, formatting))
             except IndexError as e:
                 logger.log_non_fatal_error("ID: " + metadata["id"] + " Column does not exist when trying to apply"
-                                           " string formatting: " + str(e))
+                                                                     " string formatting: " + str(e))
     return df
 
 
@@ -227,12 +253,14 @@ def process_concat_data(df, metadata, base_directory, destination_file):
     stations = metadata["stations"]
 
     df = df[df["StnID"].isin(stations)]
-    df = df_data_operations(df.copy(), metadata)
-    df = date_processing(df.copy(), metadata)
+
     if "StationName" in df.columns:
         df = df.sort_values(["StationName", "TMSTAMP"])
     else:
         df = df.sort_values(["TMSTAMP"])
+
+    df = date_processing(df.copy(), metadata)
+    df = df_data_operations(df.copy(), metadata)
 
     if previous_rows != "all" and type(previous_rows) is int:
         df = df.groupby("StnID").tail(previous_rows)
@@ -248,7 +276,6 @@ def process_concat_data(df, metadata, base_directory, destination_file):
 
 # Add a custom header to a partners file
 def add_header(metadata, partner, dest_file):
-    # just copy header file to destination location?
     src_file = "./partner_headers/" + partner + "/" + metadata["header"]
     try:
         shutil.copy(src_file, dest_file)
@@ -304,10 +331,17 @@ def merge_retention_data(dats_df, metadata, dest_file):
         if os.path.isfile(dest_file):
             partner_df = read_partner_data(metadata, dest_file)
             concatenated_df = pd.concat([partner_df, dats_df])
-            concatenated_df = concatenated_df.drop_duplicates(keep="last",
-                                                              subset=get_partner_index_cols_names(metadata))
             index_cols = get_partner_index_cols_names(metadata)
-            sorted_df = concatenated_df.sort_values(index_cols, ascending=True)
+            concatenated_df = concatenated_df.drop_duplicates(keep="last", subset=index_cols)
+
+            if "TMSTAMP" in index_cols:
+                concatenated_df["date_col"] = pd.to_datetime(concatenated_df["TMSTAMP"])
+                index_cols.remove("TMSTAMP")
+                index_cols.append("date_col")
+                sorted_df = concatenated_df.sort_values(index_cols, ascending=True)
+                sorted_df = sorted_df.drop(columns="date_col")
+            else:
+                sorted_df = concatenated_df.sort_values(index_cols, ascending=True)
             return sorted_df
         else:
             logger.log_warning("ID: " + metadata["id"] + " Could not find partner file " + dest_file +
@@ -338,7 +372,10 @@ def save_df(df, metadata, base_directory, destination_file_suffix):
                 header = True
 
     try:
-        df.to_csv(destination_file, index=False, sep=delimiter, header=header, mode=mode)
+        # ඞ is arbitrarily chosen as the quote char. A character which should not be used should be used in the partner
+        # file
+        df.to_csv(destination_file, index=False, sep=delimiter, header=header, mode=mode, quotechar="ඞ",
+                  doublequote=False)
         print("Saving df to ", destination_file)
     except OSError as e:
         logger.log_fatal_error("ID: " + metadata["id"] + " OSError when saving to file " + destination_file +
@@ -368,7 +405,7 @@ def iterate_concat_data(df_concat, version_metadata, base_directory):
 def copy_concat_stn_data(df_concat_15, df_concat_60, df_concat_24, partner_json):
     # Prod has 4 virtual threads, but since there is a large amount of IO operations which would
     # be halting, 6 workers may still be beneficial
-    num_processes = 6
+    num_processes = 4
     tasks = []
     with multiprocessing.Pool(num_processes) as pool:
         for partner in partner_json:
@@ -491,8 +528,9 @@ def process_single_dat(partner_json, station_metadata, dat_file):
             return df_stn, time_version
 
     except Exception as e:
+        stack_trace = ''.join(traceback.TracebackException.from_exception(e).format())
         logger.log_fatal_error("Unknown error caught when processing dat file " + dat_file + " Exception: "
-                               + str(e).replace("\n", ""))
+                               + str(e).replace("\n", "") + stack_trace)
         return None
 
 
@@ -513,7 +551,7 @@ def process_all_dats():
         logger.log_info("Starting .dat file transfer to partner")
         partner_json = {}
         try:
-            partner_json_file = open("./partner_data.json")
+            partner_json_file = open("./partner_data_server.json")
             partner_json = json.load(partner_json_file)
         except json.decoder.JSONDecodeError as e:
             logger.log_fatal_error("Error decoding the JSON file, partner_data.json. Please verify that "

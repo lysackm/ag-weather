@@ -1,0 +1,1 @@
+"station","datetime","tmp","rh","wd","ws","wsmax","rn_1","rad","st5","st20","sm5","sm20","et"
