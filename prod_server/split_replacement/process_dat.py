@@ -187,6 +187,7 @@ def copy_individual_stn_data(partner_data, dat_file_full, df_stn, version):
                     df_processed = df_processed.sort_values(["TMSTAMP"])
 
                 df_processed = date_processing(df_processed, version_data)
+                df_processed = non_sparce_time_processing(df_processed, version_data)
                 df_processed = df_data_operations(df_processed, version_data)
 
                 if previous_rows != "all" and type(previous_rows) is int:
@@ -259,7 +260,9 @@ def process_concat_data(df, metadata, base_directory, destination_file):
     else:
         df = df.sort_values(["TMSTAMP"])
 
+    # TODO check if all of these .copy()s are necessary
     df = date_processing(df.copy(), metadata)
+    df = non_sparce_time_processing(df.copy(), metadata)
     df = df_data_operations(df.copy(), metadata)
 
     if previous_rows != "all" and type(previous_rows) is int:
@@ -476,8 +479,8 @@ def process_column_mapping(df, metadata, dat_file=None):
                         columns.append(column_mapped)
                     else:
                         logger.log_non_fatal_error("ID: " + metadata["id"] + " Column " + column + " does not exist in "
-                                                   "the .dat file's columns or metadata columns. Mapping to partners"
-                                                   "column" + column_mapped + " was not completed, and will not "
+                                                   "the .dat file's columns or metadata columns. Mapping to partners "
+                                                   "column " + column_mapped + " was not completed, and will not "
                                                    "be included in the final file.")
                 df = df[columns]
     else:
@@ -486,33 +489,65 @@ def process_column_mapping(df, metadata, dat_file=None):
     return df
 
 
+def non_sparce_time_processing(df, metadata):
+    if "previous_lines" in metadata and metadata["previous_lines"] is True:
+        # get current date, rounded to the hour
+        current_time = datetime.datetime.now()
+        current_time = current_time.replace(minute=0, second=0, microsecond=0)
+
+        # get unique station IDs from df
+        df_stn_data = df["StnID"]
+        df_stn_data = df_stn_data.unique()
+
+        # get station metadata and merge in the time to create a non-sparce indexed dataframe with no data
+        df_stn_data["previous_hour"] = current_time
+
+        # merge in the data
+        df_merged = df_stn_data.merge(df, how="left", left_on=["previous_hour", "StnID"], right_on=["DATE_TIME", "StnID"])
+        df_merged = df_merged.fillna("")
+
+        return df_merged
+    else:
+        return df
+
+
+def return_single_valid_dat(stn_id, df_stn, dat_file_complete, time_version):
+    # all data gets added to the contacted file, given that we have a valid stnID
+    if stn_id != -1:
+        if df_stn is None:
+            df_stn = load_dat(dat_file_complete)
+
+        return df_stn, time_version
+
+
 # Given a single dat_file read it and then apply appropriate processing,
 # then copying the single file to partners if the partner json says that
 # it is required
 # returning None indicates that the loop should continue, otherwise returns
 # a tuple of the df (dat file -> df) and the time version (15, 60, 24)
 def process_single_dat(partner_json, station_metadata, dat_file):
+    df_stn = None
+    dat_file_complete = dat_file
+
+    # from the .dat file name find the matching station id
+    # isolate the name of the station
+    station_name = dat_file.split("\\")[-1][:-6]
+    time_version = dat_file.split("\\")[-1][-6:-4]
+
+    # ignoring files that are not in the format name24.dat, name60.dat, or name15.dat
+    if time_version not in ["24", "60", "15"]:
+        return None
+
+    # find the station id from the name
+    stn_id = station_metadata[station_metadata["DatFilename"] == station_name]["StnID"].values
+
+    if len(stn_id) <= 0:
+        stn_id = -1
+    else:
+        assert (len(stn_id) == 1)
+        stn_id = stn_id[0]
+
     try:
-        df_stn = None
-        dat_file_complete = dat_file
-
-        # from the .dat file name find the matching station id
-        # isolate the name of the station
-        station_name = dat_file.split("\\")[-1][:-6]
-        time_version = dat_file.split("\\")[-1][-6:-4]
-
-        # ignoring files that are not in the format name24.dat, name60.dat, or name15.dat
-        if time_version not in ["24", "60", "15"]:
-            return None
-
-        # find the station id from the name
-        stn_id = station_metadata[station_metadata["DatFilename"] == station_name]["StnID"].values
-
-        if len(stn_id) <= 0:
-            stn_id = -1
-        else:
-            assert (len(stn_id) == 1)
-            stn_id = stn_id[0]
 
         # iterate through the partner data and see if the current file is used anywhere
         for partner in partner_json:
@@ -520,18 +555,15 @@ def process_single_dat(partner_json, station_metadata, dat_file):
             if "copy_individual_stn_data" in partner_json[partner]:
                 df_stn = copy_individual_stn_data(partner_json[partner], dat_file_complete, df_stn, time_version)
 
-        # all data gets added to the contacted file, given that we have a valid stnID
-        if stn_id != -1:
-            if df_stn is None:
-                df_stn = load_dat(dat_file_complete)
-
-            return df_stn, time_version
+        return return_single_valid_dat(stn_id, df_stn, dat_file_complete, time_version)
 
     except Exception as e:
         stack_trace = ''.join(traceback.TracebackException.from_exception(e).format())
         logger.log_fatal_error("Unknown error caught when processing dat file " + dat_file + " Exception: "
                                + str(e).replace("\n", "") + stack_trace)
-        return None
+
+        # Want to still return a value for the concatenated processing
+        return return_single_valid_dat(stn_id, df_stn, dat_file_complete, time_version)
 
 
 # simple bootstrap which can be used by pool workers
