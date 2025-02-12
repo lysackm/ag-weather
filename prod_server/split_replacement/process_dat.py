@@ -17,11 +17,11 @@ from dat_logging import Logger
 
 # directory of the .dat files where the incoming data is coming
 # local testing
-dat_dir = "D:\\data\\remote_server_mock\\.dats\\"
-dest_dir = "D:\\data\\remote_server_mock\\.saved_data\\"
+# dat_dir = "D:\\data\\remote_server_mock\\.dats\\"
+# dest_dir = "D:\\data\\remote_server_mock\\.saved_data\\"
 # prod file directories
-# dat_dir = "C:/Campbellsci/Dats/"
-# dest_dir = "C:/WWW/mbagweather.ca/www/Partners/"
+dat_dir = "C:/Campbellsci/Dats/"
+dest_dir = "C:/WWW/mbagweather.ca/www/Partners/"
 
 logger = Logger()
 
@@ -186,8 +186,8 @@ def copy_individual_stn_data(partner_data, dat_file_full, df_stn, version):
                 else:
                     df_processed = df_processed.sort_values(["TMSTAMP"])
 
-                df_processed = date_processing(df_processed, version_data)
                 df_processed = non_sparce_time_processing(df_processed, version_data)
+                df_processed = date_processing(df_processed, version_data)
                 df_processed = df_data_operations(df_processed, version_data)
 
                 if previous_rows != "all" and type(previous_rows) is int:
@@ -261,8 +261,8 @@ def process_concat_data(df, metadata, base_directory, destination_file):
         df = df.sort_values(["TMSTAMP"])
 
     # TODO check if all of these .copy()s are necessary
-    df = date_processing(df.copy(), metadata)
     df = non_sparce_time_processing(df.copy(), metadata)
+    df = date_processing(df.copy(), metadata)
     df = df_data_operations(df.copy(), metadata)
 
     if previous_rows != "all" and type(previous_rows) is int:
@@ -431,7 +431,9 @@ def copy_concat_stn_data(df_concat_15, df_concat_60, df_concat_24, partner_json)
                 logger.log_non_fatal_error("Timed out when waiting for multi-threading to wait for a response "
                                            "TimeoutError: " + str(e))
             except Exception as e:
-                logger.log_non_fatal_error("Unknown multithreading error occurred attempting to continue " + str(e))
+                stack_trace = ''.join(traceback.TracebackException.from_exception(e).format())
+                logger.log_non_fatal_error("Unknown multithreading error occurred attempting to continue. "
+                                           "Error message: " + str(e) + "\n" + stack_trace)
 
 
 # load a dat file, only read 2nd of 2 headers
@@ -490,20 +492,22 @@ def process_column_mapping(df, metadata, dat_file=None):
 
 
 def non_sparce_time_processing(df, metadata):
-    if "previous_lines" in metadata and metadata["previous_lines"] is True:
+    if "non_sparce_time" in metadata and metadata["non_sparce_time"] is True:
         # get current date, rounded to the hour
         current_time = datetime.datetime.now()
         current_time = current_time.replace(minute=0, second=0, microsecond=0)
 
         # get unique station IDs from df
-        df_stn_data = df["StnID"]
-        df_stn_data = df_stn_data.unique()
+        df_stn_data = df[["StnID", "StationName", "LatDD", "LongDD", "URL"]]
+        df_stn_data = df_stn_data.drop_duplicates()
+
+        df_recorded = df.drop(columns=["StationName", "LatDD", "LongDD", "URL"])
 
         # get station metadata and merge in the time to create a non-sparce indexed dataframe with no data
-        df_stn_data["previous_hour"] = current_time
+        df_stn_data["TMSTAMP"] = str(current_time)
 
         # merge in the data
-        df_merged = df_stn_data.merge(df, how="left", left_on=["previous_hour", "StnID"], right_on=["DATE_TIME", "StnID"])
+        df_merged = df_stn_data.merge(df_recorded, how="left", on=["TMSTAMP", "StnID"])
         df_merged = df_merged.fillna("")
 
         return df_merged
@@ -583,7 +587,7 @@ def process_all_dats():
         logger.log_info("Starting .dat file transfer to partner")
         partner_json = {}
         try:
-            partner_json_file = open("./partner_data_server.json")
+            partner_json_file = open("./partner_data.json")
             partner_json = json.load(partner_json_file)
         except json.decoder.JSONDecodeError as e:
             logger.log_fatal_error("Error decoding the JSON file, partner_data.json. Please verify that "
@@ -616,7 +620,9 @@ def process_all_dats():
                 logger.log_non_fatal_error("Timed out when waiting for multi-threading to wait for a response "
                                            "TimeoutError: " + str(e))
             except Exception as e:
-                logger.log_non_fatal_error("Unknown multithreading error occurred attempting to continue " + str(e))
+                stack_trace = ''.join(traceback.TracebackException.from_exception(e).format())
+                logger.log_non_fatal_error("Unknown multithreading error occurred attempting to continue. "
+                                           "Error message: " + str(e) + "\n" + stack_trace)
 
     # create single concatenated df based off of the individual dat dfs
     df_concat_15 = pd.concat(list_concat_15)
