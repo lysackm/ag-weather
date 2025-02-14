@@ -140,10 +140,16 @@ def date_processing(df, df_metadata=None):
 def df_data_operations(df, df_metadata):
     if "lower_thresholds" in df_metadata:
         lower_threshold = df_metadata["lower_thresholds"]
-        df = apply_lower_thresholds(df, lower_threshold, df_metadata["id"])
+        if "substitution_value" in df_metadata:
+            df = apply_lower_thresholds(df, lower_threshold, df_metadata["id"], substitution=df_metadata["substitution_value"])
+        else:
+            df = apply_lower_thresholds(df, lower_threshold, df_metadata["id"])
     if "upper_thresholds" in df_metadata:
         upper_threshold = df_metadata["upper_thresholds"]
-        df = apply_upper_thresholds(df, upper_threshold, df_metadata["id"])
+        if "substitution_value" in df_metadata:
+            df = apply_upper_thresholds(df, upper_threshold, df_metadata["id"], substitution=df_metadata["substitution_value"])
+        else:
+            df = apply_upper_thresholds(df, upper_threshold, df_metadata["id"])
     if "transformations" in df_metadata:
         transformations = df_metadata["transformations"]
         df = apply_transformations(df, transformations, df_metadata["id"])

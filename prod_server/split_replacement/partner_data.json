@@ -177,6 +177,7 @@
           "Soil_TP50_VMC": 65,
           "Soil_TP100_VMC": 65
         },
+        "substitution_value": "",
         "transformations": {
           "AvgWS": 3.6,
           "MaxWS": 3.6
@@ -194,7 +195,7 @@
     }
   },
   "Current": {
-    "base_directory": "Current",
+    "base_directory": "current",
     "copy_individual_stn_data": {
       "15": {
         "id": "Current-15-1",
@@ -628,8 +629,7 @@
           "MinAir_T": "{:.2f}",
           "Pluvio_Rain": "{:.2f}",
           "Pluvio_Rain24RT": "{:.2f}",
-          "TBRG_Rain": "{:.2f}",
-          "TBRG_Rain24RT": "{:.2f}"
+          "TotRS_MJ": "{:.3f}"
         },
         "quoted_columns": [
           "TMSTAMP",
@@ -641,7 +641,7 @@
         "id": "Current-24-1",
         "run_time_regex": "[0-9]{4}-[0-9]{2}-[0-9]{2} 00:(0[0-9]|1[0-5]):[0-9]{2}",
         ".dat_to_partner_file_mapping": {
-          "alexander24.dat": "alexander24.txt",
+          "Alexander24.dat": "alexander24.txt",
           "alonsa24.dat": "Alonsa24.txt",
           "altona24.dat": "altona24.txt",
           "amaranth24.dat": "amaranth24.txt",
