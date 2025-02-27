@@ -1,3 +1,2 @@
 Python_Scripts/Mark/Aquarius/credentials.txt
-*.iml
-*jsonSchemas.xml
+.idea
