@@ -7,14 +7,6 @@ from datetime import timedelta
 warnings.filterwarnings("error")
 
 
-# as of now
-# nrcan
-# merra
-# era5
-# eccc
-# our data
-
-
 def peek_nc(file):
     warnings.filterwarnings('default')
     print("Peeking into the file", file)
@@ -90,7 +82,23 @@ def apply_function_daily(df_daily, df, src_column, operation, dest_column=""):
     df["NormDD"] = df["time"].dt.day
 
     groupby_columns = [df["NormYY"], df["NormMM"], df["NormDD"], df["StnID"]]
-    df_daily[dest_column] = df[src_column].groupby(by=groupby_columns).agg(operation).values
+    if operation == "max":
+        df_daily[dest_column] = df[src_column].groupby(by=groupby_columns).max(min_count=1).values
+    elif operation == "min":
+        df_daily[dest_column] = df[src_column].groupby(by=groupby_columns).min(min_count=1).values
+    elif operation == "avg":
+        numerator_df = df[src_column].groupby(by=[df["time"].dt.year.rename("NormYY"),
+                                              df["time"].dt.month.rename("NormMM"),
+                                              df["time"].dt.day.rename("NormDD"),
+                                              df["StnID"]]).sum(min_count=1)
+        denominator_df = df[src_column].groupby(by=[df["time"].dt.year.rename("NormYY"),
+                                                df["time"].dt.month.rename("NormMM"),
+                                                df["time"].dt.day.rename("NormDD"),
+                                                df["StnID"]]).count()
+
+        df_daily = numerator_df / denominator_df
+    elif operation == "sum":
+        df_daily[dest_column] = df[src_column].groupby(by=groupby_columns).sum(min_count=1).values
 
     return df_daily
 
@@ -109,30 +117,38 @@ def hourly_to_daily_df(df, columns, daily_merge_operations):
                                            df["time_utc_adjusted"].dt.day.rename("NormDD"),
                                            df["StnID"]]).mean()
 
+        df_daily.reset_index()
+
+        for column in columns:
+            # Not the most readable code...
+            if type(daily_merge_operations[column]) is list:
+                for daily_merge_operation in daily_merge_operations[column]:
+                    if daily_merge_operation in column:
+                        df_daily = apply_function_daily(df_daily, df, column, daily_merge_operation)
+                    elif any(substring in column for substring in operations):
+                        old_operation = [substring for substring in operations if substring in column][0]
+                        dest_column = column.replace(old_operation, "") + daily_merge_operation
+                        df_daily = apply_function_daily(df_daily, df, column, daily_merge_operation, dest_column)
+                    else:
+                        dest_column = column + "_" + daily_merge_operation
+                        df_daily = apply_function_daily(df_daily, df, column, daily_merge_operation, dest_column)
+            else:
+                df_daily = apply_function_daily(df_daily, df, column, daily_merge_operations[column])
+
+        return df_daily
     else:
-        df_daily = df[columns].groupby(by=[df["time"].dt.year.rename("NormYY"),
+        df["time"] = df["time_utc"]
+        numerator_df = df[columns].groupby(by=[df["time"].dt.year.rename("NormYY"),
                                            df["time"].dt.month.rename("NormMM"),
                                            df["time"].dt.day.rename("NormDD"),
-                                           df["StnID"]]).mean()
-    df_daily.reset_index()
+                                           df["StnID"]]).sum(min_count=1)
+        denominator_df = df[columns].groupby(by=[df["time"].dt.year.rename("NormYY"),
+                                             df["time"].dt.month.rename("NormMM"),
+                                             df["time"].dt.day.rename("NormDD"),
+                                             df["StnID"]]).count()
 
-    for column in columns:
-        # Not the most readable code...
-        if type(daily_merge_operations[column]) is list:
-            for daily_merge_operation in daily_merge_operations[column]:
-                if daily_merge_operation in column:
-                    df_daily = apply_function_daily(df_daily, df, column, daily_merge_operation)
-                elif any(substring in column for substring in operations):
-                    old_operation = [substring for substring in operations if substring in column][0]
-                    dest_column = column.replace(old_operation, "") + daily_merge_operation
-                    df_daily = apply_function_daily(df_daily, df, column, daily_merge_operation, dest_column)
-                else:
-                    dest_column = column + "_" + daily_merge_operation
-                    df_daily = apply_function_daily(df_daily, df, column, daily_merge_operation, dest_column)
-        else:
-            df_daily = apply_function_daily(df_daily, df, column, daily_merge_operations[column])
-
-    return df_daily
+        df_daily = numerator_df/denominator_df
+        return df_daily
 
 
 class StandardizeDailyData:
@@ -141,7 +157,7 @@ class StandardizeDailyData:
         self.dest_file = dest_file
 
         warnings.filterwarnings('default')
-        self.df = pd.read_csv("./data/" + source_file)
+        self.df = pd.read_csv("./data/" + source_file, na_values=[""])
         warnings.filterwarnings('error')
 
     def time_col_to_datetime(self, time_col, utc_col):
@@ -481,10 +497,12 @@ def daily_standardize_mbag():
     standardize_daily_data = StandardizeDailyData(file, file)
     standardize_daily_data.time_col_to_datetime(date_col, None)
     # need custom code to filter out invalid tipping bucket data in the winter
-    standardize_daily_data.df["TBRG_Rain"] = standardize_daily_data.df["TBRG_Rain"].mask(
-        (standardize_daily_data.df["time"].dt.dayofyear < 75) |
-        (standardize_daily_data.df["time"].dt.dayofyear > 320) |
-        (standardize_daily_data.df["AvgAir_T"] < 3))
+    in_new_year = (standardize_daily_data.df["time"].dt.dayofyear < 75)
+    in_end_of_year = (standardize_daily_data.df["time"].dt.dayofyear > 320)
+    is_freezing = standardize_daily_data.df["AvgAir_T"] < 3
+    mask_df = in_new_year | in_end_of_year | is_freezing
+
+    standardize_daily_data.df["TBRG_Rain"] = standardize_daily_data.df["TBRG_Rain"].mask(mask_df)
     standardize_daily_data.back_fill_column("Pluvio_Rain", "TBRG_Rain")
 
     standardize_daily_data.add_stn_id_col(stn_col)
@@ -542,9 +560,9 @@ def main():
     # eccc()
     # station_eccc()
 
-    daily_standardize_era5()
+    # daily_standardize_era5()
     daily_standardize_mbag()
-    daily_standardize_nrcan()
+    # daily_standardize_nrcan()
     daily_standardize_eccc()
 
 

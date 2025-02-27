@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 
 # p is a function defined in the p-days calculation
@@ -101,12 +102,14 @@ def combine_daily_data():
                                         "Tmin": "nrcan_Tmin",
                                         "Tmax": "nrcan_Tmax"})
     df_nrcan = df_nrcan.set_index(["StnID", "NormYY", "NormMM", "NormDD", "DateDT"])
+    df_nrcan = df_nrcan.replace("", np.nan)
 
     df_era5 = pd.read_csv("./data/standardized_daily/era5_temperature.csv")
     df_era5 = df_era5.rename(columns={"Tavg": "era5_Tavg",
                                       "Tmin": "era5_Tmin",
                                       "Tmax": "era5_Tmax"})
     df_era5 = df_era5.set_index(["StnID", "NormYY", "NormMM", "NormDD", "DateDT"])
+    df_era5 = df_era5.replace("", np.nan)
 
     # contains PPT, Tmin, Tmax
     df_eccc = pd.read_csv("./data/standardized_daily/eccc.csv")
@@ -115,6 +118,7 @@ def combine_daily_data():
                                       "Tmax": "eccc_Tmax",
                                       "Tavg": "eccc_Tavg"})
     df_eccc = df_eccc.set_index(["StnID", "NormYY", "NormMM", "NormDD", "DateDT"])
+    df_eccc = df_eccc.replace("", np.nan)
 
     # contains Tmin, Tmax, PPT
     df_mbag = pd.read_csv("./data/standardized_daily/mbag_stations.csv")
@@ -123,9 +127,9 @@ def combine_daily_data():
                                       "Tmax": "mbag_Tmax",
                                       "Tavg": "mbag_Tavg"})
     df_mbag = df_mbag.set_index(["StnID", "NormYY", "NormMM", "NormDD", "DateDT"])
+    df_mbag = df_mbag.replace("", np.nan)
 
-    df_joined = df_nrcan.join([df_era5, df_eccc, df_mbag],
-                              how="outer")
+    df_joined = df_nrcan.join([df_era5, df_eccc, df_mbag], how="outer")
     df_joined = df_joined.reset_index()
     return df_joined
 

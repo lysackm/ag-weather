@@ -116,6 +116,45 @@ def compare_monthly_totals(df, col):
     plt.show()
 
 
+def show_singular_station(df, column, stn_id, show_plot=False):
+    source_colour_map = {"eccc": "red", "nrcan": "green", "era5": "blue", "mbag": "black"}
+
+    df = df[df["StnID"] == stn_id]
+    source_column_name = column + "_source"
+    df["colour"] = df[source_column_name].apply(lambda x: source_colour_map[x])
+
+    plt.scatter(df["DateDT"], df[column], color=df["colour"], s=0.3)
+    plt.savefig("D:/data/graphs/climate_normal_stn_graphs/" + column + "_" + str(stn_id) + ".png")
+    if show_plot:
+        plt.show()
+    plt.clf()
+
+
+def show_all_stations_individually(column):
+    df = pd.read_csv("D:/PycharmProjects/data_management/data/merged_dataset_2024_normal.csv")
+    df["DateDT"] = pd.to_datetime(df["DateDT"])
+
+    plt.figure(figsize=(8, 6), dpi=260)
+
+    station_df = pd.read_csv("./metadata/station_metadata.csv")
+    stn_ids = station_df["StnID"].tolist()
+
+    for stn_id in stn_ids:
+        show_singular_station(df.copy(), column, stn_id)
+
+
+def save_normal_summary(df_file=""):
+    if df_file == "":
+        df = pd.read_csv("./data/climate_normal/2020_MBAg_normal.csv")
+    else:
+        df = pd.read_csv(df_file)
+    df = df.drop(columns=["DateDT", "NormLocation", "NormYY", "NormMM", "NormDD", "JD"])
+    df_summary = df.groupby(by=[df["StnID"], df["Location"]]).sum()
+    rounded_cols = ["Tmax", "Tmin", "Tavg", "PPT", "CHU", "GDD", "PDay"]
+    df_summary[rounded_cols] = df_summary[rounded_cols].round(2)
+    df_summary.to_csv("./data/climate_normal/summaries/2020_MBAg_normal_summary.csv")
+
+
 def run_normal_graph_suite(df_1, df_2, columns_to_compare):
     df = df_1.merge(df_2, how="inner", on=["StnID", "NormMM", "NormDD"])
     print(df)
@@ -130,6 +169,7 @@ def normal_comparison():
     df_2 = pd.read_csv("./data/climate_normal/nrcan_temperature.csv")
     df_3 = pd.read_csv("./data/climate_normal/era5_temperature.csv")
     df_4 = pd.read_csv("./data/climate_normal/2020_MBAg_normal.csv")
+    df_5 = pd.read_csv("./data/climate_normal/2020_MBAg_normal_non_climatological_days.csv")
 
     columns = ["Tmax", "Tmin", "PPT"]
     # run_normal_graph_suite(df_1, df_2, columns)
@@ -143,7 +183,7 @@ def daily_comparison():
     # df_2 = pd.read_csv("./data/standardized_daily/era5_temperature.csv")
 
     # group by day, compare values in column list
-    df = df_1.merge(df_2, how="inner", on=["SN", "StnID", "NormYY", "NormMM", "NormDD"])
+    df = df_1.merge(df_2, how="inner", on=["StnID", "NormYY", "NormMM", "NormDD"])
     columns = ["Tmax", "Tmin", "PPT"]
     display_linear_comparison(df, columns)
     display_yearly_scatter(df, columns, "Mbag", "NRCan")
@@ -153,8 +193,11 @@ def daily_comparison():
 
 
 def main():
-    normal_comparison()
+    # normal_comparison()
     # daily_comparison()
+    # save_normal_summary()
+
+    show_all_stations_individually("PPT")
 
 
 if __name__ == "__main__":
