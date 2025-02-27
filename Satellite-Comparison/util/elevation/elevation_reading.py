@@ -4,6 +4,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy import stats
 import plotly.express as px
+import geopy.distance
+from scipy import spatial
+
+
+def find_merra_dist(row):
+    return geopy.distance.geodesic((row["stn_lat"], row["stn_long"]), (row["merra_lat"], row["merra_lon"])).km
+
+
+def find_era5_dist(row):
+    return geopy.distance.geodesic((row["stn_lat"], row["stn_long"]), (row["era5_lat"], row["era5_long"])).km
 
 
 def process_data():
@@ -22,6 +32,20 @@ def process_data():
     df_era5["value"] = df_era5["era5_err"]
     df_era5 = df_era5[["value"]]
     df_era5.to_csv("era5_pressure_means.csv")
+
+    df = pd.read_csv("../../error_correction/random_forest_data.csv")
+
+    # distance from centroid
+    df_stn = df[["merra_lat", "merra_lon", "stn_long", "stn_lat", "era5_lat", "era5_long"]]
+
+    df_stn = df_stn.drop_duplicates()
+
+    df_stn["merra_dist"] = df_stn.apply(find_merra_dist, axis=1)
+    print("merra", df_stn["merra_dist"].mean(), df_stn["merra_dist"].quantile(0.25), df_stn["merra_dist"].quantile(0.75))
+    df_stn["era5_dist"] = df_stn.apply(find_era5_dist, axis=1)
+    print("era5", df_stn["era5_dist"].mean(), df_stn["era5_dist"].quantile(0.25), df_stn["era5_dist"].quantile(0.75))
+
+    df_stn.to_csv("dist_from_centroid.csv")
 
 
 def stn_metadata_preprocessing(stn_meta):
@@ -227,6 +251,7 @@ def pretty_merra_era():
     df = df.merge(elevation_means, how="left", left_on="StnID", right_on="StnID")
 
     df = df[["Station", "stn_elevation", "era5_elevation", "elevation_err", "value"]]
+    df.to_csv("era5_elevation_error.csv")
 
     df = df[df["value"].notna()]
     x = df["elevation_err"].tolist()
@@ -391,10 +416,10 @@ def mapped_elevation():
 
 
 if __name__ == "__main__":
-    process_data()
+    # process_data()
     # merra()
     # era5()
-    # pretty_merra_era()
+    pretty_merra_era()
     # mapped_merra()
     # mapped_era5()
-    mapped_elevation()
+    # mapped_elevation()
