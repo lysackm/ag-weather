@@ -27,8 +27,8 @@ class FrostReport:
         df["season"] = df["date"].map(map_seasons)
         df = df[~df["StnID"].isin(new_stns)]
 
-        first_frost, first_frost_avg = self.first_frost_report(df)
-        last_frost, last_frost_avg = self.last_frost_report(df)
+        first_frost, first_frost_avg = self.first_frost_report(df, True)
+        last_frost, last_frost_avg = self.last_frost_report(df, True)
         frost_free = self.frost_free_report(first_frost, last_frost)
         gdd = self.gdd_report(df, False)
         pday = self.pdays_report(df, False)
@@ -44,12 +44,15 @@ class FrostReport:
         df = df[df["min_temp_merged"] < 0]
         first_frost = calculate_first_frost(df)
         first_frost = compensate_for_leap_years(first_frost)
-
         first_frost = first_frost[first_frost["day_of_year"] != 0]
+
+        first_frost["year"] = first_frost["date"]
+        first_frost = first_frost.set_index(["StnID", "date"])
+
         if show_scatter:
             self.graph_frost_dates(first_frost,
                                    first_frost["day_of_year"],
-                                   first_frost["min_temp_merged"],
+                                   first_frost["year"],
                                    "First Frost With QC (NRCAN supplement)")
 
         title_base = "First Frost With QC (NRCAN supplement) "
@@ -67,10 +70,13 @@ class FrostReport:
 
         last_frost = last_frost[last_frost["day_of_year"] != 0]
         last_frost = last_frost[last_frost["day_of_year"] > 92]
+
+        last_frost["year"] = last_frost["date"]
+        last_frost = last_frost.set_index(["StnID", "date"])
         if show_scatter:
             self.graph_frost_dates(last_frost,
                                    last_frost["day_of_year"],
-                                   last_frost["min_temp_merged"],
+                                   last_frost["year"],
                                    "Last Frost With QC (NRCAN supplement)")
 
         title_base = "Last Frost With QC (NRCAN supplement) "
