@@ -241,14 +241,30 @@ def make_percent_improvements_bar_chart():
     #     "ERA-5 Land Linear Reg": [12.06, 7.28, 5.73, 0.87, 14.31],
     #     "ERA-5 Land RF": [83.62, 60.21, 10, 152.53, 83.79]
     # }
+    # percents = {
+    #     "MERRA-2 Mean Bias Correction": [9, 11, 0, 3, 22],
+    #     "MERRA-2 Linear Regression Correction": [10, 18, 5, 3, 37],
+    #     "MERRA-2 Random Forest Correction": [113, 73, 16, 432, 168],
+    #     "ERA5-Land Mean Bias Correction": [11, 6, 0, 1, 11],
+    #     "ERA5-Land Linear Regression Correction": [12, 7, 6, 1, 14],
+    #     "ERA5-Land Random Forest Correction": [84, 60, 10, 153, 84]
+    # }
     percents = {
-        "MERRA-2 Mean Bias Correction": [9, 11, 0, 3, 22],
-        "MERRA-2 Linear Regression Correction": [10, 18, 5, 3, 37],
-        "MERRA-2 Random Forest Correction": [113, 73, 16, 432, 168],
-        "ERA5-Land Mean Bias Correction": [11, 6, 0, 1, 11],
-        "ERA5-Land Linear Regression Correction": [12, 7, 6, 1, 14],
-        "ERA5-Land Random Forest Correction": [84, 60, 10, 153, 84]
+        "MERRA-2 Mean Bias Correction": [8, 11, 0, 4, 18],
+        "MERRA-2 Linear Regression Correction": [8, 17, 0, 4, 27],
+        "MERRA-2 Random Forest Correction": [54, 44, 0, 80, 63],
+        "ERA5-Land Mean Bias Correction": [10, 6, 0, 0, 10],
+        "ERA5-Land Linear Regression Correction": [10, 13, 0, 0, 13],
+        "ERA5-Land Random Forest Correction": [43, 38, 0, 62, 46]
     }
+    # percents = {
+    #     "MERRA-2 Mean Bias Correction": [8, 10, 0, 3, 18],
+    #     "MERRA-2 Linear Regression Correction": [9, 16, 5, 3, 27],
+    #     "MERRA-2 Random Forest Correction": [53, 42, 14, 81, 63],
+    #     "ERA5-Land Mean Bias Correction": [10, 5, 0, 1, 10],
+    #     "ERA5-Land Linear Regression Correction": [11, 6.8, 5, 0, 13],
+    #     "ERA5-Land Random Forest Correction": [46, 38, 9, 60, 40]
+    # }
 
     colors = {
         "MERRA-2 Mean Bias Correction": "bisque",
@@ -270,6 +286,8 @@ def make_percent_improvements_bar_chart():
     multiplier = 0
 
     plt.style.use("ggplot")
+    plt.rcParams['font.size'] = 20
+    # plt.rc('font', small=22)
     plt.rcParams['axes.facecolor'] = 'w'
     plt.rcParams['axes.edgecolor'] = 'dimgrey'
     plt.rcParams['grid.color'] = 'lightgrey'
@@ -284,9 +302,9 @@ def make_percent_improvements_bar_chart():
     # Add some text for labels, title and custom x-axis tick labels, etc.
     ax.set_ylabel('Percent Improvement', color="black")
     ax.set_xticks(x + 2.5 * width, attrs, color="black")
-    ax.legend(loc='upper left', ncols=2, prop={"size": 13})
+    ax.legend(loc='upper left', ncols=2, prop={"size": 18})
 
-    ax.set_ylim(0, 500)
+    ax.set_ylim(0, 100)
     # plt.yscale("log")
 
     plt.show()
@@ -348,16 +366,17 @@ def correlation_coefficient(df, col1, col2):
 
 def extreme_rmse(df, attribute, col1, col2):
     if attribute in ["AvgWS", "Pluvio_Rain"]:
-        if attribute == "Pluvio_Rain":
-            print("Extreme rmse\n\n\n", df[col1].quantile(q=0.95))
+        print(attribute + "Extreme rmse\n\n\n", df[col1].quantile(q=0.95))
         df = df[df[col1] > df[col1].quantile(q=0.95)]
         return np.sqrt(df[col2].mean())
     elif attribute in ["AvgAir_T", "Press_hPa"]:
+        print(attribute + "Extreme rmse\n\n\n", df[col1].quantile(q=0.975), df[col1].quantile(q=0.025))
         df_1 = df[df[col1] > df[col1].quantile(q=0.975)]
         df_2 = df[df[col1] < df[col1].quantile(q=0.025)]
         df = pd.concat([df_1, df_2])
         return np.sqrt(df[col2].mean())
     elif attribute in ["RH"]:
+        print(attribute + "Extreme rmse\n\n\n", df[col1].quantile(q=0.05))
         df = df[df[col1] < df[col1].quantile(q=0.05)]
         return np.sqrt(df[col2].mean())
 
