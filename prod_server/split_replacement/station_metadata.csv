@@ -14,7 +14,7 @@ SN,StnID,StationName,LatDD,LongDD,DatFilename,URL,stringFriendlyStnName
 108,563,Birch River,52.3472,-101.1099,birchriver,http://www.gov.mb.ca/agriculture/weather/birch-river-cc.html,BirchRiver
 16,216,Birtle,50.411,-100.893,birtle2_,http://www.gov.mb.ca/agriculture/weather/birtle-cc.html,Birtle
 9,209,Boissevain,49.24,-100.055,boissevain,http://www.gov.mb.ca/agriculture/weather/boissevain-cc.html,Boissevain
-111,566,BrandonNH,49.876,-99.909,brandonMBFI,http://www.gov.mb.ca/agriculture/weather/brandon-cc.html,Brandon
+111,566,Brandon,49.876,-99.909,brandonMBFI,http://www.gov.mb.ca/agriculture/weather/brandon-cc.html,Brandon
 76,530,Brunkild ,49.591,-97.518,brunkild,http://www.gov.mb.ca/agriculture/weather/brunkild-cc.html,Brunkild
 44,314,Carberry,49.905,-99.354,Carberry,http://www.gov.mb.ca/agriculture/weather/carberry-cc.html,Carberry
 12,212,Carman,49.498,-98.03,carman,http://www.gov.mb.ca/agriculture/weather/carman-cc.html,Carman

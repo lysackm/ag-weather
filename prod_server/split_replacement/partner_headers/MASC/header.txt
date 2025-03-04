@@ -1,0 +1,1 @@
+"DATE","TIME","StnNAME","StnID","Lat","Long","URL","AirTemp(Celsius)","RH(%)","Rain(mm)",RainSinceMid(mm),"AvgWindSpeed(km/h)","MaxWindSpeed(km/h)","AvgWindDirection(degrees)","SoilTemp(5cm, Celsius)","SoilTemp(20cm, Celsius)","SoilMoist(5cm, %)","SoilMoist(20cm, %)","SoilTemp(50cm, Celsius)","SoilTemp(100cm, Celsius)","SoilMoist(50cm, %)","SoilMoist(100cm, %)","BarPres(hpa)"

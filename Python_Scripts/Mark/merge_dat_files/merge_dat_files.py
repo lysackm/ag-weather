@@ -106,7 +106,6 @@ def round_columns():
     # for file in files:
 
 
-
 # merge_files will run through all the files in the directory ./dat_files
 # and concatenate the files into one file if they
 # have the same suffix (ex. altona15.dat and altona15.datx)

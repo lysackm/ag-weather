@@ -46,7 +46,7 @@ def dest_file_from_other(file, generic_dir=dest_dir):
 
 
 def copy_old_dats():
-    dat_files = fetch_file_names(new_dir)
+    dat_files = fetch_file_names(old_dir)
 
     for old_dat in dat_files:
         # print("old_dat", old_dat)
@@ -121,6 +121,8 @@ def concat_new_files_onto_dest():
                 if date >= date_of_backup and line_num >= 2:
                     # append line to new file
                     dest_f.write(line)
+                else:
+                    print("line_num", line_num, "date", date_of_backup)
                 line_num += 1
 
                 # if line is empty
@@ -136,21 +138,21 @@ def check_which_line_missing(contents):
     i = -1
     while i > -len(contents):
         if contents[i][0:21] == '"2024-08-09 11:00:00"':
-            print(contents[i - 1][0:21])
             if contents[i - 1][0:21] == '"2024-08-09 10:45:00"':
-                return None
+                return i - 1
             assert(contents[i - 1][0:21] == '"2024-08-09 10:30:00"')
             return i
         i -= 1
 
 
+# dest: where the new files end up, should be clear
+# new: what used to be in prod
 def add_missing_line():
     # go through dat files
     # find the line before "2024-08-09 10:45:00" <- what we want to insert
 
     # can we assert that "2024-08-09 10:30:00" exists? similarly can we assert that "2024-08-09 11:00:00" exists?
     # probably tbh, raise exception if it doesn't
-    copy_new_dats()
     dest_files = fetch_file_names(dest_dir)
 
     for file in dest_files:
@@ -168,15 +170,17 @@ def add_missing_line():
         index = check_which_line_missing(contents)
 
         if index is not None and suffix in file_suffixes:
-            print(contents[index][0:21], file)
-            assert (contents[index][0:21] == '"2024-08-09 11:00:00"')
+            # assert (contents[index][0:21] == '"2024-08-09 11:00:00"')
 
             with open(missing_line_file, 'r') as f:
                 lines = f.read().splitlines()
                 inserted_line = lines[-1]
                 inserted_line = inserted_line + '\n'
 
-            contents.insert(index, inserted_line)
+            if contents[index][0:21] == '"2024-08-09 10:45:00"':
+                contents[index] = inserted_line
+            else:
+                contents.insert(index, inserted_line)
 
             with open(file, "w") as f:
                 contents = "".join(contents)
@@ -190,8 +194,8 @@ def main():
     # get list of files from backups and backups only
 
     # merge 2 sets of dat files
-    # copy_old_dats()
-    # concat_new_files_onto_dest()
+    copy_old_dats()
+    concat_new_files_onto_dest()
 
     # replace missing line of data
     add_missing_line()
