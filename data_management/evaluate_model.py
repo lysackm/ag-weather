@@ -145,7 +145,7 @@ def show_all_stations_individually(column):
 
 def save_normal_summary(df_file=""):
     if df_file == "":
-        df = pd.read_csv("./data/climate_normal/2020_MBAg_normal.csv")
+        df = pd.read_csv("data/climate_normal/2020_MBAg_normal_w_clarkleigh.csv")
     else:
         df = pd.read_csv(df_file)
     df = df.drop(columns=["DateDT", "NormLocation", "NormYY", "NormMM", "NormDD", "JD"])
@@ -168,13 +168,14 @@ def normal_comparison():
     df_1 = pd.read_csv("./data/climate_normal/historical_2000_normal.csv")
     df_2 = pd.read_csv("./data/climate_normal/nrcan_temperature.csv")
     df_3 = pd.read_csv("./data/climate_normal/era5_temperature.csv")
-    df_4 = pd.read_csv("./data/climate_normal/2020_MBAg_normal.csv")
+    df_4 = pd.read_csv("data/climate_normal/2020_MBAg_normal_w_clarkleigh.csv")
     df_5 = pd.read_csv("./data/climate_normal/2020_MBAg_normal_non_climatological_days.csv")
+    df_6 = pd.read_csv("data/climate_normal/2020_MBAg_normal.csv")
 
     columns = ["Tmax", "Tmin", "PPT"]
     # run_normal_graph_suite(df_1, df_2, columns)
     # run_normal_graph_suite(df_1, df_3, ["Tavg"])
-    run_normal_graph_suite(df_1, df_4, columns + ["Tavg"])
+    run_normal_graph_suite(df_6, df_4, columns + ["Tavg"])
 
 
 def daily_comparison():
@@ -193,7 +194,7 @@ def daily_comparison():
 
 
 def main():
-    # normal_comparison()
+    normal_comparison()
     # daily_comparison()
     # save_normal_summary()
 
