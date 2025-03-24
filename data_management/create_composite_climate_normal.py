@@ -4,7 +4,7 @@ import numpy as np
 
 # p is a function defined in the p-days calculation
 def p(t):
-    k = 1
+    k = 10
 
     if t < 7:
         return t * 0
@@ -20,10 +20,11 @@ def p(t):
 
 
 # https://www.gov.mb.ca/agriculture/weather/agricultural-climate-of-mb.html
+# https://www.apsnet.org/publications/PlantDisease/BackIssues/Documents/1986Articles/PlantDisease70n10_915.PDF
 def calculate_p_day(t_min, t_max):
     t1 = p(t_min)
-    t2 = p(((2 * t_min) + t_max)/3)
-    t3 = p((t_min + (2 * t_max))/3)
+    t2 = p(((2.0 * t_min) + t_max)/3.0)
+    t3 = p((t_min + (2.0 * t_max))/3.0)
     t4 = p(t_max)
 
     return (1/24) * (5 * t1 + 8 * t2 + 8 * t3 + 3 * t4)
@@ -31,13 +32,13 @@ def calculate_p_day(t_min, t_max):
 
 # https://www.gov.mb.ca/agriculture/weather/agricultural-climate-of-mb.html
 def calculate_chu(t_min, t_max):
-    chu = (1.8 * (t_min - 4.4) + 3.33 * (t_max - 10) - 0.084 * (t_max - 10) ** 2) / 2.0
+    chu = (1.8 * (t_min - 4.4) + 3.33 * (t_max - 10) - 0.084 * (t_max - 10) ** 2.0) / 2.0
     return chu.clip(0)
 
 
 # https://www.gov.mb.ca/agriculture/weather/agricultural-climate-of-mb.html
 def calculate_gdd(t_min, t_max):
-    conditional = (t_min + t_max)/2 - 5
+    conditional = (t_min + t_max)/2.0 - 5
 
     if conditional > 0:
         return conditional
@@ -134,11 +135,20 @@ def combine_daily_data():
     return df_joined
 
 
+def calculate_accumulated_units(df):
+    df["CHU"] = df[["Tmin", "Tmax"]].apply(lambda row: calculate_chu(row["Tmin"], row["Tmax"]), axis=1)
+    df["GDD"] = df[["Tmin", "Tmax"]].apply(lambda row: calculate_gdd(row["Tmin"], row["Tmax"]), axis=1)
+    df["PDay"] = df[["Tmin", "Tmax"]].apply(lambda row: calculate_p_day(row["Tmin"], row["Tmax"]), axis=1)
+
+    return df
+
+
 def create_composite_daily_data():
     df = combine_daily_data()
     df = merge_columns(df)
     df = filter_stations(df)
     df = filter_dates(df)
+    df = calculate_accumulated_units(df)
     df.to_csv("./data/merged_dataset_2024_normal.csv", index=False)
     return df
 
@@ -166,10 +176,6 @@ def create_composite_climate_normal():
     df["non_leap_year_date"] = pd.to_datetime(date_df[["year", "month", "day"]])
     df["JD"] = df["non_leap_year_date"].dt.dayofyear
     df.drop(columns=["non_leap_year_date"])
-
-    df["CHU"] = df[["Tmin", "Tmax"]].apply(lambda row: calculate_chu(row["Tmin"], row["Tmax"]), axis=1)
-    df["GDD"] = df[["Tmin", "Tmax"]].apply(lambda row: calculate_gdd(row["Tmin"], row["Tmax"]), axis=1)
-    df["PDay"] = df[["Tmin", "Tmax"]].apply(lambda row: calculate_p_day(row["Tmin"], row["Tmax"]), axis=1)
 
     # merge in station metadata
     normal_station_metadata_df = pd.read_csv("./metadata/merged_climate_normal_stns.csv")
