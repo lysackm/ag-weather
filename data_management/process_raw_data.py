@@ -557,8 +557,8 @@ def main():
     # nrcan()
     # nrcan_climate_normal()
     # era5_t2m()
-    # eccc()
-    # station_eccc()
+    eccc()
+    station_eccc()
 
     # daily_standardize_era5()
     daily_standardize_mbag()
