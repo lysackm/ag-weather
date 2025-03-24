@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import pandas as pd
-import math
 from scipy.stats import ttest_ind
 from sklearn.metrics import root_mean_squared_error
+import seaborn as sns
 
 
 def t_test(series_1, series_2):
@@ -25,11 +25,16 @@ def rmse(series_1, series_2):
     return rmse
 
 
-#
+def graph_corr_matrix(df):
+    # corr = df.corr()
+    sns.pairplot(df)
+    plt.show()
+
+
 def graph_compared_values(series_1, series_2, x_axis, label_1="Series 1", label_2="Series 2"):
     ax1 = plt.subplot(221)
-    ax1.plot(x_axis, series_1, color="Blue", label=label_1)
-    ax1.plot(x_axis, series_2, color="Red", label=label_2)
+    ax1.plot(x_axis, series_1, color="Blue", label=label_1, alpha=0.5)
+    ax1.plot(x_axis, series_2, color="Red", label=label_2, alpha=0.5)
     ax1.legend()
 
     ax2 = plt.subplot(222)
@@ -44,9 +49,14 @@ def graph_compared_values(series_1, series_2, x_axis, label_1="Series 1", label_
 
     ax4 = plt.subplot(224)
     ax4.scatter(series_1, series_2)
-    ax4.set_ylabel(label_1)
-    ax4.set_xlabel(label_2)
+    ax4.set_ylabel(label_2)
+    ax4.set_xlabel(label_1)
     ax4.set_title("Plotting against each other")
+
+    plt.setp(ax1.get_xticklabels(), rotation=15, horizontalalignment='right')
+    plt.setp(ax2.get_xticklabels(), rotation=15, horizontalalignment='right')
+    plt.setp(ax3.get_xticklabels(), rotation=15, horizontalalignment='right')
+    plt.tight_layout()
 
     plt.show()
 
