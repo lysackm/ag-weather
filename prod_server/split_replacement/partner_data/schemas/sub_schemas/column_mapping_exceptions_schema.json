@@ -1,0 +1,13 @@
+{
+  "$id": "urn:partner-data/config/column-mapping-exceptions",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "column_mapping_exceptions",
+  "description": "Specific stations which have a different column mapping",
+  "type": "object",
+  "properties": {
+    "type": "object",
+    "patternProperties": {
+      "^S_": { "type": "string" }
+    }
+  }
+}

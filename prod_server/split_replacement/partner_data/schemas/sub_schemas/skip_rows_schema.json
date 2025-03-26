@@ -1,0 +1,10 @@
+{
+  "$id": "urn:partner-data/config/skip-rows",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "skip_rows",
+  "description": "Skip reading rows from the dat files",
+  "type": ["integer", "array"],
+  "items": {
+    "type": "number"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "base_directory": "Potato",
+  "copy_individual_stn_data": {
+    "15": {
+      "id": "Potato-15-1",
+      "run_time_regex": "[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}",
+      ".dat_to_partner_file_mapping": {
+        "CarmanPotato1_15.dat": "CarmanPotato1_15.txt",
+        "CarmanPotato2_15.dat": "CarmanPotato2_15.txt",
+        "MelbournePotato1_15.dat": "MelbournePotato1_15.txt",
+        "MelbournePotato2_15.dat": "MelbournePotato2_15.txt"
+      },
+      "direct_copy": true
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "$id": "urn:partner-data/config/lower-thresholds",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "lower_thresholds",
+  "description": "Lower thresholds to apply to the values in a specified column",
+  "type": "object",
+  "patternProperties": {
+    "^S_": { "type": "number" }
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "$id": "urn:partner-data/copy-concatenated-stn-data",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "copy_concatenated_stn_data",
+  "description": "Settings for a concatenated partner file",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "$ref": "urn:partner-data/config/id"
+    },
+    "run_time_regex": {
+      "$ref": "urn:partner-data/config/run-time-regex"
+    },
+    "retain_data": {
+      "$ref": "urn:partner-data/config/retain-data"
+    },
+    "previous_rows": {
+      "$ref": "urn:partner-data/config/previous-rows"
+    },
+    "column_mapping": {
+      "$ref": "urn:partner-data/config/column-mapping"
+    },
+    "lower_thresholds": {
+      "$ref": "urn:partner-data/config/lower-thresholds"
+    },
+    "upper_thresholds": {
+      "$ref": "urn:partner-data/config/upper-thresholds"
+    },
+    "transformations": {
+      "$ref": "urn:partner-data/config/transformations"
+    },
+    "date_format": {
+      "$ref": "urn:partner-data/config/date-format"
+    },
+    "time_format": {
+      "$ref": "urn:partner-data/config/time-format"
+    },
+    "timestamp_format": {
+      "$ref": "urn:partner-data/config/timestamp-format"
+    },
+    "column_format": {
+      "$ref": "urn:partner-data/config/column-format"
+    },
+    "header": {
+      "$ref": "urn:partner-data/config/header"
+    },
+    "csv_deliminator": {
+      "$ref": "urn:partner-data/config/csv-deliminator"
+    },
+    "skip_rows": {
+      "$ref": "urn:partner-data/config/skip-rows"
+    },
+    "quoted_columns": {
+      "$ref": "urn:partner-data/config/quoted-columns"
+    },
+    "non_sparce_time": {
+      "$ref": "urn:partner-data/config/non-sparce-time"
+    },
+    "substitution_value": {
+      "$ref": "urn:partner-data/config/substitution-value"
+    },
+    "destination_file": {
+      "$ref": "urn:partner-data/config/destination-file"
+    },
+    "stations": {
+      "$ref": "urn:partner-data/config/stations"
+    }
+  }
+}

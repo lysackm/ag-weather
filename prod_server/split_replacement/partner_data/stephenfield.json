@@ -1,0 +1,20 @@
+{
+  "base_directory": "stephenfield",
+  "copy_individual_stn_data": {
+    "24": {
+      "id": "stephenfield-24-1",
+      "run_time_regex": "[0-9]{4}-[0-9]{2}-[0-9]{2} 01:(0[0-9]|1[0-5]):[0-9]{2}",
+      ".dat_to_partner_file_mapping": {
+        "austin24.dat": "Austin_24.txt",
+        "bagot24.dat": "Bagot_24.txt",
+        "carberry24.dat": "Carberry_24.txt",
+        "carman24.dat": "Carman_24.txt",
+        "glenboro24.dat": "Glenboro_24.txt",
+        "somerset24.dat": "Somerset_24.txt",
+        "stclaude24.dat": "StClaude_24.txt",
+        "treherne24.dat": "treherne_24.txt"
+      },
+      "direct_copy": true
+    }
+  }
+}

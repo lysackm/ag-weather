@@ -1,0 +1,7 @@
+{
+  "$id": "urn:partner-data/config/non-sparce-time",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "non_sparce_time",
+  "description": "Force partner file to have a complete time index, even if it includes missing data",
+  "type": "boolean"
+}

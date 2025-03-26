@@ -1,0 +1,7 @@
+{
+  "$id": "urn:partner-data/config/retain-data",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "retain_data",
+  "description": "Indicator whether to append to the end of a file or create a fresh file each runtime",
+  "type": "boolean"
+}

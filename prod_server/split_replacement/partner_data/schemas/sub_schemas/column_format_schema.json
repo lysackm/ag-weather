@@ -1,0 +1,10 @@
+{
+  "$id": "urn:partner-data/config/column-format",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "column_format",
+  "description": "Apply formatting to specified columns",
+  "type": "object",
+  "patternProperties": {
+    "^S_": { "type": ["string", "number"] }
+  }
+}

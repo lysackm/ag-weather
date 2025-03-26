@@ -1,0 +1,10 @@
+{
+  "$id": "urn:partner-data/config/transformations",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "transformations",
+  "description": "Transformations to apply to the values in a specified column",
+  "type": "object",
+  "patternProperties": {
+    "^S_": { "type": ["number", "string"] }
+  }
+}

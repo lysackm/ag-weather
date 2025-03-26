@@ -9,11 +9,13 @@ import json
 import traceback
 import tracemalloc
 import shutil
+import jsonschema.exceptions
 import pandas as pd
 
 from pandas.api.types import is_numeric_dtype
 from pandas.api.types import is_number
 from dat_logging import Logger
+from json_data_validator import JSONDataValidator
 
 # directory of the .dat files where the incoming data is coming
 # local testing
@@ -411,16 +413,16 @@ def iterate_concat_data(df_concat, version_metadata, base_directory):
 
 
 # take the concatenated data and process it based on partner specification
-def copy_concat_stn_data(df_concat_15, df_concat_60, df_concat_24, partner_json):
+def copy_concat_stn_data(df_concat_15, df_concat_60, df_concat_24, partners_json):
     # Prod has 4 virtual threads, but since there is a large amount of IO operations which would
     # be halting, 6 workers may still be beneficial
     num_processes = 4
     tasks = []
     with multiprocessing.Pool(num_processes) as pool:
-        for partner in partner_json:
-            if "copy_concatenated_stn_data" in partner_json[partner]:
-                base_dir = partner_json[partner]["base_directory"]
-                concat_data = partner_json[partner]["copy_concatenated_stn_data"]
+        for partner_json in partners_json:
+            if "copy_concatenated_stn_data" in partner_json:
+                base_dir = partner_json["base_directory"]
+                concat_data = partner_json["copy_concatenated_stn_data"]
 
                 if "15" in concat_data:
                     tasks.append((iterate_concat_data, (df_concat_15, concat_data["15"], base_dir)))
@@ -535,7 +537,7 @@ def return_single_valid_dat(stn_id, df_stn, dat_file_complete, time_version):
 # it is required
 # returning None indicates that the loop should continue, otherwise returns
 # a tuple of the df (dat file -> df) and the time version (15, 60, 24)
-def process_single_dat(partner_json, station_metadata, dat_file):
+def process_single_dat(partners_json, station_metadata, dat_file):
     df_stn = None
     dat_file_complete = dat_file
 
@@ -560,10 +562,10 @@ def process_single_dat(partner_json, station_metadata, dat_file):
     try:
 
         # iterate through the partner data and see if the current file is used anywhere
-        for partner in partner_json:
+        for partner_json in partners_json:
             # check if we need to copy the files over to a specific partner
-            if "copy_individual_stn_data" in partner_json[partner]:
-                df_stn = copy_individual_stn_data(partner_json[partner], dat_file_complete, df_stn, time_version)
+            if "copy_individual_stn_data" in partner_json:
+                df_stn = copy_individual_stn_data(partner_json, dat_file_complete, df_stn, time_version)
 
         return return_single_valid_dat(stn_id, df_stn, dat_file_complete, time_version)
 
@@ -581,31 +583,51 @@ def pool_calculation(func, args):
     return func(*args)
 
 
+def validate_partner_data():
+    for partner_file in glob.glob("./partner_data/*.json"):
+        try:
+            partner_validator = JSONDataValidator(partner_file, "./partner_data/schemas/sub_schemas/*.json", "./partner_data/schemas/partner_file_specs_schema.json")
+            partner_validator.validate_data()
+        except jsonschema.exceptions.ValidationError as e:
+            error_message = "JSON validator failed when validating the " + partner_file
+            error_message += " partner json file. Continuing with operation, although errors may occur. "
+            error_message += " Error Message: " + e.message
+            logger.log_non_fatal_error(error_message)
+
+
 def process_all_dats():
     list_concat_15 = []
     list_concat_60 = []
     list_concat_24 = []
+
+    # Check if there are formatting issues with the partner_jsons before running
+    validate_partner_data()
 
     # Prod has 4 virtual threads, but since there is a large amount of IO operations which would
     # be halting, 6 workers may still be beneficial.
     num_processes = 4
     with multiprocessing.Pool(num_processes) as pool:
         logger.log_info("Starting .dat file transfer to partner")
-        partner_json = {}
-        try:
-            partner_json_file = open("./partner_data.json")
-            partner_json = json.load(partner_json_file)
-        except json.decoder.JSONDecodeError as e:
-            logger.log_fatal_error("Error decoding the JSON file, partner_data.json. Please verify that "
-                                   "partner_data.json has the correct formatting. Error: " + e.msg)
-            exit(1)
+
+        # create a list of the partner_data files
+        partner_files = glob.glob("./partner_data/*.json")
+        partners_json = []
+
+        for partner_file in partner_files:
+            try:
+                partner_json_file = open(partner_file)
+                partners_json.append(json.load(partner_json_file))
+            except json.decoder.JSONDecodeError as e:
+                logger.log_fatal_error("Error decoding the JSON file, partner_data.json. Please verify that "
+                                       "partner_data.json has the correct formatting. Error: " + e.msg)
+                continue
 
         dat_files = glob.glob(dat_dir + "*.dat")
         station_metadata = pd.read_csv("station_metadata.csv")
 
         # create a task for each dat file. This is prepping for the multithreading
         # which will send workers to then process each individual dat file
-        tasks = [(process_single_dat, (partner_json, station_metadata, dat_file)) for dat_file in dat_files]
+        tasks = [(process_single_dat, (partners_json, station_metadata, dat_file)) for dat_file in dat_files]
         results = [pool.apply_async(pool_calculation, task) for task in tasks]
 
         # iterate through the result of the workers and merge data
@@ -641,7 +663,7 @@ def process_all_dats():
     df_concat_24 = post_processing_concat_file(df_concat_24, station_metadata)
 
     # check if partners need the concatenated file, move over data if necessary
-    copy_concat_stn_data(df_concat_15, df_concat_60, df_concat_24, partner_json)
+    copy_concat_stn_data(df_concat_15, df_concat_60, df_concat_24, partners_json)
     logger.log_info("Finished .dat file transfer to partner\n")
 
 
@@ -652,6 +674,7 @@ def main():
         process_all_dats()
     except Exception as e:
         logger.log_fatal_error("Found uncaught error with unknown consequences. Prematurely exiting program. " + str(e))
+        print(traceback.format_exc())
         exit(1)
 
     print("Successfully completed running program in", time.time() - start_time, "seconds, memory usage:",

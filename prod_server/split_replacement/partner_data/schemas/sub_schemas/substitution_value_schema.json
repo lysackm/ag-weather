@@ -1,0 +1,7 @@
+{
+  "$id": "urn:partner-data/config/substitution-value",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "substitution_value",
+  "description": "Substitute data which is filtered by the upper and lower thresholds",
+  "type": "string"
+}

@@ -1,0 +1,9 @@
+{
+  "$id": "urn:partner-data/config/csv-deliminator",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "csv_deliminator",
+  "description": "Replacing , in the partner file",
+  "type": "string",
+  "minLength": 1,
+  "maxLength": 1
+}

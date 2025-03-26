@@ -1,0 +1,10 @@
+{
+  "$id": "urn:partner-data/config/column-mapping",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "column_mapping",
+  "description": "Maps the columns from the dat files to columns in the partner file",
+  "type": "object",
+  "patternProperties": {
+    "^S_": { "type": "string" }
+  }
+}

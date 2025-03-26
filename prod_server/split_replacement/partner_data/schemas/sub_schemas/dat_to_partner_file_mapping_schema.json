@@ -1,0 +1,10 @@
+{
+  "$id": "urn:partner-data/config/dat-to-partner-file-mapping",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": ".dat_to_partner_file_mapping",
+  "description": "Maps the dat file to a partner file",
+  "type": "object",
+  "patternProperties": {
+    "^S_": { "type": "string" }
+  }
+}

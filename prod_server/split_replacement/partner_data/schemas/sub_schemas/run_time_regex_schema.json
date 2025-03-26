@@ -1,0 +1,7 @@
+{
+  "$id": "urn:partner-data/config/run-time-regex",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "run_time_regex",
+  "description": "A regex which when compared to the current time determines if the partner file is updated",
+  "type": "string"
+}

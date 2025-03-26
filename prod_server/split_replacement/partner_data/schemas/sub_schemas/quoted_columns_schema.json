@@ -1,0 +1,10 @@
+{
+  "$id": "urn:partner-data/config/quoted-columns",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "quoted_columns",
+  "description": "List of columns to be surrounded by quotes",
+  "type": "array",
+  "items": {
+    "type": "string"
+  }
+}

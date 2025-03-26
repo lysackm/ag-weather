@@ -1,0 +1,10 @@
+{
+  "$id": "urn:partner-data/config/upper-thresholds",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "upper_thresholds",
+  "description": "Upper thresholds to apply to the values in a specified column",
+  "type": "object",
+  "patternProperties": {
+    "^S_": { "type": "number" }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "$id": "urn:partner-data/config/header",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "header",
+  "description": "Name of the header file",
+  "type": ["string", "boolean"],
+  "anyOf": [
+    { "type": "string" },
+    { "type": "boolean", "const": false }
+  ]
+}

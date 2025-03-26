@@ -1,0 +1,7 @@
+{
+  "$id": "urn:partner-data/config/direct-copy",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "",
+  "description": "Variable to indicate if the files copied to the partner are a direct copy of the dat file",
+  "type": "boolean"
+}

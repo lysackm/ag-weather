@@ -1,0 +1,10 @@
+{
+  "$id": "urn:partner-data/config/previous-rows",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "previous_rows",
+  "description": "The number of previous rows to be saved to the partner file",
+  "anyOf": [
+    { "type": "integer", "minimum": 0 },
+    { "type":  "string", "const":  "all" }
+  ]
+}

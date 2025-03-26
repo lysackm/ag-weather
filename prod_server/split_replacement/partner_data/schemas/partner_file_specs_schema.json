@@ -1,0 +1,94 @@
+{
+  "$id": "urn:partner-data",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "partner_data",
+  "description": "Schema to verify partner data for the split file replacement program",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "base_directory": {
+      "description": "The directory where the partner data will be saved",
+      "type": "string"
+    },
+    "copy_concatenated_stn_data": {
+      "description": "Saving data from multiple stations in one file",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "15": {
+          "anyOf": [
+            { "$ref": "urn:partner-data/copy-concatenated-stn-data" },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "urn:partner-data/copy-concatenated-stn-data"
+              }
+            }
+          ]
+        },
+        "60": {
+          "anyOf": [
+            { "$ref": "urn:partner-data/copy-concatenated-stn-data" },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "urn:partner-data/copy-concatenated-stn-data"
+              }
+            }
+          ]
+        },
+        "24": {
+          "anyOf": [
+            { "$ref": "urn:partner-data/copy-concatenated-stn-data" },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "urn:partner-data/copy-concatenated-stn-data"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "copy_individual_stn_data": {
+      "description": "Saving data from a single station in a single file",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "15": {
+          "anyOf": [
+            { "$ref": "urn:partner-data/copy-individual-stn-data" },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "urn:partner-data/copy-individual-stn-data"
+              }
+            }
+          ]
+        },
+        "60": {
+          "anyOf": [
+            { "$ref": "urn:partner-data/copy-individual-stn-data" },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "urn:partner-data/copy-individual-stn-data"
+              }
+            }
+          ]
+        },
+        "24": {
+          "anyOf": [
+            { "$ref": "urn:partner-data/copy-individual-stn-data" },
+            {
+              "type": "array",
+              "items": {
+                "$ref": "urn:partner-data/copy-individual-stn-data"
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

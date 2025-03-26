@@ -1,0 +1,7 @@
+{
+  "$id": "urn:partner-data/config/time-format",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "time_format",
+  "description": "Format for the TIME column",
+  "type": "string"
+}
