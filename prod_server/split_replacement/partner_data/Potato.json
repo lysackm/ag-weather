@@ -1,4 +1,5 @@
 {
+  "run_partner": false,
   "base_directory": "Potato",
   "copy_individual_stn_data": {
     "15": {

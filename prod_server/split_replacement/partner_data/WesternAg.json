@@ -1,5 +1,5 @@
 {
-  "base_directory": "WesternAg",
+  "base_directory": "stagingtest/WesternAg",
   "copy_individual_stn_data": {
     "24": {
       "id": "WesternAg-24-1",

@@ -1,5 +1,5 @@
 {
-  "base_directory": "AGOL",
+  "base_directory": "stagingtest/AGOL",
   "copy_concatenated_stn_data": {
     "60": {
       "id": "AGOL-60-1",

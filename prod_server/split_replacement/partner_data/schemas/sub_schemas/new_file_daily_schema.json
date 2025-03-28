@@ -1,0 +1,7 @@
+{
+  "$id": "urn:partner-data/config/new-file-daily",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "new_file_daily",
+  "description": "Create a new file each day with the data inside",
+  "type": "boolean"
+}

@@ -6,6 +6,10 @@
   "type": "object",
   "additionalProperties": false,
   "properties": {
+    "run_partner": {
+      "description": "A boolean flag that can have the partner be ran or not",
+      "type": "boolean"
+    },
     "base_directory": {
       "description": "The directory where the partner data will be saved",
       "type": "string"

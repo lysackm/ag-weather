@@ -1,0 +1,1 @@
+"StnId","StnName","DateDT","AvgAir_T","MaxAir_T","MinAir_T","AvgRH","24hr_Rain"

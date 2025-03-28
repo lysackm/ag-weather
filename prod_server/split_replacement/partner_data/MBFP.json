@@ -1,5 +1,5 @@
 {
-  "base_directory": "MBFP",
+  "base_directory": "stagingtest/MBFP",
   "copy_concatenated_stn_data": {
     "60": {
       "id": "MBFP-60-1",

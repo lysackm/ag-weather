@@ -65,6 +65,9 @@
     },
     "stations": {
       "$ref": "urn:partner-data/config/stations"
+    },
+    "new_file_daily": {
+      "$ref": "urn:partner-data/config/new-file-daily"
     }
   }
 }

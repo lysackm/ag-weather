@@ -1,5 +1,5 @@
 {
-  "base_directory": "ECCC",
+  "base_directory": "stagingtest/ECCC",
   "copy_concatenated_stn_data": {
     "60": [
       {
@@ -41,6 +41,7 @@
           237,
           572,
           218,
+          213,
           504,
           517,
           511,
@@ -105,6 +106,7 @@
           514,
           246,
           208,
+          561,
           243,
           202,
           554,
@@ -154,12 +156,12 @@
           "Max5WD_10": "Max5WD_10",
           "WS_2Min": "WS_2Min",
           "WD_2Min": "WD_2Min",
-          "Soil_T05": "Soil_T05",
+          "RECNBR": "Soil_T05",
           "AvgRS_kw": "AvgRS_kw",
           "TotRS_MJ": "TotRS_MJ",
           "TBRG_Rain": "TBRG_Rain",
           "TBRG_Rain24RT": "TBRG_Rain24RT",
-          "Soil_TP5_TempC": "Soil_TP5_TempC",
+          "Soil_T05": "Soil_TP5_TempC",
           "Soil_TP5_VMC": "Soil_TP5_VMC",
           "Soil_TP20_TempC": "Soil_TP20_TempC",
           "Soil_TP20_VMC": "Soil_TP20_VMC",
@@ -171,7 +173,6 @@
           "AvgAir_T": -50,
           "MaxAir_T": -50,
           "MinAir_T": -50,
-          "AvgRH": 5,
           "AvgRH": 5,
           "Pluvio_Rain": 0,
           "Pluvio_Rain24RT": 0,
@@ -204,7 +205,6 @@
           "MaxAir_T": 50,
           "MinAir_T": 50,
           "AvgRH": 100,
-          "AvgRH": 100,
           "Pluvio_Rain": 150,
           "Pluvio_Rain24RT": 300,
           "WS_10Min": 30,
@@ -230,10 +230,41 @@
           "Evap60": 2.5,
           "SolarRad": 10
         },
-        "transformations": {
-          "Soil_T05": ""
+        "column_format": {
+          "Air_T": "{:^.2f}",
+          "AvgAir_T": "{:^.2f}",
+          "MaxAir_T": "{:^.2f}",
+          "MinAir_T": "{:^.2f}",
+          "RH": "{:^.1f}",
+          "AvgRH": "{:^.1f}",
+          "Pluvio_Rain": "{:^.2f}",
+          "Pluvio_Rain24RT": "{:^.2f}",
+          "WS_10Min": "{:^.2f}",
+          "WD_10Min": "{:^.0f}",
+          "AvgWS": "{:^.2f}",
+          "AvgWD": "{:^.0f}",
+          "AvgSD": "{:^.1f}",
+          "MaxWS_10": "{:^.2f}",
+          "MaxWD_10": "{:^.2f}",
+          "MaxWS": "{:^.2f}",
+          "MaxWD": "{:^.0f}",
+          "Max5WS_10": "{:^.2f}",
+          "Max5WD_10": "{:^.0f}",
+          "WS_2Min": "{:^.2f}",
+          "WD_2Min": "{:^.0f}",
+          "TotRS_MJ": "{:^.3f}",
+          "Soil_T05": "{:^.2f}",
+          "Soil_TP5_VMC": "{:^.2f}",
+          "Soil_TP20_TempC": "{:^.2f}",
+          "Soil_TP20_VMC": "{:^.2f}",
+          "Evap60": "{:^.3f}",
+          "SolarRad": "{:^.2f}"
         },
-        "timestamp_format": "%m/%d/%Y %H:%M"
+        "transformations": {
+          "RECNBR": ""
+        },
+        "timestamp_format": "%m/%d/%Y %H:%M",
+        "substitution_value": ""
       },
       {
         "id": "ECCC-60-2",
@@ -389,7 +420,7 @@
           "Max5WD_10": "Max5WD_10",
           "WS_2Min": "WS_2Min",
           "WD_2Min": "WD_2Min",
-          "Soil_T05": "Soil_T05",
+          "RECNBR": "Soil_T05",
           "AvgRS_kw": "AvgRS_kw",
           "TotRS_MJ": "TotRS_MJ",
           "TBRG_Rain": "TBRG_Rain",
@@ -401,12 +432,41 @@
           "Evap60": "Evap60",
           "SolarRad": "SolarRad"
         },
+        "column_format": {
+          "Air_T": "{:^.2f}",
+          "AvgAir_T": "{:^.2f}",
+          "MaxAir_T": "{:^.2f}",
+          "MinAir_T": "{:^.2f}",
+          "RH": "{:^.1f}",
+          "AvgRH": "{:^.1f}",
+          "Pluvio_Rain": "{:^.2f}",
+          "Pluvio_Rain24RT": "{:^.2f}",
+          "WS_10Min": "{:^.2f}",
+          "WD_10Min": "{:^.0f}",
+          "AvgWS": "{:^.2f}",
+          "AvgWD": "{:^.0f}",
+          "AvgSD": "{:^.1f}",
+          "MaxWS_10": "{:^.2f}",
+          "MaxWD_10": "{:^.2f}",
+          "MaxWS": "{:^.2f}",
+          "MaxWD": "{:^.0f}",
+          "Max5WS_10": "{:^.2f}",
+          "Max5WD_10": "{:^.0f}",
+          "WS_2Min": "{:^.2f}",
+          "WD_2Min": "{:^.0f}",
+          "TotRS_MJ": "{:^.3f}",
+          "Soil_T05": "{:^.2f}",
+          "Soil_TP5_VMC": "{:^.2f}",
+          "Soil_TP20_TempC": "{:^.2f}",
+          "Soil_TP20_VMC": "{:^.2f}",
+          "Evap60": "{:^.3f}",
+          "SolarRad": "{:^.2f}"
+        },
         "lower_thresholds": {
           "Air_T": -50,
           "AvgAir_T": -50,
           "MaxAir_T": -50,
           "MinAir_T": -50,
-          "AvgRH": 5,
           "AvgRH": 5,
           "Pluvio_Rain": 0,
           "Pluvio_Rain24RT": 0,
@@ -439,7 +499,6 @@
           "MaxAir_T": 50,
           "MinAir_T": 50,
           "AvgRH": 100,
-          "AvgRH": 100,
           "Pluvio_Rain": 150,
           "Pluvio_Rain24RT": 300,
           "WS_10Min": 30,
@@ -466,12 +525,13 @@
           "SolarRad": 10
         },
         "transformations": {
-          "Soil_T05": "",
+          "RECNBR": "",
           "AvgWS": 3.599,
           "MaxWS": 3.599
         },
         "timestamp_format": "%m/%d/%Y %H:%M",
-        "header": "header.txt"
+        "header": "header.txt",
+        "substitution_value": ""
       }
     ]
   }

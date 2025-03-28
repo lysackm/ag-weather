@@ -393,20 +393,34 @@ def save_df(df, metadata, base_directory, destination_file_suffix):
                                " OSError: " + str(e))
 
 
+def get_concat_data_destination_file(metadata):
+    # For whatever reason they have both, destination_file takes precedent
+    if "destination_file" in metadata:
+        return metadata["destination_file"]
+    elif "new_file_daily" in metadata and metadata["new_file_daily"]:
+        curr_date = datetime.datetime.now()
+        yesterday_date = curr_date - datetime.timedelta(days=1)
+        destination_file = str(yesterday_date.date()) + ".txt"
+        return destination_file
+    else:
+        raise KeyError("Did not find destination_file or new_file_daily in the partner file")
+
+
 # go through metadata related to concatenated data
 def iterate_concat_data(df_concat, version_metadata, base_directory):
     if type(version_metadata) is list:
         for request in version_metadata:
             if check_run_time_regex(request):
-                logger.log_info("Saving file " + request["destination_file"] + " to partner " + base_directory)
-                df = process_concat_data(df_concat.copy(), request, base_directory, request["destination_file"])
-                save_df(df, request, base_directory, request["destination_file"])
+                destination_file = get_concat_data_destination_file(request)
+                logger.log_info("Saving file " + destination_file + " to partner " + base_directory)
+                df = process_concat_data(df_concat.copy(), request, base_directory, destination_file)
+                save_df(df, request, base_directory, destination_file)
     elif type(version_metadata) is dict:
         if check_run_time_regex(version_metadata):
-            logger.log_info("Saving file " + version_metadata["destination_file"] + " to partner " + base_directory)
-            df = process_concat_data(df_concat.copy(), version_metadata, base_directory,
-                                     version_metadata["destination_file"])
-            save_df(df, version_metadata, base_directory, version_metadata["destination_file"])
+            destination_file = get_concat_data_destination_file(version_metadata)
+            logger.log_info("Saving file " + destination_file + " to partner " + base_directory)
+            df = process_concat_data(df_concat.copy(), version_metadata, base_directory, destination_file)
+            save_df(df, version_metadata, base_directory, destination_file)
     else:
         logger.log_non_fatal_error("Unknown data when parsing the version meta data "
                                    "for " + base_directory + ". Skipping copying this data")
@@ -593,6 +607,12 @@ def validate_partner_data():
             error_message += " partner json file. Continuing with operation, although errors may occur. "
             error_message += " Error Message: " + e.message
             logger.log_non_fatal_error(error_message)
+        except json.decoder.JSONDecodeError as e:
+            error_message = "There is a JSON encoding error with loading the schema. JSON validation for "
+            error_message += partner_file + " skipped. "
+            error_message += "Error: " + str(e)
+            logger.log_non_fatal_error(error_message)
+            continue
 
 
 def process_all_dats():
@@ -616,7 +636,9 @@ def process_all_dats():
         for partner_file in partner_files:
             try:
                 partner_json_file = open(partner_file)
-                partners_json.append(json.load(partner_json_file))
+                partner_json_data = json.load(partner_json_file)
+                if "run_partner" not in partner_json_data or partner_json_data["run_partner"]:
+                    partners_json.append(partner_json_data)
             except json.decoder.JSONDecodeError as e:
                 logger.log_fatal_error("Error decoding the JSON file, partner_data.json. Please verify that "
                                        "partner_data.json has the correct formatting. Error: " + e.msg)
