@@ -1,5 +1,5 @@
 {
-  "base_directory": "stagingtest/AGOL",
+  "base_directory": "AGOL",
   "copy_concatenated_stn_data": {
     "60": {
       "id": "AGOL-60-1",
@@ -143,7 +143,7 @@
         "AvgWS": "AvgWindSpeed(km/h)",
         "MaxWS": "MaxWindSpeed(km/h)",
         "AvgWD": "AvgWindDirection(degrees)",
-        "Soil_TP5_TempC": "SoilTemp(5cm, Celsius)",
+        "Soil_T05": "SoilTemp(5cm, Celsius)",
         "Soil_TP20_TempC": "SoilTemp(20cm, Celsius)",
         "Soil_TP5_VMC": "SoilMoist(5cm, %)",
         "Soil_TP20_VMC": "SoilMoist(20cm, %)",
