@@ -1,0 +1,15 @@
+{
+  "$id": "urn:partner-data/config/offset",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "offset",
+  "type": "object",
+  "properties": {
+    "unit": {
+      "type": "string"
+    },
+    "value": {
+      "type": "number"
+    }
+  },
+  "description": "Offset for the Date, Timestamp, and time columns"
+}

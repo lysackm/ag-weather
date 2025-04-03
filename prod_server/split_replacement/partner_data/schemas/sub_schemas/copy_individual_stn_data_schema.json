@@ -39,6 +39,15 @@
     "timestamp_format": {
       "$ref": "urn:partner-data/config/timestamp-format"
     },
+    "date_offset": {
+      "$ref": "urn:partner-data/config/offset"
+    },
+    "time_offset": {
+      "$ref": "urn:partner-data/config/offset"
+    },
+    "timestamp_offset": {
+      "$ref": "urn:partner-data/config/offset"
+    },
     "column_format": {
       "$ref": "urn:partner-data/config/column-format"
     },

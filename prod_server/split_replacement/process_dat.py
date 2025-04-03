@@ -79,6 +79,24 @@ def apply_upper_thresholds(df, upper_thresholds, metadata_id, substitution="NaN"
     return df
 
 
+def parse_transformation_string(df, column, transformation_string, metadata_id):
+    # $ is an escape character
+    if len(transformation_string) > 0 and transformation_string[0] == '$':
+        transformation = transformation_string[1:].split("$")
+        try:
+            if transformation[0].upper() == "UPPERCASE":
+                df[column] = df[column].str.upper()
+        except KeyError as e:
+            err_msg = metadata_id
+            err_msg += " Column " + str(column) + " does not exist in data when applying transformation "
+            err_msg += transformation_string + ". Transformation not applied."
+            logger.log_non_fatal_error(err_msg)
+    else:
+        df[column] = transformation_string
+
+    return df
+
+
 # apply some transformation to the given df, based on a dictionary of column to transformation
 # mappings. If the transformation is a string then all values are replaced with the string, if it
 # is an int or float, then the transformation is multiplied to the column
@@ -86,7 +104,7 @@ def apply_transformations(df, transformations, metadata_id):
     for column, transformation in transformations.items():
         try:
             if type(transformation) is str:
-                df[column] = transformation
+                df = parse_transformation_string(df, column, transformation, metadata_id)
             elif type(transformation) is int or type(transformation) is float:
                 if is_numeric_dtype(df[column]):
                     df[column] = df[column] * transformation
@@ -96,6 +114,10 @@ def apply_transformations(df, transformations, metadata_id):
                                        " all numerical data.")
                     is_num_col = df[column].apply(is_number)
                     df.loc[is_num_col, column] = df.loc[is_num_col, column] * transformation
+            else:
+                err_msg = metadata_id
+                err_msg += " Unknown transformation done on column " + column
+                logger.log_warning(err_msg)
         except KeyError as e:
             logger.log_non_fatal_error("ID: " + metadata_id + " Trying to apply transformation " + str(transformation) +
                                        " when column " + column + " doesnt exist. KeyError: " + str(e))
@@ -110,7 +132,20 @@ def apply_quotes(df, quoted_columns):
 
 
 # Format the column to the specified format in df_metadata
-def format_time_column(df, timestamp, df_metadata_dict, column, format_key):
+def format_time_column(df, timestamp, df_metadata_dict, column, format_key, offset_key):
+    try:
+        if offset_key in df_metadata_dict:
+            unit = df_metadata_dict[offset_key]["unit"]
+            value = df_metadata_dict[offset_key]["value"]
+            timedelta = pd.Timedelta(value=value, unit=unit)
+            timestamp = timestamp + timedelta
+    except ValueError as e:
+        err_msg = "ID: " + df_metadata_dict["id"]
+        err_msg += " There was an error in the time offset on column " + column
+        err_msg += ". Transformation not applied, continuing."
+        err_msg += " ValueError: " + str(e)
+        logger.log_non_fatal_error(err_msg)
+
     try:
         if format_key in df_metadata_dict:
             df.loc[:, column] = timestamp.dt.strftime(df_metadata_dict[format_key])
@@ -131,9 +166,9 @@ def date_processing(df, df_metadata=None):
 
     timestamp = pd.to_datetime(df["TMSTAMP"])
 
-    format_time_column(df, timestamp, df_metadata, "DATE", "date_format")
-    format_time_column(df, timestamp, df_metadata, "TIME", "time_format")
-    format_time_column(df, timestamp, df_metadata, "TMSTAMP", "timestamp_format")
+    format_time_column(df, timestamp, df_metadata, "DATE", "date_format", "date_offset")
+    format_time_column(df, timestamp, df_metadata, "TIME", "time_format", "time_offset")
+    format_time_column(df, timestamp, df_metadata, "TMSTAMP", "timestamp_format", "timestamp_offset")
 
     return df
 

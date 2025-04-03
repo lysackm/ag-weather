@@ -204,7 +204,8 @@ class TestFormatTimeColumns(unittest.TestCase):
         df_metadata_dict = {"date_format": "%Y/%m/%d"}
         column = "formatted_date"
         format_key = "date_format"
-        process_dat.format_time_column(self.df, self.timestamp, df_metadata_dict, column, format_key)
+        offset_key = "date_offset"
+        process_dat.format_time_column(self.df, self.timestamp, df_metadata_dict, column, format_key, offset_key)
         expected_output = ["2000/01/01", "2000/01/02", "2000/01/03", "2000/01/04"]
         self.assertEqual(list(self.df["formatted_date"].values), expected_output)
 
@@ -212,7 +213,8 @@ class TestFormatTimeColumns(unittest.TestCase):
         df_metadata_dict = {}
         column = "TIME"
         format_key = "date_format"
-        process_dat.format_time_column(self.df, self.timestamp, df_metadata_dict, column, format_key)
+        offset_key = "date_offset"
+        process_dat.format_time_column(self.df, self.timestamp, df_metadata_dict, column, format_key, offset_key)
         expected_output = [datetime.time(0, 0)] * 4
         self.assertEqual(list(self.df["TIME"].values), expected_output)
 
@@ -220,7 +222,8 @@ class TestFormatTimeColumns(unittest.TestCase):
         df_metadata_dict = {}
         column = "DATE"
         format_key = "date_format"
-        process_dat.format_time_column(self.df, self.timestamp, df_metadata_dict, column, format_key)
+        offset_key = "date_offset"
+        process_dat.format_time_column(self.df, self.timestamp, df_metadata_dict, column, format_key, offset_key)
         expected_output = [datetime.date(2000, 1, 1), datetime.date(2000, 1, 2), datetime.date(2000, 1, 3), datetime.date(2000, 1, 4)]
         self.assertEqual(list(self.df["DATE"].values), expected_output)
 
@@ -346,7 +349,7 @@ class TestProcessRow(unittest.TestCase):
         format_str = "{:^ .1f}"
         value = float(2)
         value = process_dat.process_row(value, format_str)
-        self.assertEqual(value, "")
+        self.assertEqual(value, " 2.0")
 
     @unittest.skip("Safety net has not been created. Convert ints to floats")
     def test_process_row_int_input(self):

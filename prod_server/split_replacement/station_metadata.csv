@@ -5,8 +5,8 @@ SN,StnID,StationName,LatDD,LongDD,DatFilename,URL,stringFriendlyStnName
 119,574,Amaranth,50.6424,-98.6686,amaranth,http://www.gov.mb.ca/agriculture/weather/amaranth-cc.html,Amaranth
 6,206,Arborg,50.904,-97.273,arborg,http://www.gov.mb.ca/agriculture/weather/arborg-cc.html,Arborg
 49,505,Argue,49.436,-100.308,argue,http://www.gov.mb.ca/agriculture/weather/argue-cc.html,Argue
-120,575,Ashville,51.1623,-100.297,ashville,http://www.gov.mb.ca/agriculture/weather/ashville-cc.html,Austin
-78,533,Austin,49.9607,-98.9054,austin,http://www.gov.mb.ca/agriculture/weather/austin-cc.html,Ashville
+120,575,Ashville,51.1623,-100.297,ashville,http://www.gov.mb.ca/agriculture/weather/ashville-cc.html,Ashville
+78,533,Austin,49.9607,-98.9054,austin,http://www.gov.mb.ca/agriculture/weather/austin-cc.html,Austin
 79,534,Bagot,49.9601,-98.6367,bagot,http://www.gov.mb.ca/agriculture/weather/bagot-cc.html,Bagot
 47,503,Baldur,49.356,-99.248,baldur,http://www.gov.mb.ca/agriculture/weather/baldur-cc.html,Baldur
 40,251,Beausejour,50.116,-96.434,beausejour,http://www.gov.mb.ca/agriculture/weather/beausejour-cc.html,Beausejour
@@ -20,10 +20,10 @@ SN,StnID,StationName,LatDD,LongDD,DatFilename,URL,stringFriendlyStnName
 12,212,Carman,49.498,-98.03,carman,http://www.gov.mb.ca/agriculture/weather/carman-cc.html,Carman
 46,502,Cartwright,49.088,-99.325,cartwright,http://www.gov.mb.ca/agriculture/weather/cartwright-cc.html,Cartwright
 114,569,Clarkleigh,50.5947,-98.0035,clarkleigh,http://www.gov.mb.ca/agriculture/weather/clarkleigh-cc.html,Clarkleigh
-45,501,Clearwater,49.118,-99.054,clearwater,http://www.gov.mb.ca/agriculture/weather/clearwater-cc.html,Dand
-87,542,Dand,49.3776,-100.5387,dand,http://www.gov.mb.ca/agriculture/weather/dand-cc.html,Deloraine
-34,241,Deloraine,49.148,-100.491,deloraine,http://www.gov.mb.ca/agriculture/weather/deloraine-cc.html,DominionCity
-80,535,Dominion City,49.1631,-97.1454,dominioncity,http://www.gov.mb.ca/agriculture/weather/dominion-city-cc.html,DriftingRiver
+45,501,Clearwater,49.118,-99.054,clearwater,http://www.gov.mb.ca/agriculture/weather/clearwater-cc.html,Clearwater
+87,542,Dand,49.3776,-100.5387,dand,http://www.gov.mb.ca/agriculture/weather/dand-cc.html,Dand
+34,241,Deloraine,49.148,-100.491,deloraine,http://www.gov.mb.ca/agriculture/weather/deloraine-cc.html,Deloraine
+80,535,Dominion City,49.1631,-97.1454,dominioncity,http://www.gov.mb.ca/agriculture/weather/dominion-city-cc.html,DominionCity
 56,512,Drifting River,51.358,-100.361,driftingriver,http://www.gov.mb.ca/agriculture/weather/driftingriver-cc.html,DriftingRiver
 17,217,Dugald,49.826,-96.776,dugald2_,http://www.gov.mb.ca/agriculture/weather/dugald-cc.html,Dugald
 90,545,Eden,50.4324,-99.4392,eden,http://www.gov.mb.ca/agriculture/weather/eden-cc.html,Eden
@@ -31,7 +31,7 @@ SN,StnID,StationName,LatDD,LongDD,DatFilename,URL,stringFriendlyStnName
 31,237,Elm Creek,49.68,-97.984,elmcreek,http://www.gov.mb.ca/agriculture/weather/elmcreek-cc.html,ElmCreek
 66,522,Elma,49.875,-95.92,elma,http://www.gov.mb.ca/agriculture/weather/elma-cc.html,Elma
 117,572,Erickson,50.5057,-99.9013,erickson,http://www.gov.mb.ca/agriculture/weather/erickson-cc.html,Erickson
-18,218,Eriksdale,50.829,-98.111,eriksdale2_,http://www.gov.mb.ca/agriculture/weather/eriksdale-cc.html,Ericksdale
+18,218,Eriksdale,50.829,-98.111,eriksdale2_,http://www.gov.mb.ca/agriculture/weather/eriksdale-cc.html,Eriksdale
 13,213,Ethelbert,51.572,-100.488,ethelbert,http://www.gov.mb.ca/agriculture/weather/ethelbert-cc.html,Ethelbert
 48,504,Findlay,49.547,-100.782,findlay,http://www.gov.mb.ca/agriculture/weather/findlay-cc.html,Findlay
 61,517,Fisherton,51.185,-97.769,fisherton,http://www.gov.mb.ca/agriculture/weather/fisherton-cc.html,Fisherton
@@ -85,7 +85,7 @@ SN,StnID,StationName,LatDD,LongDD,DatFilename,URL,stringFriendlyStnName
 112,567,Richer,49.6089,-96.5256,richer,http://www.gov.mb.ca/agriculture/weather/richer-cc.html,Richer
 95,550,Rivers,50.0514,-100.2341,rivers,http://www.gov.mb.ca/agriculture/weather/rivers-cc.html,Rivers
 109,564,Riverton,51.0203,-97.0625,Riverton,http://www.gov.mb.ca/agriculture/weather/riverton-cc.html,Riverton
-72,528,Rorketon,51.333,-99.493,rorketon,http://www.gov.mb.ca/agriculture/weather/rorketon-cc.html,Rorkenton
+72,528,Rorketon,51.333,-99.493,rorketon,http://www.gov.mb.ca/agriculture/weather/rorketon-cc.html,Rorketon
 83,538,Rosa,49.2415,-96.8135,Rosa,http://www.gov.mb.ca/agriculture/weather/rosa-cc.html,Rosa
 15,215,Russell,50.769,-101.297,russell,http://www.gov.mb.ca/agriculture/weather/russell-cc.html,Russell
 64,520,Ruthenia,50.827,-100.903,ruthenia,http://www.gov.mb.ca/agriculture/weather/ruthenia-cc.html,Ruthenia
