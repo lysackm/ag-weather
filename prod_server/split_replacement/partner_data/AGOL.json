@@ -183,8 +183,20 @@
         "MaxWS": 3.6
       },
       "column_format": {
+        "Air_T": "{:.1f}",
+        "RH": "{:.1f}",
+        "Pluvio_Rain": "{:.1f}",
+        "Pluvio_Rain24RT": "{:.1f}",
         "AvgWS": "{:.2f}",
         "MaxWS": "{:.2f}",
+        "Soil_T05": "{:.1f}",
+        "Soil_TP20_TempC": "{:.1f}",
+        "Soil_TP5_VMC": "{:.0f}",
+        "Soil_TP20_VMC": "{:.0f}",
+        "Soil_TP50_TempC": "{:.1f}",
+        "Soil_TP100_TempC": "{:.1f}",
+        "Soil_TP50_VMC": "{:.0f}",
+        "Soil_TP100_VMC": "{:.0f}",
         "Press_hPa": "{:.0f}"
       },
       "date_format": "%m/%d/%Y",
