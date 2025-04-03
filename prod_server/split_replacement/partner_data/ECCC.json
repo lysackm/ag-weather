@@ -264,6 +264,7 @@
           "RECNBR": ""
         },
         "timestamp_format": "%m/%d/%Y %H:%M",
+        "header": "header.txt",
         "substitution_value": ""
       },
       {
