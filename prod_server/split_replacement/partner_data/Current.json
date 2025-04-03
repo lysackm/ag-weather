@@ -1,5 +1,5 @@
 {
-  "base_directory": "stagingtest/current",
+  "base_directory": "current",
   "copy_individual_stn_data": {
     "15": {
       "id": "Current-15-1",
