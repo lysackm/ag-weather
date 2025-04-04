@@ -636,6 +636,7 @@
           "HmMinAir_T": "HmMinAir_T",
           "AvgRH": "AvgRH",
           "MaxRH": "HmMaxRH",
+          "HmMaxRH": "HmMaxRH",
           "MinRH": "MinRH",
           "HmMinRH": "HmMinRH",
           "Pluvio_Rain": "Pluvio_Rain",
