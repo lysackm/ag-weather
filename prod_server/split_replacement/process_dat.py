@@ -600,7 +600,8 @@ def process_single_dat(partners_json, station_metadata, dat_file):
         return None
 
     # find the station id from the name
-    stn_id = station_metadata[station_metadata["DatFilename"] == station_name]["StnID"].values
+    station_metadata["DatFilename"] = station_metadata["DatFilename"].str.lower()
+    stn_id = station_metadata[station_metadata["DatFilename"] == station_name.lower()]["StnID"].values
 
     if len(stn_id) <= 0:
         stn_id = -1
