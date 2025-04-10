@@ -245,7 +245,7 @@
           "AvgWD": "{:^.0f}",
           "AvgSD": "{:^.1f}",
           "MaxWS_10": "{:^.2f}",
-          "MaxWD_10": "{:^.2f}",
+          "MaxWD_10": "{:^.0f}",
           "MaxWS": "{:^.2f}",
           "MaxWD": "{:^.0f}",
           "Max5WS_10": "{:^.2f}",
@@ -263,6 +263,9 @@
         "transformations": {
           "RECNBR": ""
         },
+        "quoted_columns": [
+          "HmMaxWS"
+        ],
         "timestamp_format": "%m/%d/%Y %H:%M",
         "header": "header.txt",
         "substitution_value": ""
@@ -528,6 +531,9 @@
         "transformations": {
           "RECNBR": ""
         },
+        "quoted_columns": [
+          "HmMaxWS"
+        ],
         "timestamp_format": "%m/%d/%Y %H:%M",
         "header": "header.txt",
         "substitution_value": ""
