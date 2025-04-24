@@ -1,5 +1,5 @@
 {
-  "base_directory": "stagingtest/MBAg",
+  "base_directory": "MBAg",
   "copy_concatenated_stn_data": {
     "60": {
       "id": "MBAg-60-1",
@@ -447,7 +447,8 @@
     "60": {
       "id": "MBAg-60-2",
       ".dat_to_partner_file_mapping": {
-        "glenleatest60.dat": "GlenleaTest_60.txt"
+        "glenleatest60.dat": "GlenleaTest_60.txt",
+        "PT12_60.dat": "PT12_60.txt"
       },
       "direct_copy": true
     }
