@@ -440,7 +440,16 @@
         "Max_Soil_TP100_VMC": "",
         "Min_Soil_TP100_VMC": "",
         "EvapTot24": ""
-      }
+      },
+      "quoted_columns": [
+        "TMSTAMP",
+        "HmMaxAir_T",
+        "HmMinAir_T",
+        "HmMaxRH",
+        "HmMinRH",
+        "HmMaxWS",
+        "HmMaxRS"
+      ]
     }
   },
   "copy_individual_stn_data": {

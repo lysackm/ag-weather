@@ -284,6 +284,9 @@ def column_formatting(df, metadata):
             except IndexError as e:
                 logger.log_non_fatal_error("ID: " + metadata["id"] + " Column does not exist when trying to apply"
                                                                      " string formatting: " + str(e))
+            except KeyError as e:
+                logger.log_non_fatal_error("ID: " + metadata["id"] + " Column does not exist when trying to apply"
+                                                                     " string formatting: " + str(e))
     return df
 
 
