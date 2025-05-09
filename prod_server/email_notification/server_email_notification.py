@@ -39,10 +39,8 @@ def get_curr_image_hash():
 
     arr = np.asarray(bytearray(new_image), dtype=np.uint8)
     img = cv2.imdecode(arr, -1)
-    # crop the image so only the header appears. Only should change if the time changes on the chart
-    crop_img = img[0:60, :]
 
-    image_hash = hashlib.sha256(crop_img).hexdigest()
+    image_hash = hashlib.sha256(img).hexdigest()
 
     return image_hash
 
