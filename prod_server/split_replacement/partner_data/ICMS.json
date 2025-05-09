@@ -4,14 +4,15 @@
     "24": {
       "id": "ICMS-24-1",
       "retain_data": true,
-      "run_time_regex": "[0-9]{4}-((0[5-9])|10)-[0-9]{2} 00:(0[0-9]|1[0-5]):[0-9]{2}",
+      "run_time_regex": "[0-9]{4}-[0-9]{2}-[0-9]{2} 00:(0[0-9]|1[0-5]):[0-9]{2}",
       ".dat_to_partner_file_mapping": {
         "eden24.dat": "Eden24.txt",
         "gladstone24.dat": "Gladstone24.txt",
         "portage2_24.dat": "ICMS24.txt",
         "lakefrancis24.dat": "LakeFrancis24.txt",
         "neepawa24.dat": "Neepawa24.txt",
-        "sanclara24.dat": "SanClara24.txt"
+        "sanclara24.dat": "SanClara24.txt",
+        "teulon24.dat": "Teulon24.txt"
       },
       "column_mapping": {
         "TMSTAMP": "DateTime",
@@ -88,14 +89,15 @@
     "60": {
       "id": "ICMS-60-1",
       "retain_data": true,
-      "run_time_regex": "[0-9]{4}-((0[5-9])|10)-[0-9]{2} [0-9]{2}:(0[0-9]|1[0-5]):[0-9]{2}",
+      "run_time_regex": "[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:(0[0-9]|1[0-5]):[0-9]{2}",
       ".dat_to_partner_file_mapping": {
         "eden60.dat": "eden60.txt",
         "gladstone60.dat": "Gladstone60.txt",
         "portage2_60.dat": "ICMS60.txt",
         "lakefrancis60.dat": "LakeFrancis60.txt",
         "neepawa60.dat": "Neepawa60.txt",
-        "sanclara60.dat": "SanClara60.txt"
+        "sanclara60.dat": "SanClara60.txt",
+        "teulon60.dat": "Teulon60.txt"
       },
       "direct_copy": false,
       "column_mapping": {
