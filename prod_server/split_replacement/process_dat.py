@@ -10,6 +10,7 @@ import traceback
 import tracemalloc
 import shutil
 import jsonschema.exceptions
+import numpy as np
 import pandas as pd
 
 from pandas.api.types import is_numeric_dtype
@@ -173,6 +174,112 @@ def date_processing(df, df_metadata=None):
     return df
 
 
+# p is a function defined in the p-days calculation
+def p(t):
+    k = 10
+
+    if t < 7:
+        return t * 0
+    elif 7 <= t < 21:
+        return k * (1 - ((t - 21) ** 2 / (21 - 7) ** 2))
+    elif 21 <= t < 30:
+        return k * (1 - ((t - 21) ** 2 / (30 - 21) ** 2))
+    elif 30 <= t:
+        return t * 0
+
+
+# https://www.gov.mb.ca/agriculture/weather/agricultural-climate-of-mb.html
+# https://www.apsnet.org/publications/PlantDisease/BackIssues/Documents/1986Articles/PlantDisease70n10_915.PDF
+def calculate_p_day(t_min, t_max):
+    try:
+        t1 = p(t_min)
+        t2 = p(((2.0 * t_min) + t_max)/3.0)
+        t3 = p((t_min + (2.0 * t_max))/3.0)
+        t4 = p(t_max)
+
+        return (1/24) * (5 * t1 + 8 * t2 + 8 * t3 + 3 * t4)
+    except (TypeError, ValueError) as e:
+        error_msg = "Encountered type error when calculating PDays. Setting value for row to be np.nan. " + str(e)
+        logger.log_warning(error_msg)
+        return np.nan
+
+
+# https://www.gov.mb.ca/agriculture/weather/agricultural-climate-of-mb.html
+def calculate_chu(t_min, t_max):
+    try:
+        chu = (1.8 * (t_min - 4.4) + 3.33 * (t_max - 10) - 0.084 * (t_max - 10) ** 2.0) / 2.0
+        return chu.clip(0)
+    except (TypeError, ValueError) as e:
+        error_msg = "Encountered type error when calculating CHU. Setting value for row to be np.nan. " + str(e)
+        logger.log_warning(error_msg)
+        return np.nan
+
+
+# https://www.gov.mb.ca/agriculture/weather/agricultural-climate-of-mb.html
+def calculate_gdd(t_min, t_max):
+    try:
+        conditional = (t_min + t_max)/2.0 - 5
+
+        if conditional > 0:
+            return conditional
+        elif conditional <= 0:
+            return 0
+    except (TypeError, ValueError) as e:
+        error_msg = "Encountered type error when calculating GDD. Setting value for row to be np.nan. " + str(e)
+        logger.log_warning(error_msg)
+        return np.nan
+
+
+# add columns derived from raw data
+def derivative_columns(df, df_metadata):
+    if "column_mapping" in df_metadata and "CHU" in df_metadata["column_mapping"]:
+        try:
+            df["CHU"] = (df[["MinAir_T", "MaxAir_T"]].apply(lambda row: calculate_chu(row["MinAir_T"], row["MaxAir_T"]), axis=1))
+            df["CHU"] = df["CHU"].round(2)
+        except KeyError as e:
+            error_msg = df_metadata["id"] + " Could not find the min and max temperature columns when calculating "
+            error_msg += "the CHU. Columns MinAir_T or MaxAir_T could not be found. Setting CHU to NaN. "
+            error_msg += "Error: " + str(e)
+            logger.log_non_fatal_error(error_msg)
+            df["CHU"] = "NaN"
+        except Exception as e:
+            error_msg = df_metadata["id"] + " Error encounted when calculating CHU, setting CHU to NaN. " + str(e)
+            logger.log_non_fatal_error(error_msg)
+            df["CHU"] = "NaN"
+
+    if "column_mapping" in df_metadata and "GDD" in df_metadata["column_mapping"]:
+        try:
+            df["GDD"] = (df[["MinAir_T", "MaxAir_T"]].apply(lambda row: calculate_gdd(row["MinAir_T"], row["MaxAir_T"]), axis=1))
+            df["GDD"] = df["GDD"].round(2)
+        except KeyError as e:
+            error_msg = df_metadata["id"] + " Could not find the min and max temperature columns when calculating "
+            error_msg += "the GDD. Columns MinAir_T or MaxAir_T could not be found. Setting GDD to NaN"
+            error_msg += " Error: " + str(e)
+            logger.log_non_fatal_error(error_msg)
+            df["GDD"] = "NaN"
+        except Exception as e:
+            error_msg = df_metadata["id"] + " Error encounted when calculating GDD, setting GDD to NaN. " + str(e)
+            logger.log_non_fatal_error(error_msg)
+            df["GDD"] = "NaN"
+
+    if "column_mapping" in df_metadata and "PDAY" in df_metadata["column_mapping"]:
+        try:
+            df["PDAY"] = (df[["MinAir_T", "MaxAir_T"]].apply(lambda row: calculate_p_day(row["MinAir_T"], row["MaxAir_T"]), axis=1))
+            df["PDAY"] = df["PDAY"].round(2)
+        except KeyError as e:
+            error_msg = df_metadata["id"] + " Could not find the min and max temperature columns when calculating "
+            error_msg += "PDays. Columns MinAir_T or MaxAir_T could not be found. Setting PDAY to NaN"
+            error_msg += " Error: " + str(e)
+            logger.log_non_fatal_error(error_msg)
+            df["PDAY"] = "NaN"
+        except Exception as e:
+            error_msg = df_metadata["id"] + " Error encounted when calculating Pdays, setting PDAY to NaN. " + str(e)
+            logger.log_non_fatal_error(error_msg)
+            df["PDAY"] = "NaN"
+
+    return df
+
+
 # apply thresholds and transformations to df
 def df_data_operations(df, df_metadata):
     if "lower_thresholds" in df_metadata:
@@ -201,6 +308,7 @@ def df_data_operations(df, df_metadata):
 def copy_file_directly(base_directory, src_file, dest_file):
     dest_file = dest_dir + base_directory + "/" + dest_file
     shutil.copy(src_file, dest_file)
+    logger.log_info("Copying directly:" + base_directory)
     print("Copying directly:", base_directory)
 
 
@@ -231,6 +339,7 @@ def copy_individual_stn_data(partner_data, dat_file_full, df_stn, version):
 
                 df_processed = non_sparce_time_processing(df_processed, version_data)
                 df_processed = date_processing(df_processed, version_data)
+                df_processed = derivative_columns(df_processed, version_data)
                 df_processed = df_data_operations(df_processed, version_data)
 
                 if previous_rows != "all" and type(previous_rows) is int:
@@ -240,7 +349,7 @@ def copy_individual_stn_data(partner_data, dat_file_full, df_stn, version):
                 df_processed = process_column_mapping(df_processed, version_data, dat_file)
 
                 destination_file = dest_dir + partner_data["base_directory"] + "/" + mapped_dat_files[dat_file]
-                df_processed = merge_retention_data(df_processed, version_data, destination_file)
+                df_processed = merge_retention_data(df_processed, version_data, destination_file, dat_file)
                 save_df(df_processed, version_data, partner_data["base_directory"], mapped_dat_files[dat_file])
             else:
                 copy_file_directly(partner_data["base_directory"], dat_file_full, mapped_dat_files[dat_file])
@@ -309,6 +418,7 @@ def process_concat_data(df, metadata, base_directory, destination_file):
     # TODO check if all of these .copy()s are necessary
     df = non_sparce_time_processing(df.copy(), metadata)
     df = date_processing(df.copy(), metadata)
+    df = derivative_columns(df.copy(), metadata)
     df = df_data_operations(df.copy(), metadata)
 
     if previous_rows != "all" and type(previous_rows) is int:
@@ -344,10 +454,9 @@ def get_partner_index_cols_names(metadata):
         return ["TMSTAMP", "StnID"]
 
 
-def read_partner_data(metadata, dest_file):
+def read_partner_data(metadata, dest_file, columns):
     sep = ","
     skip_rows = []
-    columns = list(metadata["column_mapping"].values())
 
     if "csv_deliminator" in metadata:
         sep = metadata["csv_deliminator"]
@@ -375,10 +484,15 @@ def read_partner_data(metadata, dest_file):
     return df
 
 
-def merge_retention_data(dats_df, metadata, dest_file):
+def merge_retention_data(dats_df, metadata, dest_file, dat_file=None):
     if "retain_data" in metadata and metadata["retain_data"]:
         if os.path.isfile(dest_file):
-            partner_df = read_partner_data(metadata, dest_file)
+            if "column_mapping_exceptions" in metadata and dat_file in metadata["column_mapping_exceptions"]:
+                columns = list(metadata["column_mapping_exceptions"][dat_file].values())
+            else:
+                columns = list(metadata["column_mapping"].values())
+
+            partner_df = read_partner_data(metadata, dest_file, columns)
             concatenated_df = pd.concat([partner_df, dats_df])
             index_cols = get_partner_index_cols_names(metadata)
             concatenated_df = concatenated_df.drop_duplicates(keep="last", subset=index_cols)
