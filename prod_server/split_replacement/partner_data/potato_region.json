@@ -5,6 +5,8 @@
       "id": "potato_region-24-1",
       "run_time_regex": "[0-9]{4}-[0-9]{2}-[0-9]{2} 03:(0[0-9]|1[0-5]):[0-9]{2}",
       ".dat_to_partner_file_mapping": {
+        "austin24.dat": "Austin24.txt",
+        "bagot24.dat": "Bagot24.txt",
         "Carberry24.dat": "carberry24.txt",
         "carman24.dat": "carman24.txt",
         "brandonMBFI24.dat": "brandon24.txt",
