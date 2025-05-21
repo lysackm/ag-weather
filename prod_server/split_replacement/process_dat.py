@@ -654,10 +654,12 @@ def process_column_mapping(df, metadata, dat_file=None):
                         df = df.rename(columns={column: column_mapped})
                         columns.append(column_mapped)
                     else:
-                        logger.log_non_fatal_error("ID: " + metadata["id"] + " Column " + column + " does not exist in "
-                                                   "the .dat file's columns or metadata columns. Mapping to partners "
-                                                   "column " + column_mapped + " was not completed, and will not "
-                                                   "be included in the final file.")
+                        df[column_mapped] = None
+                        error_message = "ID: " + metadata["id"] + " "
+                        error_message += "Column " + column + " does not exist in .dat file " + dat_file
+                        error_message += " columns or metadata columns. Creating column with missing data."
+                        logger.log_warning(error_message)
+                        columns.append(column_mapped)
                 df = df[columns]
     else:
         logger.log_warning("ID: " + metadata["id"] + " No column mapping provided for destination file " + dest_dir)
@@ -839,7 +841,7 @@ def process_all_dats():
 
     # check if partners need the concatenated file, move over data if necessary
     copy_concat_stn_data(df_concat_15, df_concat_60, df_concat_24, partners_json)
-    logger.log_info("Finished .dat file transfer to partner\n")
+    logger.log_info("Finished .dat file transfer to partner")
 
 
 def main():
@@ -852,8 +854,11 @@ def main():
         print(traceback.format_exc())
         exit(1)
 
-    print("Successfully completed running program in", time.time() - start_time, "seconds, memory usage:",
-          tracemalloc.get_traced_memory()[1] / (sys.getsizeof([]) * 1000000.0), "MB")
+    info_message = "Successfully completed running program in " + str(time.time() - start_time)
+    info_message += " seconds, memory usage: "
+    info_message += str(tracemalloc.get_traced_memory()[1] / (sys.getsizeof([]) * 1000000.0)) + "MB \n"
+    print(info_message)
+    logger.log_info(info_message)
     tracemalloc.stop()
 
 
